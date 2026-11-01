@@ -1,8 +1,11 @@
-# Scio v0.7 — app di studio installabile (PWA)
+# Scio v0.8 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
+
+## Novità della v0.8
+- Lettura ad alta voce: Scio sceglie da solo la voce migliore del dispositivo (quelle “naturali” o di rete prima di quelle metalliche) e, in "Aspetto", si può scegliere una voce a mano e provarla. Se una voce online non risponde, ripiega su una del dispositivo.
 
 ## Novità della v0.7
 - Un profilo per ogni figlio (PIN personale facoltativo) e un'unica area genitori con PIN.
@@ -14,9 +17,9 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.6 a v0.7)
-1. Decomprimi lo zip.
-2. Nel repository su github.com: **Add file › Upload files** e trascina **tutto il contenuto** della cartella (cartelle `fonts` e `icons` comprese). I file con lo stesso nome vengono sostituiti; `i18n.js` è nuovo.
+## Aggiornare il sito su GitHub (da v0.7 a v0.8)
+1. Dalla v0.7 cambiano solo quattro file: `app.js`, `i18n.js`, `sw.js` e `README.md`.
+2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.
 4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione di Scio pronta".
 
