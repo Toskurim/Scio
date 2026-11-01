@@ -1,10 +1,13 @@
-# Scio v0.12 — app di studio installabile (PWA)
+# Scio v0.12.1 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+
+## Novità della v0.12.1
+- **Privacy**: il nome del ragazzo non viene più inviato al servizio AI. Alle richieste vanno solo il livello scolastico, gli adattamenti DSA scelti (servono per adattare i contenuti) e le foto o i testi del capitolo. Attenzione: se sulle foto compare il nome scritto sul quaderno, quello viaggia con la foto.
 
 ## Novità della v0.12
 - **Statistiche per i genitori**: nell'Area genitori, sulla scheda di ogni ragazzo, c'è il pulsante "Statistiche" con: capitoli, test e media; giorni con attività negli ultimi 7 e 30 giorni (grafico a colonne degli ultimi 14); risultati degli ultimi 20 test con la linea del 70%; tabella per materia con media e andamento (in salita, stabile, in calo); argomenti sbagliati più spesso; stato del ripasso dilazionato; verifiche dei prossimi 30 giorni con l'ultimo risultato di quella materia; esercizi guidati e indizi usati. Si può stampare o salvare in PDF.
@@ -51,6 +54,7 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio �
 - Chiave API cifrata (AES-GCM) con chiave del dispositivo non esportabile.
 - PIN genitori e PIN dei figli salvati solo come impronta (PBKDF2, sale casuale), 4-8 cifre, PIN banali rifiutati, blocco crescente dopo 3 errori.
 - Copia dei dati senza chiave né PIN; il ripristino ricostruisce ogni campo con controlli di tipo e lunghezza.
+- Al servizio AI non va il nome del ragazzo, ma vanno il livello, i DSA scelti e le foto del capitolo: scegli un servizio di cui ti fidi.
 - Quiz a voce: il riconoscimento vocale è del browser, che può inviare l'audio al proprio fornitore.
 
 ### Limiti onesti

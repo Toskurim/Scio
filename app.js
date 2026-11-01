@@ -2,7 +2,7 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.12';
+const VERSIONE = '0.12.1';
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -206,7 +206,8 @@ const TESTO_LIVELLO = {
 function profiloTesto() {
   const p = S.profilo;
   const dsa = Object.keys(DSA).filter(k => p.dsa && p.dsa[k]).map(k => DSA[k]);
-  return 'Studente: ' + p.nome + ', ' + TESTO_LIVELLO[p.livello || 'superiori'] + '.\n' +
+  /* Il nome del ragazzo non viene mai inviato al servizio AI. */
+  return 'Studente: ' + TESTO_LIVELLO[p.livello || 'superiori'] + '.\n' +
     (dsa.length ? 'Adattamenti obbligatori per DSA:\n- ' + dsa.join('\n- ') : 'Nessun adattamento DSA particolare.') +
     (p.colori
       ? '\nEvidenziazione a colori, SOLO in riassunto_breve e riassunto_completo: racchiudi tra [[c:...]] i concetti e le definizioni chiave, tra [[d:...]] le date, i numeri, le quantità e le formule da ricordare, tra [[p:...]] i nomi di persone, i luoghi e i termini tecnici. Non usare il doppio asterisco. Non evidenziare più di un sesto del testo.'
