@@ -2,7 +2,7 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.9';
+const VERSIONE = '0.10';
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -147,6 +147,7 @@ function pulisciDati(o) {
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
       riassunto_breve: L(x.riassunto_breve, 1500), riassunto_completo: Tx(x.riassunto_completo),
       schema: { radice: Tx(x.schema && x.schema.radice, 300), rami: A(x.schema && x.schema.rami).filter(r => r && typeof r === 'object').map(r => ({ titolo: Tx(r.titolo, 300), punti: L(r.punti, 800) })) },
+      mappa: pulisciMappa(x.mappa),
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
       test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000) })),
@@ -283,6 +284,98 @@ const SCHEMA_ESERCIZIO = OBJ({
 });
 const SCHEMA_VALUTA = OBJ({ esito: { type: 'string', enum: ['giusto', 'quasi', 'da_rivedere'] }, feedback: T });
 
+/* ===== Mappe concettuali ===== */
+const MP = { W: 190, GAP: 150 };
+function pulisciMappa(m) {
+  const A = x => Array.isArray(x) ? x : [];
+  const Tx = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
+  const vistiId = new Set();
+  const nodi = A(m && m.nodi).filter(n => n && typeof n === 'object').slice(0, 60).map(n => ({ id: Tx(n.id, 20).replace(/[^A-Za-z0-9_-]/g, ''), testo: Tx(n.testo, 120).trim() }))
+    .filter(n => n.id && n.testo && !vistiId.has(n.id) && vistiId.add(n.id));
+  const relazioni = A(m && m.relazioni).filter(r => r && typeof r === 'object').slice(0, 120).map(r => ({ da: Tx(r.da, 20).replace(/[^A-Za-z0-9_-]/g, ''), a: Tx(r.a, 20).replace(/[^A-Za-z0-9_-]/g, ''), etichetta: Tx(r.etichetta, 60).trim() }))
+    .filter(r => vistiId.has(r.da) && vistiId.has(r.a) && r.da !== r.a);
+  return { nodi, relazioni };
+}
+const haMappa = c => !!(c && c.mappa && Array.isArray(c.mappa.nodi) && c.mappa.nodi.length >= 2);
+const senzaMarc = t => String(t == null ? '' : t).replace(/\[\[[dcp]:(.+?)\]\]/g, '$1').replace(/\*\*/g, '');
+function spezza(t, max, maxRighe) {
+  const parole = String(t).split(/\s+/).filter(Boolean), r = []; let cur = '';
+  parole.forEach(p => { if (cur && (cur + ' ' + p).length > max) { r.push(cur); cur = p; } else cur = cur ? cur + ' ' + p : p; });
+  if (cur) r.push(cur);
+  if (r.length > maxRighe) { const k = r.slice(0, maxRighe); k[maxRighe - 1] += '…'; return k; }
+  return r;
+}
+/* Mappa di ripiego, senza AI: dallo schema del capitolo. */
+function mappaDaSchema(c) {
+  const nodi = [{ id: 'n0', testo: senzaMarc(c.schema && c.schema.radice || c.titolo) }], relazioni = [];
+  arr(c.schema && c.schema.rami).slice(0, 8).forEach((r, i) => {
+    nodi.push({ id: 'r' + i, testo: senzaMarc(r.titolo) }); relazioni.push({ da: 'n0', a: 'r' + i, etichetta: 'comprende' });
+    arr(r.punti).slice(0, 5).forEach((p, j) => { nodi.push({ id: 'p' + i + '_' + j, testo: senzaMarc(p) }); relazioni.push({ da: 'r' + i, a: 'p' + i + '_' + j, etichetta: 'include' }); });
+  });
+  return pulisciMappa({ nodi, relazioni });
+}
+function mappaLayout(m) {
+  const nodo = {}; m.nodi.forEach(n => { nodo[n.id] = { id: n.id, righe: spezza(senzaMarc(n.testo), 24, 4) }; });
+  const rel = m.relazioni.filter(r => nodo[r.da] && nodo[r.a] && r.da !== r.a).map(r => ({ da: r.da, a: r.a, etichetta: senzaMarc(r.etichetta), albero: false }));
+  const radice = m.nodi[0].id; /* il primo nodo è sempre il concetto centrale */
+  const figli = {}, prof = {}; prof[radice] = 0;
+  const coda = [radice];
+  while (coda.length) { const id = coda.shift(); rel.forEach(r => { if (r.da === id && !(r.a in prof)) { prof[r.a] = prof[id] + 1; r.albero = true; (figli[id] = figli[id] || []).push(r.a); coda.push(r.a); } }); }
+  m.nodi.forEach(n => { if (!(n.id in prof)) { prof[n.id] = 1; (figli[radice] = figli[radice] || []).push(n.id); rel.push({ da: radice, a: n.id, etichetta: '', albero: true }); } });
+  const maxRighe = Math.max.apply(null, Object.keys(nodo).map(k => nodo[k].righe.length));
+  const h = 18 + maxRighe * 18, slot = h + 14;
+  let cursore = 10;
+  const posiziona = id => { const k = figli[id] || [], n = nodo[id]; if (!k.length) { n.y = cursore + h / 2; cursore += slot; return; } k.forEach(posiziona); n.y = (nodo[k[0]].y + nodo[k[k.length - 1]].y) / 2; };
+  posiziona(radice);
+  let maxD = 0;
+  Object.keys(nodo).forEach(k => { nodo[k].d = prof[k]; nodo[k].x = 10 + prof[k] * (MP.W + MP.GAP); if (prof[k] > maxD) maxD = prof[k]; });
+  return { nodo, rel, h, W: 20 + (maxD + 1) * MP.W + maxD * MP.GAP, H: cursore - 14 + 10, radice };
+}
+function mappaSVG(m, zoom, titolo) {
+  const L = mappaLayout(m), W = MP.W;
+  let archi = '', etich = '', nodi = '';
+  L.rel.forEach(r => {
+    const a = L.nodo[r.da], b = L.nodo[r.a];
+    let x1, x2, c1, c2, lx;
+    if (b.x > a.x) { x1 = a.x + W; x2 = b.x; c1 = c2 = (x1 + x2) / 2; lx = c1; }
+    else if (b.x < a.x) { x1 = a.x; x2 = b.x + W; c1 = c2 = (x1 + x2) / 2; lx = c1; }
+    else { x1 = a.x; x2 = b.x; c1 = c2 = x1 - 70; lx = x1 - 52; }
+    archi += '<path class="mp-arco' + (r.albero ? '' : ' mp-cross') + '" d="M' + x1 + ' ' + a.y + ' C' + c1 + ' ' + a.y + ' ' + c2 + ' ' + b.y + ' ' + x2 + ' ' + b.y + '" marker-end="url(#mpfr)"/>';
+    if (r.etichetta) {
+      const rg = spezza(r.etichetta, 16, 2), w = Math.max.apply(null, rg.map(x => x.length)) * 6.6 + 10, hh = rg.length * 14 + 4, ly = (a.y + b.y) / 2;
+      etich += '<g><rect class="mp-lab" x="' + (lx - w / 2) + '" y="' + (ly - hh / 2) + '" width="' + w + '" height="' + hh + '" rx="4"/><text class="mp-lt" text-anchor="middle">' +
+        rg.map((x, i) => '<tspan x="' + lx + '" y="' + (ly - hh / 2 + 13 + i * 14) + '">' + esc(x) + '</tspan>').join('') + '</text></g>';
+    }
+  });
+  Object.keys(L.nodo).forEach(k => {
+    const n = L.nodo[k], y0 = n.y - L.h / 2, top = n.y - (n.righe.length - 1) * 9 + 5;
+    nodi += '<g><rect class="mp-n mp-d' + Math.min(n.d, 3) + '" x="' + n.x + '" y="' + y0 + '" width="' + W + '" height="' + L.h + '" rx="10"/><text class="mp-t mp-td' + Math.min(n.d, 3) + '" text-anchor="middle">' +
+      n.righe.map((x, i) => '<tspan x="' + (n.x + W / 2) + '" y="' + (top + i * 18) + '">' + esc(x) + '</tspan>').join('') + '</text></g>';
+  });
+  const dim = zoom ? ' width="' + Math.round(L.W * zoom) + '" height="' + Math.round(L.H * zoom) + '"' : ' width="100%"';
+  return '<svg class="mp-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + L.W + ' ' + L.H + '"' + dim + ' data-w="' + L.W + '" data-h="' + L.H + '" role="img" aria-label="' + esc(titolo || t('mappa')) + '">' +
+    '<defs><marker id="mpfr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mp-fr" d="M0 0 L10 5 L0 10 z"/></marker></defs>' + archi + etich + nodi + '</svg>';
+}
+function mappaElenco(m) {
+  const nm = {}; m.nodi.forEach(n => { nm[n.id] = senzaMarc(n.testo); });
+  return m.relazioni.map(r => nm[r.da] + (r.etichetta ? ' — ' + senzaMarc(r.etichetta) + ' → ' : ' → ') + nm[r.a]);
+}
+function vMappa(c) {
+  if (!haMappa(c)) return '<div class="card"><h2>' + t('mappa') + '</h2><p>' + t('mappa_vuota') + '</p><button class="btn" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_crea')) + '</button> ' + (V.busy ? '<span class="spin"></span>' : '') + '</div>';
+  return '<div class="card"><div class="row"><button class="btn sec small" data-act="mappa-zoom" data-d="0.8" aria-label="' + t('mappa_meno') + '">−</button><button class="btn sec small" data-act="mappa-zoom" data-d="1.25" aria-label="' + t('mappa_piu') + '">+</button>' +
+    '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button><button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button></div>' +
+    '<div class="mappa-wrap" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo) + '</div></div>' +
+    '<details class="card"><summary>' + t('mappa_elenco') + '</summary><ul>' + mappaElenco(c.mappa).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></details>';
+}
+const SCHEMA_MAPPA = OBJ({ nodi: { type: 'array', items: OBJ({ id: T, testo: T }) }, relazioni: { type: 'array', items: OBJ({ da: T, a: T, etichetta: T }) } });
+const SYS_MAPPA = `Sei Scio, un tutor di studio. Ti viene dato il riassunto di un capitolo. Costruisci una MAPPA CONCETTUALE: nodi (concetti) collegati da relazioni con una breve etichetta (un verbo o una breve espressione).
+REGOLE:
+- Usa SOLO ciò che è nel riassunto, senza inventare nulla.
+- Da 12 a 30 nodi. Ogni nodo ha "id" breve e unico (n1, n2, n3...) e "testo" di massimo 8 parole: un concetto, non una frase intera.
+- Il PRIMO nodo è il concetto centrale e non riceve relazioni in entrata. Gli altri nodi formano un albero che parte da lui: ogni nodo riceve almeno una relazione dal suo "genitore", dal più generale al più particolare, al massimo 3-4 livelli.
+- Ogni relazione ha "da" (id), "a" (id) ed "etichetta" di 1-4 parole che si legge in modo naturale tra i due concetti (per esempio "è composto da", "causa", "avviene in", "si chiama"). Mai etichette vuote.
+- Puoi aggiungere da 2 a 5 relazioni trasversali tra rami diversi, se il testo le giustifica.
+- Mantieni i termini del libro (date, nomi, termini tecnici). Rispondi SOLO con il JSON richiesto.`;
 /* ===== Stampa e download ===== */
 function dispensaHTML(c) {
   const li = a => '<ul>' + arr(a).map(x => '<li>' + md(x) + '</li>').join('') + '</ul>';
@@ -290,6 +383,7 @@ function dispensaHTML(c) {
   const sezioni = [];
   sezioni.push('<h1>' + esc(c.titolo) + '</h1>' + intest + legendaColori() + '<h2>In breve</h2>' + li(c.riassunto_breve) + '<h2>Riassunto</h2><p>' + md(c.riassunto_completo) + '</p>');
   if (arr(c.schema && c.schema.rami).length) sezioni.push(intest + '<h2>Schema</h2><div class="radice">' + esc(c.schema.radice || c.titolo) + '</div>' + arr(c.schema.rami).map(r => '<div class="ramo"><h3>' + md(r.titolo) + '</h3>' + li(r.punti) + '</div>').join(''));
+  if (haMappa(c)) sezioni.push('<div class="mappa-pg">' + intest + '<h2>' + t('mappa') + '</h2>' + mappaSVG(c.mappa, 0, c.titolo) + '</div>');
   if (arr(c.spiegazioni).length) sezioni.push(intest + '<h2>Spiegazioni</h2>' + c.spiegazioni.map(x => '<h3>' + md(x.concetto) + '</h3><p>' + md(x.spiegazione) + '</p><p><b>Esempio:</b> ' + md(x.esempio) + '</p>').join(''));
   if (arr(c.glossario).length) sezioni.push(intest + '<h2>Glossario</h2>' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join(''));
   return sezioni.map((x, n) => '<section' + (n ? ' class="nuova"' : '') + '>' + x + '</section>').join('');
@@ -299,6 +393,7 @@ function dispensaTesto(c) {
   const r = [c.titolo, c.materia + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con Scio', '', 'IN BREVE'].concat(arr(c.riassunto_breve).map(x => '- ' + pulisci(x)));
   r.push('', 'RIASSUNTO', pulisci(c.riassunto_completo));
   if (arr(c.schema && c.schema.rami).length) { r.push('', 'SCHEMA', pulisci(c.schema.radice || c.titolo)); c.schema.rami.forEach(x => { r.push('  ' + pulisci(x.titolo)); arr(x.punti).forEach(p => r.push('    - ' + pulisci(p))); }); }
+  if (haMappa(c)) { r.push('', 'MAPPA CONCETTUALE'); mappaElenco(c.mappa).forEach(x => r.push('  ' + pulisci(x))); }
   if (arr(c.spiegazioni).length) { r.push('', 'SPIEGAZIONI'); c.spiegazioni.forEach(x => r.push(pulisci(x.concetto), '  ' + pulisci(x.spiegazione), '  Esempio: ' + pulisci(x.esempio), '')); }
   if (arr(c.glossario).length) { r.push('GLOSSARIO'); c.glossario.forEach(g => r.push(pulisci(g.termine) + ': ' + pulisci(g.definizione))); }
   return r.join('\n');
@@ -820,10 +915,11 @@ function mancano(c) {
 }
 function vCapitolo() {
   const c = S.capitoli.find(x => x.id === V.cap); if (!c) return vHome();
-  const TB = ['riassunto', 'schema', 'spiegazioni', 'glossario', 'test'];
+  const TB = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'test'];
   let corpo = '';
   if (V.tab === 'riassunto') corpo = legendaColori() + '<div class="card"><h2>' + t('in_breve') + '</h2><ul>' + c.riassunto_breve.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></div><div class="card"><h2>' + t('riass_compl') + '</h2>' + md(c.riassunto_completo) + '</div>' + (arr(c.inventario).length ? '<details class="card"><summary><b>' + t('inventario') + '</b> (' + c.inventario.length + ')</summary><ul>' + c.inventario.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></details>' : '');
   else if (V.tab === 'schema') corpo = '<div class="card"><h2>' + esc(c.schema.radice || c.titolo) + '</h2>' + arr(c.schema.rami).map(r => '<div class="tree"><h3>' + md(r.titolo) + '</h3><ul>' + arr(r.punti).map(p => '<li>' + md(p) + '</li>').join('') + '</ul></div>').join('') + '</div>';
+  else if (V.tab === 'mappa') corpo = vMappa(c);
   else if (V.tab === 'spiegazioni') corpo = c.spiegazioni.map((s, i) => '<div class="card"><h3>' + md(s.concetto) + '</h3><p>' + md(s.spiegazione) + '</p><div class="fb"><b>' + t('esempio') + ':</b> ' + md(s.esempio) + '</div><button class="btn sec small" data-act="meglio" data-i="' + i + '">' + t('spiega_meglio') + '</button><div id="m' + i + '"></div></div>').join('') || '<div class="card muted">–</div>';
   else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
   else corpo = vTestPartenza(c);
@@ -1017,12 +1113,37 @@ const AZ = {
     const tx = V.tab === 'riassunto' ? c.riassunto_breve.join('. ') + '. ' + c.riassunto_completo
       : V.tab === 'glossario' ? c.glossario.map(g => g.termine + ': ' + g.definizione).join('. ')
       : V.tab === 'spiegazioni' ? c.spiegazioni.map(x => x.concetto + '. ' + x.spiegazione + ' ' + x.esempio).join(' ')
+      : V.tab === 'mappa' ? (haMappa(c) ? mappaElenco(c.mappa).join('. ') : c.titolo)
       : V.tab === 'schema' ? (c.schema.radice || c.titolo) + '. ' + arr(c.schema.rami).map(r => r.titolo + ': ' + arr(r.punti).join('. ')).join('. ')
       : c.titolo;
     leggiConEvidenza(tx); return 'async';
   },
   'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const t = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = t; return 'async'; },
   'scarica': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; const b = new Blob(['\ufeff' + dispensaTesto(c)], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (c.titolo || 'capitolo').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) + '.txt'; document.body.appendChild(a); a.click(); a.remove(); return 'async'; },
+  'mappa-zoom': el => {
+    V.mz = Math.max(0.3, Math.min(3, (V.mz || 1) * parseFloat(el.dataset.d)));
+    const sv = document.querySelector('.mappa-wrap svg');
+    if (sv) { sv.setAttribute('width', Math.round(sv.dataset.w * V.mz)); sv.setAttribute('height', Math.round(sv.dataset.h * V.mz)); }
+    return 'async';
+  },
+  'mappa-adatta': () => {
+    const w = document.querySelector('.mappa-wrap'), sv = w && w.querySelector('svg'); if (!sv) return 'async';
+    V.mz = Math.max(0.3, Math.min(1, (w.clientWidth - 8) / sv.dataset.w));
+    sv.setAttribute('width', Math.round(sv.dataset.w * V.mz)); sv.setAttribute('height', Math.round(sv.dataset.h * V.mz));
+    return 'async';
+  },
+  'crea-mappa': async () => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
+    V.busy = true; render();
+    try {
+      let m;
+      if (FAM.ai.provider === 'demo') m = mappaDaSchema(c);
+      else m = pulisciMappa(await chiediJSON(SYS_MAPPA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_MAPPA));
+      if (m.nodi.length < 4 || m.relazioni.length < 3) throw new Error('la mappa è venuta troppo piccola: riprova');
+      c.mappa = m; V.mz = 1; salva();
+    } catch (e) { toast(e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni.' : 'Non sono riuscito: ' + e.message); }
+    V.busy = false; render();
+  },
   'completa': async () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
     if (FAM.ai.provider === 'demo') { toast('In modalità demo non si può completare.'); return; }

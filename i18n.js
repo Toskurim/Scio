@@ -46,6 +46,14 @@ D('elimina_materia', 'Elimina questa materia', 'Delete this subject', 'Dieses Fa
 /* capitolo */
 D('riassunto', 'Riassunto', 'Summary', 'Zusammenfassung', 'Résumé', 'Resumen', 'Rezumat', 'Përmbledhje', 'ملخص', '摘要');
 D('schema', 'Schema', 'Outline', 'Schema', 'Schéma', 'Esquema', 'Schemă', 'Skemë', 'مخطط', '思维导图');
+D('mappa', 'Mappa concettuale', 'Concept map', 'Begriffskarte', 'Carte conceptuelle', 'Mapa conceptual', 'Hartă conceptuală', 'Hartë konceptuale', 'خريطة المفاهيم', '概念图');
+D('mappa_crea', 'Crea la mappa concettuale', 'Create the concept map', 'Begriffskarte erstellen', 'Créer la carte conceptuelle', 'Crear el mapa conceptual', 'Creează harta conceptuală', 'Krijo hartën konceptuale', 'إنشاء خريطة المفاهيم', '生成概念图');
+D('mappa_rifai', 'Rifai la mappa', 'Redo the map', 'Karte neu erstellen', 'Refaire la carte', 'Rehacer el mapa', 'Refă harta', 'Ribëje hartën', 'إعادة إنشاء الخريطة', '重新生成');
+D('mappa_vuota', 'La mappa concettuale mostra i concetti del capitolo e come sono collegati tra loro. Scio la prepara a partire dal riassunto di questo capitolo.', 'The concept map shows the chapter\'s concepts and how they connect. Scio builds it from this chapter\'s summary.', 'Die Begriffskarte zeigt die Begriffe des Kapitels und wie sie zusammenhängen. Scio erstellt sie aus der Zusammenfassung dieses Kapitels.', 'La carte conceptuelle montre les concepts du chapitre et leurs liens. Scio la prépare à partir du résumé de ce chapitre.', 'El mapa conceptual muestra los conceptos del capítulo y cómo se relacionan. Scio lo prepara a partir del resumen de este capítulo.', 'Harta conceptuală arată conceptele capitolului și cum se leagă între ele. Scio o pregătește pornind de la rezumatul acestui capitol.', 'Harta konceptuale tregon konceptet e kapitullit dhe si lidhen mes tyre. Scio e përgatit nga përmbledhja e këtij kapitulli.', 'تعرض خريطة المفاهيم مفاهيم الفصل وكيف ترتبط ببعضها. يعدّها Scio انطلاقًا من ملخص هذا الفصل.', '概念图展示本章的概念及其相互联系。Scio 根据本章摘要生成。');
+D('mappa_adatta', 'Adatta', 'Fit', 'Einpassen', 'Ajuster', 'Ajustar', 'Potrivește', 'Përshtat', 'ملاءمة', '适应');
+D('mappa_piu', 'Ingrandisci', 'Zoom in', 'Vergrößern', 'Agrandir', 'Acercar', 'Mărește', 'Zmadho', 'تكبير', '放大');
+D('mappa_meno', 'Riduci', 'Zoom out', 'Verkleinern', 'Réduire', 'Alejar', 'Micșorează', 'Zvogëlo', 'تصغير', '缩小');
+D('mappa_elenco', 'Elenco dei collegamenti (testo)', 'List of links (text)', 'Liste der Verbindungen (Text)', 'Liste des liens (texte)', 'Lista de conexiones (texto)', 'Lista legăturilor (text)', 'Lista e lidhjeve (tekst)', 'قائمة الروابط (نص)', '连接列表(文字)');
 D('spiegazioni', 'Spiegazioni', 'Explanations', 'Erklärungen', 'Explications', 'Explicaciones', 'Explicații', 'Shpjegime', 'شروحات', '讲解');
 D('glossario', 'Glossario', 'Glossary', 'Glossar', 'Glossaire', 'Glosario', 'Glosar', 'Fjalor', 'مسرد', '词汇表');
 D('test', 'Test', 'Test', 'Test', 'Test', 'Prueba', 'Test', 'Test', 'اختبار', '测验');

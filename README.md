@@ -1,8 +1,14 @@
-# Scio v0.9 — app di studio installabile (PWA)
+# Scio v0.10 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
+
+Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+
+## Novità della v0.10
+- **Mappa concettuale**: in ogni capitolo c'è la nuova scheda "Mappa concettuale". Un pulsante la crea dal riassunto del capitolo: concetti collegati da frasi brevi ("comprende", "causa"...), con ingrandimento, adattamento allo schermo, lettura ad alta voce, stampa (pagina orizzontale) e file di testo. Per chi usa lo screen reader c'è anche l'elenco dei collegamenti in forma di testo. Senza chiave AI (modalità demo) la mappa viene ricavata dallo Schema.
+- Funziona anche per i capitoli già fatti: basta aprirli e premere "Crea la mappa concettuale".
 
 ## Novità della v0.9
 - Quattro livelli scolastici per ogni profilo: **elementari (6-10)**, media (11-13), superiori (14-18) e **università (19+)**. Alle elementari Scio usa frasi corte, parole semplici, test da 10 a 15 domande e il tema "Gioco" consigliato; all'università usa un registro tecnico e rigoroso e domande di ragionamento. I profili esistenti restano invariati.
