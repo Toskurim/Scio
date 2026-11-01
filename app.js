@@ -2,7 +2,7 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.10.1';
+const VERSIONE = '0.11';
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -292,7 +292,7 @@ function pulisciMappa(m) {
   const vistiId = new Set();
   const nodi = A(m && m.nodi).filter(n => n && typeof n === 'object').slice(0, 60).map(n => ({ id: Tx(n.id, 20).replace(/[^A-Za-z0-9_-]/g, ''), testo: Tx(n.testo, 120).trim() }))
     .filter(n => n.id && n.testo && !vistiId.has(n.id) && vistiId.add(n.id));
-  const relazioni = A(m && m.relazioni).filter(r => r && typeof r === 'object').slice(0, 120).map(r => ({ da: Tx(r.da, 20).replace(/[^A-Za-z0-9_-]/g, ''), a: Tx(r.a, 20).replace(/[^A-Za-z0-9_-]/g, ''), etichetta: Tx(r.etichetta, 60).trim() }))
+  const relazioni = A(m && m.relazioni).filter(r => r && typeof r === 'object').slice(0, 120).map(r => ({ da: Tx(r.da, 20).replace(/[^A-Za-z0-9_-]/g, ''), a: Tx(r.a, 20).replace(/[^A-Za-z0-9_-]/g, ''), etichetta: Tx(r.etichetta, 60).trim(), x: r.x === true }))
     .filter(r => vistiId.has(r.da) && vistiId.has(r.a) && r.da !== r.a);
   return { nodi, relazioni };
 }
@@ -316,12 +316,13 @@ function mappaDaSchema(c) {
 }
 function mappaLayout(m) {
   const nodo = {}; m.nodi.forEach(n => { nodo[n.id] = { id: n.id, righe: spezza(senzaMarc(n.testo), 24, 4) }; });
-  const rel = m.relazioni.filter(r => nodo[r.da] && nodo[r.a] && r.da !== r.a).map(r => ({ da: r.da, a: r.a, etichetta: senzaMarc(r.etichetta), albero: false }));
+  const rel = m.relazioni.map((r, i) => ({ da: r.da, a: r.a, etichetta: senzaMarc(r.etichetta), albero: false, x: !!r.x, i })).filter(r => nodo[r.da] && nodo[r.a] && r.da !== r.a);
+  const esplicito = rel.some(r => r.x); /* struttura già esplicita: i collegamenti trasversali non fanno da ramo */
   const radice = m.nodi[0].id; /* il primo nodo è sempre il concetto centrale */
   const figli = {}, prof = {}; prof[radice] = 0;
   const coda = [radice];
-  while (coda.length) { const id = coda.shift(); rel.forEach(r => { if (r.da === id && !(r.a in prof)) { prof[r.a] = prof[id] + 1; r.albero = true; (figli[id] = figli[id] || []).push(r.a); coda.push(r.a); } }); }
-  m.nodi.forEach(n => { if (!(n.id in prof)) { prof[n.id] = 1; (figli[radice] = figli[radice] || []).push(n.id); rel.push({ da: radice, a: n.id, etichetta: '', albero: true }); } });
+  while (coda.length) { const id = coda.shift(); rel.forEach(r => { if (r.da === id && !(r.a in prof) && !(esplicito && r.x)) { prof[r.a] = prof[id] + 1; r.albero = true; (figli[id] = figli[id] || []).push(r.a); coda.push(r.a); } }); }
+  m.nodi.forEach(n => { if (!(n.id in prof)) { prof[n.id] = 1; (figli[radice] = figli[radice] || []).push(n.id); rel.push({ da: radice, a: n.id, etichetta: '', albero: true, x: false, i: -1 }); } });
   const maxRighe = Math.max.apply(null, Object.keys(nodo).map(k => nodo[k].righe.length));
   const h = 18 + maxRighe * 18, slot = h + 14;
   let cursore = 10;
@@ -331,7 +332,7 @@ function mappaLayout(m) {
   Object.keys(nodo).forEach(k => { nodo[k].d = prof[k]; nodo[k].x = 10 + prof[k] * (MP.W + MP.GAP); if (prof[k] > maxD) maxD = prof[k]; });
   return { nodo, rel, h, W: 20 + (maxD + 1) * MP.W + maxD * MP.GAP, H: cursore - 14 + 10, radice };
 }
-function mappaSVG(m, zoom, titolo) {
+function mappaSVG(m, zoom, titolo, edit, sel) {
   const L = mappaLayout(m), W = MP.W;
   let archi = '', etich = '', nodi = '';
   L.rel.forEach(r => {
@@ -349,7 +350,7 @@ function mappaSVG(m, zoom, titolo) {
   });
   Object.keys(L.nodo).forEach(k => {
     const n = L.nodo[k], y0 = n.y - L.h / 2, top = n.y - (n.righe.length - 1) * 9 + 5;
-    nodi += '<g><rect class="mp-n mp-d' + Math.min(n.d, 3) + '" x="' + n.x + '" y="' + y0 + '" width="' + W + '" height="' + L.h + '" rx="10"/><text class="mp-t mp-td' + Math.min(n.d, 3) + '" text-anchor="middle">' +
+    nodi += '<g' + (edit ? ' class="mp-click" data-act="mappa-sel" data-id="' + esc(k) + '"' : '') + '><rect class="mp-n mp-d' + Math.min(n.d, 3) + (edit && k === sel ? ' mp-sel' : '') + '" x="' + n.x + '" y="' + y0 + '" width="' + W + '" height="' + L.h + '" rx="10"/><text class="mp-t mp-td' + Math.min(n.d, 3) + '" text-anchor="middle">' +
       n.righe.map((x, i) => '<tspan x="' + (n.x + W / 2) + '" y="' + (top + i * 18) + '">' + esc(x) + '</tspan>').join('') + '</text></g>';
   });
   const dim = zoom ? ' width="' + Math.round(L.W * zoom) + '" height="' + Math.round(L.H * zoom) + '"' : ' width="100%"';
@@ -360,12 +361,54 @@ function mappaElenco(m) {
   const nm = {}; m.nodi.forEach(n => { nm[n.id] = senzaMarc(n.testo); });
   return m.relazioni.map(r => nm[r.da] + (r.etichetta ? ' — ' + senzaMarc(r.etichetta) + ' → ' : ' → ') + nm[r.a]);
 }
+/* --- modifica a mano --- */
+function mappaNormalizza(m) {
+  const L = mappaLayout(m);
+  L.rel.forEach(r => { if (r.i >= 0) m.relazioni[r.i].x = !r.albero; else m.relazioni.push({ da: r.da, a: r.a, etichetta: '', x: false }); });
+}
+const mpFigli = (m, id) => m.relazioni.filter(r => !r.x && r.da === id).map(r => r.a);
+function mpDiscendenti(m, id) { const out = new Set(), st = [id]; while (st.length) { mpFigli(m, st.pop()).forEach(f => { if (!out.has(f)) { out.add(f); st.push(f); } }); } return out; }
+const mpGenIdx = (m, id) => m.relazioni.findIndex(r => !r.x && r.a === id);
+const vv = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+function mappaCorr() { const c = S.capitoli.find(x => x.id === V.cap); return haMappa(c) ? c : null; }
+function mappaPrima(c) { V.mundo = V.mundo || []; V.mundo.push(JSON.stringify(c.mappa)); if (V.mundo.length > 30) V.mundo.shift(); }
+function rinfresca() {
+  const w = document.querySelector('.mappa-wrap'), sx = w ? w.scrollLeft : 0, sy = w ? w.scrollTop : 0, py = window.scrollY;
+  render();
+  const n = document.querySelector('.mappa-wrap'); if (n) { n.scrollLeft = sx; n.scrollTop = sy; } window.scrollTo(0, py);
+}
+function nuovoIdNodo(m) { const u = new Set(m.nodi.map(n => n.id)); let id; do { id = 'u' + (Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36)).slice(-9); } while (u.has(id)); return id; }
+function vPannelloMappa(c) {
+  const m = c.mappa, radice = m.nodi[0].id;
+  if (!m.nodi.some(n => n.id === V.mSel)) V.mSel = radice;
+  const sel = m.nodi.find(n => n.id === V.mSel), gi = mpGenIdx(m, sel.id), nome = n => esc(senzaMarc(n.testo).slice(0, 40));
+  const desc = mpDiscendenti(m, sel.id);
+  const fratelli = gi >= 0 ? m.relazioni.map((r, i) => i).filter(i => !m.relazioni[i].x && m.relazioni[i].da === m.relazioni[gi].da) : [];
+  const pos = fratelli.indexOf(gi);
+  const trasv = m.relazioni.map((r, i) => ({ r, i })).filter(o => o.r.x && (o.r.da === sel.id || o.r.a === sel.id));
+  const nmap = {}; m.nodi.forEach(n => { nmap[n.id] = senzaMarc(n.testo).slice(0, 40); });
+  return '<div class="card" id="mp-pannello"><p class="muted">' + t('mappa_aiuto') + '</p>' +
+    '<label class="f">' + t('mappa_nodo') + '<select id="mp-sel">' + m.nodi.map(n => '<option value="' + esc(n.id) + '"' + (n.id === sel.id ? ' selected' : '') + '>' + nome(n) + '</option>').join('') + '</select></label>' +
+    '<label class="f">' + t('mappa_testo') + '<input type="text" id="mp-testo" maxlength="120" value="' + esc(sel.testo) + '"></label>' +
+    (gi >= 0 ? '<label class="f">' + t('mappa_etich') + '<input type="text" id="mp-etich" maxlength="60" value="' + esc(m.relazioni[gi].etichetta) + '"></label>' : '') +
+    '<div class="row"><button class="btn small" data-act="mappa-salva">' + t('mappa_salva') + '</button>' +
+    (gi >= 0 ? '<button class="btn sec small" data-act="mappa-ordine" data-d="-1"' + (pos <= 0 ? ' disabled' : '') + '>↑ ' + t('mappa_su') + '</button><button class="btn sec small" data-act="mappa-ordine" data-d="1"' + (pos >= fratelli.length - 1 ? ' disabled' : '') + '>↓ ' + t('mappa_giu') + '</button>' : '') + '</div>' +
+    (gi >= 0 ? '<label class="f" style="margin-top:12px">' + t('mappa_sposta') + '<select id="mp-genitore">' + m.nodi.filter(n => n.id !== sel.id && !desc.has(n.id)).map(n => '<option value="' + esc(n.id) + '"' + (n.id === m.relazioni[gi].da ? ' selected' : '') + '>' + nome(n) + '</option>').join('') + '</select></label><button class="btn sec small" data-act="mappa-sposta">' + t('mappa_sposta_btn') + '</button>' : '') +
+    '<h3 style="margin-top:16px">' + t('mappa_aggiungi') + '</h3><label class="f">' + t('mappa_nuovo_testo') + '<input type="text" id="mp-nuovo" maxlength="120"></label><label class="f">' + t('mappa_etich') + '<input type="text" id="mp-nuovo-et" maxlength="60"></label><button class="btn sec small" data-act="mappa-aggiungi"' + (m.nodi.length >= 60 ? ' disabled' : '') + '>' + t('mappa_aggiungi_btn') + '</button>' +
+    '<h3 style="margin-top:16px">' + t('mappa_collega') + '</h3><label class="f"><select id="mp-verso">' + m.nodi.filter(n => n.id !== sel.id).map(n => '<option value="' + esc(n.id) + '">' + nome(n) + '</option>').join('') + '</select></label><label class="f">' + t('mappa_etich') + '<input type="text" id="mp-verso-et" maxlength="60"></label><button class="btn sec small" data-act="mappa-collega">' + t('mappa_collega_btn') + '</button>' +
+    (trasv.length ? '<h3 style="margin-top:16px">' + t('mappa_trasv') + '</h3><ul>' + trasv.map(o => '<li>' + esc(nmap[o.r.da] + (o.r.etichetta ? ' — ' + senzaMarc(o.r.etichetta) + ' → ' : ' → ') + nmap[o.r.a]) + ' <button class="btn sec small" data-act="mappa-del-x" data-i="' + o.i + '" aria-label="✕">✕</button></li>').join('') + '</ul>' : '') +
+    (gi >= 0 ? '<div style="margin-top:16px"><button class="btn sec small" data-act="mappa-elimina">' + t('mappa_elimina') + '</button></div>' : '') + '</div>';
+}
 function vMappa(c) {
   if (!haMappa(c)) return '<div class="card"><h2>' + t('mappa') + '</h2><p>' + t('mappa_vuota') + '</p><button class="btn" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_crea')) + '</button> ' + (V.busy ? '<span class="spin"></span>' : '') + '</div>';
+  const ed = !!V.mEdit;
+  if (ed && !c.mappa.nodi.some(n => n.id === V.mSel)) V.mSel = c.mappa.nodi[0].id;
   return '<div class="card"><div class="row"><button class="btn sec small" data-act="mappa-zoom" data-d="0.8" aria-label="' + t('mappa_meno') + '">−</button><button class="btn sec small" data-act="mappa-zoom" data-d="1.25" aria-label="' + t('mappa_piu') + '">+</button>' +
-    '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button><button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button></div>' +
-    '<div class="mappa-wrap" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo) + '</div></div>' +
-    '<details class="card"><summary>' + t('mappa_elenco') + '</summary><ul>' + mappaElenco(c.mappa).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></details>';
+    '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button>' +
+    (ed ? '<button class="btn sec small" data-act="mappa-annulla"' + (V.mundo && V.mundo.length ? '' : ' disabled') + '>↶ ' + t('mappa_annulla') + '</button>' : '<button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button>') +
+    '<button class="btn small" data-act="mappa-modifica">' + (ed ? t('mappa_fine') : t('mappa_modifica')) + '</button></div>' +
+    '<div class="mappa-wrap" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo, ed, V.mSel) + '</div></div>' +
+    (ed ? vPannelloMappa(c) : '<details class="card"><summary>' + t('mappa_elenco') + '</summary><ul>' + mappaElenco(c.mappa).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></details>');
 }
 const SCHEMA_MAPPA = OBJ({ nodi: { type: 'array', items: OBJ({ id: T, testo: T }) }, relazioni: { type: 'array', items: OBJ({ da: T, a: T, etichetta: T }) } });
 const SYS_MAPPA = `Sei Scio, un tutor di studio. Ti viene dato il riassunto di un capitolo. Costruisci una MAPPA CONCETTUALE: nodi (concetti) collegati da relazioni con una breve etichetta (un verbo o una breve espressione).
@@ -1105,9 +1148,9 @@ const AZ = {
   'del': el => { V.foto.splice(+el.dataset.i, 1); },
   'prepara-cap': () => { preparaCapitolo(); return 'async'; },
   'prepara-es': () => { preparaEsercizio(); return 'async'; },
-  'apri-cap': el => { V.cap = el.dataset.id; V.tab = 'riassunto'; V.test = null; V.vista = 'capitolo'; },
+  'apri-cap': el => { V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.tab = 'riassunto'; V.test = null; V.vista = 'capitolo'; },
   'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
-  'tab': el => { V.tab = el.dataset.t; },
+  'tab': el => { V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; },
   'ascolta': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async';
     const tx = V.tab === 'riassunto' ? c.riassunto_breve.join('. ') + '. ' + c.riassunto_completo
@@ -1120,6 +1163,63 @@ const AZ = {
   },
   'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const t = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = t; return 'async'; },
   'scarica': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; const b = new Blob(['\ufeff' + dispensaTesto(c)], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (c.titolo || 'capitolo').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) + '.txt'; document.body.appendChild(a); a.click(); a.remove(); return 'async'; },
+  'mappa-modifica': () => {
+    const c = mappaCorr(); if (!c) return 'async';
+    V.mEdit = !V.mEdit; V.mundo = [];
+    if (V.mEdit) { mappaNormalizza(c.mappa); salva(); V.mSel = c.mappa.nodi[0].id; }
+    rinfresca(); return 'async';
+  },
+  'mappa-sel': el => { V.mSel = el.dataset.id; rinfresca(); const p = document.getElementById('mp-pannello'); if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' }); return 'async'; },
+  'mappa-salva': () => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, n = m.nodi.find(x => x.id === V.mSel); if (!n) return 'async';
+    const tx = vv('mp-testo').trim().slice(0, 120); if (!tx) { toast('Il testo del nodo non può essere vuoto.'); return 'async'; }
+    mappaPrima(c); n.testo = tx;
+    const gi = mpGenIdx(m, n.id); if (gi >= 0) m.relazioni[gi].etichetta = vv('mp-etich').trim().slice(0, 60);
+    salva(); rinfresca(); return 'async';
+  },
+  'mappa-sposta': () => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, id = V.mSel, np = vv('mp-genitore');
+    const gi = mpGenIdx(m, id); if (gi < 0 || !m.nodi.some(n => n.id === np) || np === id || mpDiscendenti(m, id).has(np)) return 'async';
+    if (m.relazioni[gi].da === np) return 'async';
+    mappaPrima(c); const e = m.relazioni.splice(gi, 1)[0]; e.da = np; m.relazioni.push(e);
+    salva(); rinfresca(); return 'async';
+  },
+  'mappa-ordine': el => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, gi = mpGenIdx(m, V.mSel); if (gi < 0) return 'async';
+    const fr = m.relazioni.map((r, i) => i).filter(i => !m.relazioni[i].x && m.relazioni[i].da === m.relazioni[gi].da), p = fr.indexOf(gi), q = p + parseInt(el.dataset.d, 10);
+    if (q < 0 || q >= fr.length) return 'async';
+    mappaPrima(c); const tmp = m.relazioni[fr[p]]; m.relazioni[fr[p]] = m.relazioni[fr[q]]; m.relazioni[fr[q]] = tmp;
+    salva(); rinfresca(); return 'async';
+  },
+  'mappa-aggiungi': () => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa;
+    const tx = vv('mp-nuovo').trim().slice(0, 120); if (!tx) { toast('Scrivi il testo del nuovo nodo.'); return 'async'; }
+    if (m.nodi.length >= 60) { toast('La mappa ha già 60 nodi: è il massimo.'); return 'async'; }
+    mappaPrima(c); const id = nuovoIdNodo(m); m.nodi.push({ id, testo: tx }); m.relazioni.push({ da: V.mSel, a: id, etichetta: vv('mp-nuovo-et').trim().slice(0, 60), x: false });
+    V.mSel = id; salva(); rinfresca(); return 'async';
+  },
+  'mappa-collega': () => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, verso = vv('mp-verso');
+    if (!m.nodi.some(n => n.id === verso) || verso === V.mSel) return 'async';
+    if (m.relazioni.some(r => r.da === V.mSel && r.a === verso)) { toast('Questi due nodi sono già collegati.'); return 'async'; }
+    mappaPrima(c); m.relazioni.push({ da: V.mSel, a: verso, etichetta: vv('mp-verso-et').trim().slice(0, 60), x: true });
+    salva(); rinfresca(); return 'async';
+  },
+  'mappa-del-x': el => {
+    const c = mappaCorr(); if (!c) return 'async'; const i = parseInt(el.dataset.i, 10), m = c.mappa;
+    if (!(i >= 0 && i < m.relazioni.length) || !m.relazioni[i].x) return 'async';
+    mappaPrima(c); m.relazioni.splice(i, 1); salva(); rinfresca(); return 'async';
+  },
+  'mappa-elimina': () => {
+    const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, id = V.mSel, gi = mpGenIdx(m, id); if (gi < 0 || id === m.nodi[0].id) return 'async';
+    mappaPrima(c); const padre = m.relazioni[gi].da, via = mpDiscendenti(m, id); via.add(id);
+    m.nodi = m.nodi.filter(n => !via.has(n.id)); m.relazioni = m.relazioni.filter(r => !via.has(r.da) && !via.has(r.a));
+    V.mSel = padre; salva(); rinfresca(); return 'async';
+  },
+  'mappa-annulla': () => {
+    const c = mappaCorr(); if (!c || !V.mundo || !V.mundo.length) return 'async';
+    c.mappa = pulisciMappa(JSON.parse(V.mundo.pop())); salva(); rinfresca(); return 'async';
+  },
   'mappa-zoom': el => {
     V.mz = Math.max(0.3, Math.min(3, (V.mz || 1) * parseFloat(el.dataset.d)));
     const sv = document.querySelector('.mappa-wrap svg');
@@ -1134,6 +1234,8 @@ const AZ = {
   },
   'crea-mappa': async () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
+    if (haMappa(c) && !confirm(t('mappa_sovrascrivi'))) return;
+    V.mEdit = false; V.mundo = [];
     V.busy = true; render();
     try {
       let m;
@@ -1328,6 +1430,7 @@ document.addEventListener('input', e => {
   }
   anteprima();
 });
+document.addEventListener('change', e => { if (e.target && e.target.id === 'mp-sel') { V.mSel = e.target.value; rinfresca(); } });
 document.addEventListener('dragover', e => { if (inFotoView()) e.preventDefault(); });
 document.addEventListener('drop', e => { if (!inFotoView()) return; e.preventDefault(); aggiungiFoto([...(e.dataTransfer && e.dataTransfer.files || [])]); });
 document.addEventListener('paste', e => { if (!inFotoView()) return; const f = [...(e.clipboardData && e.clipboardData.files || [])]; if (f.length) { e.preventDefault(); aggiungiFoto(f); } });

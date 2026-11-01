@@ -137,3 +137,10 @@ input[type=range]{width:100%;min-height:36px}
   #stampa .mp-d1,#stampa .mp-d2,#stampa .mp-d3{fill:#fff} #stampa .mp-td1,#stampa .mp-td2,#stampa .mp-td3,#stampa .mp-lt{fill:#000}
   #stampa .mp-n{stroke:#000} #stampa .mp-arco{stroke:#000} #stampa .mp-fr{fill:#000} #stampa .mp-lab{fill:#fff;stroke:#888}
 }
+
+/* v0.11: modifica della mappa */
+.mp-click{cursor:pointer}
+.mp-click:hover .mp-n{stroke-width:4}
+.mp-n.mp-sel{stroke:var(--ink);stroke-width:5}
+#mp-pannello ul{padding-left:20px}
+#mp-pannello li{margin-bottom:6px}
