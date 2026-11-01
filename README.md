@@ -1,10 +1,15 @@
-# Scio v0.12.1 — app di studio installabile (PWA)
+# Scio v0.13 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+
+## Novità della v0.13
+- Il genitore sceglie, per ciascun figlio, quali sezioni sono disponibili: riassunto, schema, mappa concettuale, spiegazioni, glossario (Area genitori › Modifica profilo). Il test è sempre disponibile.
+- Le sezioni nascoste non compaiono nel capitolo, non si ascoltano, non si stampano né si scaricano; il genitore le vede sempre da "Contenuti". Chi aggiorna trova tutto attivo.
+- Nota: l'AI prepara comunque tutte le parti (servono per i test); la scelta riguarda ciò che il ragazzo vede.
 
 ## Novità della v0.12.1
 - **Privacy**: il nome del ragazzo non viene più inviato al servizio AI. Alle richieste vanno solo il livello scolastico, gli adattamenti DSA scelti (servono per adattare i contenuti) e le foto o i testi del capitolo. Attenzione: se sulle foto compare il nome scritto sul quaderno, quello viaggia con la foto.
