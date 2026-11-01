@@ -1,8 +1,8 @@
 'use strict';
-/* ===== Scio v0.7 — app web installabile (PWA) ===== */
+/* ===== Scio v0.8 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.7';
+const VERSIONE = '0.8';
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
 const LS_VECCHIO = 'scio.v0.1';
@@ -140,7 +140,7 @@ function pulisciDati(o) {
   if (!grezzi) throw new Error('non valido');
   const figli = grezzi.filter(f => f && typeof f === 'object' && f.profilo && typeof f.profilo === 'object').slice(0, 12).map(c => {
     const pr = c.profilo;
-    const profilo = { nome: Tx(pr.nome, 60), livello: pr.livello === 'media' ? 'media' : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), pin: '' };
+    const profilo = { nome: Tx(pr.nome, 60), livello: pr.livello === 'media' ? 'media' : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '' };
     Object.keys(DSA).forEach(k => { if (pr.dsa && pr.dsa[k] === true) profilo.dsa[k] = true; });
     const capitoli = A(c.capitoli).filter(x => x && typeof x === 'object').slice(0, 500).map(x => ({
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
@@ -541,20 +541,62 @@ function boxNuovaVerifica() {
 let TOKEN = 0;
 function plain(s) { return String(s == null ? '' : s).replace(/\[\[[dcp]:/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '').replace(/^### /gm, '').replace(/\s+/g, ' ').trim(); }
 function voceDi() { return LINGUE_VOCE[(S.profilo && S.profilo.lingua) || 'it']; }
-function scegliVoce(lang) { try { const vs = speechSynthesis.getVoices(); const b = lang.slice(0, 2); return vs.find(v => v.lang.replace('_', '-') === lang) || vs.find(v => v.lang.replace('_', '-').slice(0, 2) === b); } catch (e) { return null; } }
+/* Ogni dispositivo ha voci diverse: quelle "naturali" o di rete suonano molto meglio di quelle di base (metalliche).
+   Scio le ordina per qualità; la persona può comunque sceglierne una a mano nelle impostazioni. */
+function punteggioVoce(v, lang) {
+  const l = String(v.lang || '').replace('_', '-').toLowerCase(), n = String(v.name || ''), L = String(lang).toLowerCase();
+  let p = 0;
+  if (l === L) p += 40; else if (l.slice(0, 2) === L.slice(0, 2)) p += 20; else return -1000;
+  if (/natural|neural|wavenet|studio|premium|enhanced|migliorat|alta qualit|high.?quality/i.test(n)) p += 60;
+  if (/google/i.test(n)) p += 35;
+  if (/online|network/i.test(n)) p += 30;
+  if (/microsoft/i.test(n)) p += 10;
+  if (/espeak|festival|pico|compact|\blite\b|rhvoice|mbrola/i.test(n)) p -= 80;
+  if (v.default) p += 3;
+  if (v.localService === false && navigator.onLine === false) p -= 300;
+  return p;
+}
+function vociLingua(lang) {
+  try { return speechSynthesis.getVoices().map(v => [punteggioVoce(v, lang), v]).filter(x => x[0] > -1000).sort((a, b) => b[0] - a[0]).map(x => x[1]); } catch (e) { return []; }
+}
+function scegliVoce(lang, nome) { const vs = vociLingua(lang); return vs.length ? ((nome && vs.find(v => v.name === nome)) || vs[0]) : null; }
 function fermaVoce() { TOKEN++; try { speechSynthesis.cancel(); } catch (e) { /* non disponibile */ } try { if (V && V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } if (V) V.rec = null; }
-function parlaCb(testo, cb, bnd) {
+function parlaCb(testo, cb, bnd, opz) {
   if (!('speechSynthesis' in window)) { toast(t('voce_non')); if (cb) cb(); return null; }
+  opz = opz || {};
   try {
     speechSynthesis.cancel(); const id = ++TOKEN;
-    const u = new SpeechSynthesisUtterance(testo); u.lang = voceDi(); const vv = scegliVoce(u.lang); if (vv) u.voice = vv;
-    u.rate = (S.profilo && S.profilo.vel) || 0.9;
-    u.onend = () => { if (id === TOKEN && cb) cb(); };
-    u.onerror = ev => { if (id !== TOKEN || ev.error === 'interrupted' || ev.error === 'canceled') return; toast(t('voce_non')); if (cb) cb(); };
-    if (bnd) u.onboundary = ev => { if (id === TOKEN) bnd(ev); };
-    speechSynthesis.speak(u); return u;
+    const lang = opz.lingua ? LINGUE_VOCE[opz.lingua] : voceDi();
+    const nome = opz.voce !== undefined ? opz.voce : (S.profilo && S.profilo.voce);
+    const vel = opz.vel || (S.profilo && S.profilo.vel) || 0.9;
+    const prima = scegliVoce(lang, nome); let ripiego = false;
+    const crea = vv => {
+      const u = new SpeechSynthesisUtterance(testo); u.lang = lang; if (vv) u.voice = vv;
+      u.rate = vel; u.pitch = 1;
+      u.onend = () => { if (id === TOKEN && cb) cb(); };
+      u.onerror = ev => {
+        if (id !== TOKEN || ev.error === 'interrupted' || ev.error === 'canceled') return;
+        const locale = vociLingua(lang).find(x => x.localService);
+        if (!ripiego && vv && vv.localService === false && locale) { ripiego = true; try { speechSynthesis.cancel(); speechSynthesis.speak(crea(locale)); return; } catch (e) { /* si segnala sotto */ } }
+        toast(t('voce_non')); if (cb) cb();
+      };
+      if (bnd) u.onboundary = ev => { if (id === TOKEN) bnd(ev); };
+      return u;
+    };
+    const u = crea(prima); speechSynthesis.speak(u); return u;
   } catch (e) { toast(t('voce_non')); if (cb) cb(); return null; }
 }
+/* Elenco delle voci nelle impostazioni (le voci si caricano con calma: si riempie anche quando arrivano) */
+function riempiVoci() {
+  const s = document.getElementById('voce-sel'); if (!s) return;
+  const sel = document.getElementById('lingua-fig');
+  const lg = (sel && sel.value) || (S.profilo && S.profilo.lingua) || 'it';
+  const cur = s.dataset.pronto ? s.value : (s.dataset.cur || ''); s.dataset.pronto = '1';
+  const vs = vociLingua(LINGUE_VOCE[lg] || 'it-IT');
+  s.innerHTML = '<option value="">' + esc(t('voce_auto')) + '</option>' + vs.map(v => '<option value="' + esc(v.name) + '">' + esc(v.name + ' (' + v.lang + ')') + '</option>').join('');
+  s.value = vs.some(v => v.name === cur) ? cur : '';
+}
+try { speechSynthesis.getVoices(); speechSynthesis.addEventListener('voiceschanged', riempiVoci); } catch (e) { /* voce non disponibile */ }
 function leggiConEvidenza(testo) {
   const clean = plain(testo); if (!clean) return;
   const parole = []; const re = /\S+/g; let m;
@@ -678,6 +720,8 @@ function bloccoAspetto(p) {
   const cur = p.font || 'tema';
   return '<label class="f">' + t('carattere') + '<select data-pref="font">' + opt('tema', 'f_tema', cur) + opt('lexend', 'f_lexend', cur) + opt('andika', 'f_andika', cur) + opt('atkinson', 'f_atkinson', cur) + opt('sistema', 'f_sistema', cur) + '</select></label>' +
     r('fs', 0.8, 1.6, 0.1, p.fs || 1, 'dimensione') + r('lh', 1.3, 2.4, 0.1, p.lh || 1.6, 'interlinea') + r('ls', 0, 0.2, 0.02, p.ls || 0, 'spaz_lettere') + r('ws', 0, 0.4, 0.05, p.ws || 0, 'spaz_parole') + r('vel', 0.5, 1.4, 0.1, p.vel || 0.9, 'vel_lettura') +
+    '<label class="f">' + t('voce_scelta') + '<select data-pref="voce" id="voce-sel" data-cur="' + esc(p.voce || '') + '"><option value="">' + esc(t('voce_auto')) + '</option></select></label>' +
+    '<button class="btn sec small" type="button" data-act="prova-voce">' + t('prova_voce') + '</button><p class="muted">' + t('voce_aiuto') + '</p>' +
     '<div class="fb" id="anteprima">' + t('anteprima') + '</div>';
 }
 function bloccoTema(p) {
@@ -891,7 +935,8 @@ function render() {
       }
     });
   }
-  if (v === 'setup' || v === 'aspetto') anteprima();
+  if (v === 'setup' || v === 'aspetto') { anteprima(); riempiVoci(); }
+  if (v === 'setup') document.getElementById('lingua-fig').addEventListener('change', riempiVoci);
   if (V.voce) voceTick();
 }
 function anteprima() {
@@ -987,6 +1032,12 @@ const AZ = {
     V.busy = false; render();
   },
   'stop': () => { fermaVoce(); V.lettura = null; },
+  'prova-voce': () => {
+    const sv = document.getElementById('voce-sel'), sl = document.getElementById('lingua-fig'), sp = document.querySelector('[data-pref="vel"]');
+    const lg = (sl && sl.value) || (S.profilo && S.profilo.lingua) || 'it';
+    fermaVoce(); parlaCb(I18N[lg].voce_frase, null, null, { voce: sv ? sv.value : '', lingua: lg, vel: sp ? parseFloat(sp.value) : 0 });
+    return 'async';
+  },
   'meglio': async el => { const c = S.capitoli.find(x => x.id === V.cap); const s = c.spiegazioni[+el.dataset.i]; const box = document.getElementById('m' + el.dataset.i); box.innerHTML = '<p><span class="spin"></span></p>';
     try { if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); box.innerHTML = '<div class="fb">In demo la spiegazione alternativa non è disponibile. Con la chiave AI, Scio la riscrive con parole e un esempio diversi.</div>'; }
       else { const t = await chiamaAI('Sei Scio, tutor di studio. Spiega in modo diverso, più semplice, con un nuovo esempio concreto. Massimo 6 frasi brevi, in italiano. Solo testo.\n\n' + profiloTesto(), 'Concetto: ' + s.concetto + '\nSpiegazione precedente: ' + s.spiegazione, []); box.innerHTML = '<div class="fb">' + md(t) + '</div>'; } }
@@ -1078,7 +1129,7 @@ const AZ = {
     const livello = document.getElementById('livello').value === 'media' ? 'media' : 'superiori';
     const lg2 = document.getElementById('lingua-fig').value;
     const rm = document.getElementById('rmpin');
-    const prof = { nome: nome, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: (document.querySelector('input[name=tema]:checked') || {}).value || consigliato(livello, dsa), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
+    const prof = { nome: nome, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: (document.querySelector('input[name=tema]:checked') || {}).value || consigliato(livello, dsa), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
     if (f) f.profilo = prof; else { const n = statoVuoto(); n.profilo = prof; DB.figli.push(n); }
     salva(); V.edit = null;
     if (!f && DB.figli.length === 1) attiva(DB.figli[0].id); else { V.vista = 'genitori'; V.genitoriOk = true; }
@@ -1144,7 +1195,7 @@ document.addEventListener('input', e => {
   const el = e.target; if (!el.dataset || !el.dataset.pref) return;
   if (el.type === 'radio' && !el.checked) return;
   if (V.vista === 'aspetto' && S.profilo) {
-    const k = el.dataset.pref; S.profilo[k] = (k === 'font' || k === 'tema') ? el.value : parseFloat(el.value);
+    const k = el.dataset.pref; S.profilo[k] = (k === 'font' || k === 'tema' || k === 'voce') ? el.value : parseFloat(el.value);
     salva(); applicaTema();
   }
   anteprima();
