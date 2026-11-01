@@ -1,10 +1,13 @@
-# Scio v0.10 — app di studio installabile (PWA)
+# Scio v0.10.1 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+
+## Novità della v0.10.1
+- Correzione: la nuova versione richiede anche `style.css` (colori della mappa concettuale). Quando aggiorni carica sempre tutti i file della cartella.
 
 ## Novità della v0.10
 - **Mappa concettuale**: in ogni capitolo c'è la nuova scheda "Mappa concettuale". Un pulsante la crea dal riassunto del capitolo: concetti collegati da frasi brevi ("comprende", "causa"...), con ingrandimento, adattamento allo schermo, lettura ad alta voce, stampa (pagina orizzontale) e file di testo. Per chi usa lo screen reader c'è anche l'elenco dei collegamenti in forma di testo. Senza chiave AI (modalità demo) la mappa viene ricavata dallo Schema.

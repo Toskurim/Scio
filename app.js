@@ -2,7 +2,7 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.10';
+const VERSIONE = '0.10.1';
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';

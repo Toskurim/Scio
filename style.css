@@ -115,3 +115,25 @@ input[type=range]{width:100%;min-height:36px}
 [dir=rtl] .dsainfo ul{margin:4px 18px 4px 0}
 [dir=rtl] .tree{border-left:0;border-right:4px solid var(--accent);padding-left:0;padding-right:14px}
 [dir=rtl] .tree ul{padding-left:0;padding-right:20px}
+
+/* v0.10: mappe concettuali */
+.mappa-wrap{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.mp-svg{display:block;max-width:none}
+.mappa-wrap .mp-svg{max-width:none}
+#stampa .mp-svg{max-width:100%;height:auto}
+.mp-arco{fill:none;stroke:var(--muted);stroke-width:2}
+.mp-cross{stroke-dasharray:6 5}
+.mp-fr{fill:var(--muted)}
+.mp-lab{fill:var(--card);stroke:var(--border);stroke-width:1}
+.mp-lt{font-size:12px;fill:var(--ink);font-family:inherit}
+.mp-n{stroke:var(--accent);stroke-width:2}
+.mp-d0{fill:var(--accent)} .mp-d1{fill:var(--soft)} .mp-d2{fill:var(--card)} .mp-d3{fill:var(--card);stroke:var(--border)}
+.mp-t{font-size:14px;font-family:inherit;font-weight:600}
+.mp-td0{fill:var(--acc-ink)} .mp-td1,.mp-td2,.mp-td3{fill:var(--ink)}
+@media print{
+  @page mappa{size:landscape}
+  #stampa .mappa-pg{page:mappa}
+  #stampa .mp-d0{fill:#222} #stampa .mp-td0{fill:#fff}
+  #stampa .mp-d1,#stampa .mp-d2,#stampa .mp-d3{fill:#fff} #stampa .mp-td1,#stampa .mp-td2,#stampa .mp-td3,#stampa .mp-lt{fill:#000}
+  #stampa .mp-n{stroke:#000} #stampa .mp-arco{stroke:#000} #stampa .mp-fr{fill:#000} #stampa .mp-lab{fill:#fff;stroke:#888}
+}
