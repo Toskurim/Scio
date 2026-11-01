@@ -1,34 +1,36 @@
-# Scio v0.6 — app di studio installabile (PWA)
+# Scio v0.7 — app di studio installabile (PWA)
 
-Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC, e dopo la prima apertura parte anche senza rete (le funzioni AI richiedono comunque internet, o Ollama sul PC di casa).
+Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
-## Pubblicare su GitHub Pages
-1. Su github.com, in alto a destra **+ › New repository**. Nome: `scio`. Visibilità: **Public** (Pages gratuito richiede un repository pubblico). Non aggiungere README.
-2. **uploading an existing file** › trascina **dentro la pagina tutto il contenuto della cartella** (non la cartella stessa; includi `fonts`, `icons` e il file `.nojekyll`) › **Commit changes**.
-3. **Settings › Pages › Build and deployment › Source: Deploy from a branch › Branch `main` / `(root)` › Save.**
-4. Dopo circa un minuto l'indirizzo è `https://toskurim.github.io/scio/`.
-5. Aprilo da Chrome/Edge: menu › **Installa app** (su iPhone: Condividi › Aggiungi a Home).
+## Novità della v0.7
+- Un profilo per ogni figlio (PIN personale facoltativo) e un'unica area genitori con PIN.
+- Lingue: area genitori e studio del ragazzo possono avere lingue diverse (italiano, inglese, tedesco, francese, spagnolo, rumeno, albanese, arabo con scrittura da destra a sinistra, cinese). Le traduzioni dell'interfaccia non sono state controllate da madrelingua: si correggono in `i18n.js`.
+- Ripasso dilazionato delle domande sbagliate (dopo 1, 3, 7, 16, 35 giorni).
+- Quiz a voce, lettura ad alta voce con la parola evidenziata, carattere/spaziatura/dimensione personalizzabili.
+- Calendario delle verifiche con piano di ripasso.
+- "Controlla il mio svolgimento": foto del proprio lavoro, indica dove controllare senza mai scrivere la soluzione.
+- I test hanno da 20 a 30 domande.
+- Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-**Nel repository non va mai messa nessuna chiave API.** La chiave si inserisce solo dentro l'app, sul dispositivo.
+## Aggiornare il sito su GitHub (da v0.6 a v0.7)
+1. Decomprimi lo zip.
+2. Nel repository su github.com: **Add file › Upload files** e trascina **tutto il contenuto** della cartella (cartelle `fonts` e `icons` comprese). I file con lo stesso nome vengono sostituiti; `i18n.js` è nuovo.
+3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.
+4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione di Scio pronta".
 
-## Sicurezza (cosa è stato fatto)
-- Politica di sicurezza della pagina (CSP) molto restrittiva: nessuno script esterno, nessun inline, collegamenti consentiti solo ad Anthropic, OpenRouter, Gemini, Groq e al PC locale. Font inclusi nel sito, nessuna risorsa esterna.
-- Chiave API cifrata (AES-GCM) con una chiave del dispositivo non esportabile; mai in chiaro nel browser.
-- PIN genitori salvato solo come impronta (PBKDF2, 150.000 giri, sale casuale), 4-8 cifre, PIN banali rifiutati, blocco crescente dopo 3 errori.
-- Copia dei dati senza chiave né PIN; il ripristino ricostruisce ogni campo con controlli di tipo e lunghezza, quindi un file manomesso non può inserire codice. Dopo il ripristino si sceglie un nuovo PIN e si reinserisce la chiave.
-- Indirizzi AI personalizzati ammessi solo se sul PC locale, Gemini o Groq.
-- La pagina non si lascia incorniciare in altri siti; il service worker non memorizza mai le chiamate AI.
-- Il file `_headers` aggiunge intestazioni HTTP complete (incluso `frame-ancestors`) se in futuro userai Netlify o Cloudflare Pages; GitHub Pages le ignora.
+## Sicurezza
+- Politica di sicurezza della pagina (CSP) restrittiva: nessuno script esterno, nessun inline; collegamenti solo ad Anthropic, OpenRouter, Gemini, Groq e al PC locale.
+- Chiave API cifrata (AES-GCM) con chiave del dispositivo non esportabile.
+- PIN genitori e PIN dei figli salvati solo come impronta (PBKDF2, sale casuale), 4-8 cifre, PIN banali rifiutati, blocco crescente dopo 3 errori.
+- Copia dei dati senza chiave né PIN; il ripristino ricostruisce ogni campo con controlli di tipo e lunghezza.
+- Quiz a voce: il riconoscimento vocale è del browser, che può inviare l'audio al proprio fornitore.
 
 ### Limiti onesti
-- Il PIN protegge dai figli curiosi, non da chi ha il dispositivo sbloccato e conoscenze tecniche: i dati sono comunque nel browser.
-- Con GitHub Pages non si possono impostare intestazioni HTTP: la protezione anti-incorniciamento è affidata allo script.
-- Proteggi l'account GitHub con la verifica in due passaggi e un'email sicura: chi lo controlla potrebbe cambiare il codice.
-- Sul tuo account imposta in Console Anthropic un tetto di spesa mensile (già fatto: 10 $).
-
-## Collegare l'AI
-Area genitori › Impostazioni. Claude/OpenRouter con chiave; Gemini e Groq con chiave; Ollama o LM Studio **solo sul PC dove girano** (imposta `OLLAMA_ORIGINS=https://toskurim.github.io`). Da telefono usa una chiave online.
+- I PIN tengono lontani i curiosi, non chi ha il dispositivo sbloccato e competenze tecniche.
+- GitHub Pages non permette intestazioni HTTP: la protezione anti-incorniciamento è affidata allo script.
+- Proteggi l'account GitHub con la verifica in due passaggi.
+- La stampa e il file di testo restano in italiano nei titoli; i contenuti seguono la lingua del ragazzo.
 
 Licenze font: cartella `fonts` (SIL OFL).
