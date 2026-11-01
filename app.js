@@ -2,7 +2,7 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.11';
+const VERSIONE = '0.12';
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -182,7 +182,7 @@ function legendaColori() {
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
-function lg() { return (['genitori', 'fam', 'setup', 'scelta'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
+function lg() { return (['genitori', 'fam', 'setup', 'scelta', 'stat'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
 function applicaTema() {
   const p = S.profilo, b = document.body, r = document.documentElement;
   b.setAttribute('data-tema', p && TEMI[p.tema] ? p.tema : 'calmo');
@@ -1017,6 +1017,82 @@ function vEsercizio() {
   if (es.finito) h += '<div class="card"><div class="fb ok"><b>' + t('es_completato') + '</b> ' + t('indizi_usati', { n: es.indiziTotali }) + '</div><button class="btn" data-act="home">' + t('torna_studio') + '</button></div>';
   return h + '<div class="row" style="margin-bottom:12px"><button class="btn sec small" data-act="apri-materia" data-m="' + esc(es.materia) + '">‹ ' + esc(es.materia) + '</button></div>' + boxSposta(es, 'es') + '<p class="muted" style="text-align:center">' + t('no_soluzione') + '</p>';
 }
+/* ===== Statistiche per i genitori ===== */
+function statisticheFiglio(f, adesso) {
+  const oggi = zero(adesso || new Date());
+  const gg = iso => { const d = new Date(iso); return isNaN(d) ? null : fmtData(zero(d)); };
+  const attivita = {}, add = iso => { const g = gg(iso); if (g) attivita[g] = (attivita[g] || 0) + 1; };
+  arr(f.capitoli).forEach(c => { add(c.data); arr(c.risultati).forEach(r => add(r.data)); });
+  arr(f.esercizi).forEach(e => add(e.data));
+  const giorni = n => Array.from({ length: n }, (_, k) => { const d = new Date(oggi); d.setDate(oggi.getDate() - (n - 1 - k)); const sd = fmtData(d); return { giorno: sd, n: attivita[sd] || 0, data: d }; });
+  const g14 = giorni(14), g30 = giorni(30);
+  const norm = x => String(x || '').trim().toLowerCase();
+  const tutti = [];
+  arr(f.capitoli).forEach(c => arr(c.risultati).forEach(r => { const d = new Date(r.data); if (!isNaN(d)) tutti.push({ t: d.getTime(), data: r.data, pct: Math.round(100 * r.punti / (r.totale || 1)), titolo: c.titolo, materia: c.materia, errati: arr(r.errati) }); }));
+  tutti.sort((a, b) => a.t - b.t);
+  const media = tutti.length ? Math.round(tutti.reduce((a, x) => a + x.pct, 0) / tutti.length) : null;
+  const mat = {};
+  arr(f.capitoli).forEach(c => { const k = norm(c.materia) || '—'; (mat[k] = mat[k] || { materia: c.materia || '—', capitoli: 0, ris: [] }).capitoli++; });
+  tutti.forEach(r => { const k = norm(r.materia) || '—'; (mat[k] = mat[k] || { materia: r.materia || '—', capitoli: 0, ris: [] }).ris.push(r); });
+  const mean = a => a.reduce((x, y) => x + y.pct, 0) / a.length;
+  const materie = Object.keys(mat).sort().map(k => {
+    const m = mat[k], r = m.ris; let tr = 'poco';
+    if (r.length >= 2) { const ult = r.slice(-3), prima = r.slice(0, Math.max(0, r.length - 3)).slice(-3); if (prima.length) { const d = mean(ult) - mean(prima); tr = d >= 8 ? 'su' : d <= -8 ? 'giu' : 'stabile'; } }
+    return { materia: m.materia, capitoli: m.capitoli, test: r.length, media: r.length ? Math.round(mean(r)) : null, ultimo: r.length ? r[r.length - 1].data : '', trend: tr };
+  });
+  const cont = {};
+  tutti.forEach(r => r.errati.forEach(a => { const k = norm(a); if (!k) return; const o = cont[k] = cont[k] || { argomento: a.trim(), volte: 0, materie: new Set() }; o.volte++; if (r.materia) o.materie.add(r.materia); }));
+  const deboli = Object.keys(cont).map(k => ({ argomento: cont[k].argomento, volte: cont[k].volte, materie: [...cont[k].materie] })).sort((a, b) => b.volte - a.volte || a.argomento.localeCompare(b.argomento)).slice(0, 10);
+  const os = fmtData(oggi), limite = new Date(oggi); limite.setDate(limite.getDate() - 3); const lim = fmtData(limite);
+  const rip = Object.keys(f.rip || {}).map(k => f.rip[k]).filter(r => r && r.next);
+  const ripasso = { totale: rip.length, dovute: rip.filter(r => r.next <= os).length, ritardo: rip.filter(r => r.next < lim).length };
+  const verifiche = arr(f.verifiche).map(v => ({ materia: v.materia, argomento: v.argomento, data: v.data, giorni: Math.round((parseData(v.data) - oggi) / 864e5) })).filter(x => x.giorni >= 0 && x.giorni <= 30).sort((a, b) => a.giorni - b.giorni).map(x => {
+    const r = tutti.filter(y => norm(y.materia) === norm(x.materia)); x.nTest = r.length; x.ultimoPct = r.length ? r[r.length - 1].pct : null; return x;
+  });
+  const es = arr(f.esercizi), fin = es.filter(e => e.finito);
+  return { capitoli: arr(f.capitoli).length, test: tutti.length, media, esercizi: es.length, esFiniti: fin.length, indiziMedi: fin.length ? Math.round(10 * fin.reduce((a, e) => a + e.indiziTotali, 0) / fin.length) / 10 : null, controlli: f.controlli || 0,
+    g14, attivi7: g14.slice(-7).filter(g => g.n > 0).length, attivi30: g30.filter(g => g.n > 0).length, ultimiTest: tutti.slice(-20), materie, deboli, ripasso, verifiche };
+}
+function graficoAttivita(st, lang) {
+  const w = 28, h = 70, G = st.g14, max = Math.max(1, Math.max.apply(null, G.map(g => g.n)));
+  let barre = '';
+  G.forEach((g, i) => {
+    const x = 6 + i * w, bh = Math.round(g.n / max * (h - 14));
+    barre += (g.n ? '<rect class="st-bar" x="' + (x + 4) + '" y="' + (h - bh) + '" width="' + (w - 8) + '" height="' + bh + '" rx="3"/><text class="st-t" x="' + (x + w / 2) + '" y="' + (h - bh - 3) + '" text-anchor="middle">' + g.n + '</text>' : '<rect class="st-zero" x="' + (x + 4) + '" y="' + (h - 2) + '" width="' + (w - 8) + '" height="2"/>') +
+      '<text class="st-t st-d" x="' + (x + w / 2) + '" y="' + (h + 14) + '" text-anchor="middle">' + esc(g.data.toLocaleDateString(lang, { weekday: 'narrow' })) + '</text>';
+  });
+  return '<svg class="st-svg" viewBox="0 0 ' + (12 + 14 * w) + ' ' + (h + 20) + '" width="' + (12 + 14 * w) + '" role="img" aria-label="' + esc(t('stat_attivita') + ': ' + t('stat_giorni7', { a: st.attivi7 })) + '">' + barre + '</svg>';
+}
+function graficoTest(st) {
+  const L = st.ultimiTest, w = 28, h = 100; let barre = '';
+  L.forEach((r, i) => {
+    const x = 6 + i * w, bh = Math.max(2, Math.round(r.pct * 0.8));
+    barre += '<rect class="' + (r.pct >= 70 ? 'st-ok' : 'st-basso') + '" x="' + (x + 3) + '" y="' + (90 - bh) + '" width="' + (w - 6) + '" height="' + bh + '" rx="3"/><text class="st-t" x="' + (x + w / 2) + '" y="' + (90 - bh - 3) + '" text-anchor="middle">' + r.pct + '</text>';
+  });
+  const vw = 12 + Math.max(L.length, 20) * w;
+  return '<svg class="st-svg" viewBox="0 0 ' + vw + ' ' + h + '" width="' + vw + '" role="img" aria-label="' + esc(t('stat_test_tempo') + ': ' + L.map(r => r.pct + '%').join(', ')) + '"><line class="st-soglia" x1="0" x2="' + vw + '" y1="' + (90 - 56) + '" y2="' + (90 - 56) + '"/>' + barre + '</svg>';
+}
+function statisticheCorpo(f, st) {
+  const lang = LINGUE_VOCE[LINGUA_CORRENTE], tr = { su: '↑ ' + t('stat_su'), giu: '↓ ' + t('stat_giu'), stabile: '→ ' + t('stat_stabile'), poco: '– ' + t('stat_poco') };
+  const vuoto = '<p class="muted">' + t('stat_vuoto') + '</p>';
+  return '<div class="row"><span class="chip">' + t('n_cap', { n: st.capitoli }) + '</span><span class="chip">' + t('test_fatti') + ': ' + st.test + '</span>' +
+    '<span class="chip ' + (st.media != null && st.media < 60 ? 'warn' : st.media != null ? 'ok' : '') + '">' + t('stat_media') + ': ' + (st.media != null ? st.media + '%' : '–') + '</span>' +
+    '<span class="chip">' + t('n_es', { n: st.esercizi }) + '</span><span class="chip">' + t('stat_controlli') + ': ' + st.controlli + '</span></div>' +
+    '<h3 style="margin-top:16px">' + t('stat_attivita') + '</h3><p>' + t('stat_giorni7', { a: st.attivi7 }) + ' · ' + t('stat_giorni30', { a: st.attivi30 }) + '</p>' + graficoAttivita(st, lang) + '<p class="muted">' + t('stat_giorni_nota') + '</p>' +
+    '<h3 style="margin-top:16px">' + t('stat_test_tempo') + '</h3>' + (st.ultimiTest.length ? graficoTest(st) + '<p class="muted">' + t('stat_soglia') + '</p>' : vuoto) +
+    '<h3 style="margin-top:16px">' + t('stat_materie') + '</h3>' + (st.materie.length ? '<div class="st-scroll"><table class="st-tab"><thead><tr><th>' + t('stat_materia') + '</th><th>' + t('stat_cap') + '</th><th>' + t('stat_test') + '</th><th>' + t('stat_media_c') + '</th><th>' + t('stat_trend') + '</th></tr></thead><tbody>' +
+      st.materie.map(m => '<tr><td>' + esc(m.materia) + '</td><td>' + m.capitoli + '</td><td>' + m.test + '</td><td>' + (m.media != null ? m.media + '%' : '–') + '</td><td>' + tr[m.trend] + '</td></tr>').join('') + '</tbody></table></div>' : vuoto) +
+    '<h3 style="margin-top:16px">' + t('stat_deboli') + '</h3>' + (st.deboli.length ? '<ul>' + st.deboli.map(d => '<li><b>' + esc(d.argomento) + '</b> — ' + t('stat_volte', { n: d.volte }) + (d.materie.length ? ' <span class="muted">(' + esc(d.materie.join(', ')) + ')</span>' : '') + '</li>').join('') + '</ul>' : vuoto) +
+    '<h3 style="margin-top:16px">' + t('stat_ripasso') + '</h3><p>' + t('stat_rip_riga', { a: st.ripasso.totale, b: st.ripasso.dovute, c: st.ripasso.ritardo }) + '</p>' +
+    '<h3 style="margin-top:16px">' + t('stat_verifiche') + '</h3>' + (st.verifiche.length ? '<ul>' + st.verifiche.map(v => '<li><b>' + esc(v.materia) + '</b>' + (v.argomento ? ' · ' + esc(v.argomento) : '') + ' — ' + esc(quando(v.giorni)) + ' <span class="muted">(' + (v.ultimoPct != null ? t('stat_ultimo_test', { p: v.ultimoPct }) : t('stat_nessun_test')) + ')</span></li>').join('') + '</ul>' : vuoto) +
+    '<h3 style="margin-top:16px">' + t('stat_esercizi') + '</h3><p>' + (st.esercizi ? t('stat_es_riga', { f: st.esFiniti, n: st.esercizi, m: st.indiziMedi != null ? st.indiziMedi : '–' }) : t('stat_vuoto')) + '</p>';
+}
+function vStat() {
+  const f = DB.figli.find(x => x.id === V.statF);
+  if (!V.genitoriOk || !f) return vGenitori();
+  const st = statisticheFiglio(f);
+  return barra() + '<div class="card"><div class="row"><button class="btn sec small" data-act="stat-indietro">‹ ' + t('area_gen') + '</button><button class="btn sec small" data-act="stat-stampa">' + t('stat_stampa') + '</button></div><h1 style="margin-top:10px">' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1>' + statisticheCorpo(f, st) + '</div>';
+}
 function vGenitori() {
   if (!V.genitoriOk) return barra() + '<div class="card"><h1>' + t('area_gen') + '</h1><label class="f">' + t('pin') + '<input type="password" id="pinin" inputmode="numeric" maxlength="8" autocomplete="off"></label><button class="btn" data-act="pin-ok">' + t('entra') + '</button></div>';
   const lang = LINGUE_VOCE[LINGUA_CORRENTE];
@@ -1025,7 +1101,7 @@ function vGenitori() {
     const s0 = S; S = f; const nrip = ripDovute().length, ver = prossimeVerifiche(30); S = s0;
     rr.sort((a, b) => b.r.data.localeCompare(a.r.data));
     return '<div class="card"><h2>' + esc(f.profilo.nome) + (f.profilo.pin ? ' 🔒' : '') + '</h2><div class="row"><span class="chip">' + t('n_cap', { n: f.capitoli.length }) + '</span><span class="chip">' + t('test_fatti') + ': ' + rr.length + '</span><span class="chip">' + t('n_es', { n: f.esercizi.length }) + '</span><span class="chip ' + (nrip ? 'warn' : '') + '">' + t('ripasso_oggi') + ': ' + nrip + '</span></div><p></p>' +
-      '<div class="row"><button class="btn small" data-act="apri-figlio" data-id="' + f.id + '">' + t('apri_come', { n: esc(f.profilo.nome) }) + '</button><button class="btn sec small" data-act="modifica-figlio" data-id="' + f.id + '">' + t('modifica') + '</button><button class="btn sec small" data-act="elimina-figlio" data-id="' + f.id + '">' + t('elimina_figlio') + '</button></div>' +
+      '<div class="row"><button class="btn small" data-act="stat-apri" data-id="' + f.id + '">' + t('stat_btn') + '</button><button class="btn small" data-act="apri-figlio" data-id="' + f.id + '">' + t('apri_come', { n: esc(f.profilo.nome) }) + '</button><button class="btn sec small" data-act="modifica-figlio" data-id="' + f.id + '">' + t('modifica') + '</button><button class="btn sec small" data-act="elimina-figlio" data-id="' + f.id + '">' + t('elimina_figlio') + '</button></div>' +
       (ver.length ? '<p></p><b>' + t('verifiche') + '</b>' + ver.map(x => '<p>' + esc(x.v.materia) + (x.v.argomento ? ' · ' + esc(x.v.argomento) : '') + ' <span class="chip ' + (x.d <= 3 ? 'warn' : '') + '">' + esc(quando(x.d)) + '</span></p>').join('') : '') +
       '<details><summary>' + t('da_rinforzare') + '</summary>' + (rr.length ? rr.slice(0, 8).map(x => '<p><b>' + esc(x.c.titolo) + '</b> · ' + t('p_su_n', { p: x.r.punti, n: x.r.totale }) + ' · ' + esc(new Date(x.r.data).toLocaleDateString(lang)) + (x.r.errati.length ? '<br><span class="muted">' + t('da_ripassare') + ': ' + esc(x.r.errati.join(', ')) + '</span>' : '') + '</p>').join('') : '<p class="muted">' + t('nessun_test') + '</p>') + '</details>' +
       '<details><summary>' + t('contenuti') + '</summary>' + (f.capitoli.length ? f.capitoli.map(c => '<p><b>' + esc(c.titolo) + '</b> <span class="muted">(' + esc(c.materia) + ')</span> <button class="btn sec small" data-act="apri-cap-di" data-f="' + f.id + '" data-id="' + c.id + '">' + t('vedi') + '</button></p>').join('') : '<p class="muted">–</p>') + f.esercizi.map(e => '<p><b>' + esc(e.materia) + '</b>: ' + esc(e.richiesta).slice(0, 70) + ' <span class="chip ' + (e.finito ? 'ok' : 'warn') + '">' + (e.finito ? t('completato') : t('in_corso')) + '</span></p>').join('') + '</details></div>';
@@ -1040,10 +1116,10 @@ function render() {
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
   if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
-  if (!['genitori', 'fam', 'setup'].includes(V.vista)) V.genitoriOk = false;
+  if (!['genitori', 'fam', 'setup', 'stat'].includes(V.vista)) V.genitoriOk = false;
   applicaTema();
   const v = V.vista;
-  const M = { fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, aspetto: vAspetto, ripasso: vRipasso };
+  const M = { fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
   document.getElementById('app').innerHTML = (M[v] || vHome)();
   const f1 = document.getElementById('f1'), f2 = document.getElementById('f2');
   if (f1) f1.onchange = e => aggiungiFoto([...e.target.files]);
@@ -1163,6 +1239,13 @@ const AZ = {
   },
   'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const t = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = t; return 'async'; },
   'scarica': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; const b = new Blob(['\ufeff' + dispensaTesto(c)], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (c.titolo || 'capitolo').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) + '.txt'; document.body.appendChild(a); a.click(); a.remove(); return 'async'; },
+  'stat-apri': el => { V.statF = el.dataset.id; V.vista = 'stat'; },
+  'stat-indietro': () => { V.vista = 'genitori'; },
+  'stat-stampa': () => {
+    const f = DB.figli.find(x => x.id === V.statF); if (!f) return 'async';
+    document.getElementById('stampa').innerHTML = '<section><h1>' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1><p class="meta">' + esc(new Date().toLocaleDateString(LINGUE_VOCE[LINGUA_CORRENTE])) + ' · Scio</p>' + statisticheCorpo(f, statisticheFiglio(f)) + '</section>';
+    const tt = document.title; document.title = t('stat_di', { n: f.profilo.nome }); try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
+  },
   'mappa-modifica': () => {
     const c = mappaCorr(); if (!c) return 'async';
     V.mEdit = !V.mEdit; V.mundo = [];

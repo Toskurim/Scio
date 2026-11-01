@@ -1,10 +1,14 @@
-# Scio v0.11 — app di studio installabile (PWA)
+# Scio v0.12 — app di studio installabile (PWA)
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+
+## Novità della v0.12
+- **Statistiche per i genitori**: nell'Area genitori, sulla scheda di ogni ragazzo, c'è il pulsante "Statistiche" con: capitoli, test e media; giorni con attività negli ultimi 7 e 30 giorni (grafico a colonne degli ultimi 14); risultati degli ultimi 20 test con la linea del 70%; tabella per materia con media e andamento (in salita, stabile, in calo); argomenti sbagliati più spesso; stato del ripasso dilazionato; verifiche dei prossimi 30 giorni con l'ultimo risultato di quella materia; esercizi guidati e indizi usati. Si può stampare o salvare in PDF.
+- I dati vengono solo dal dispositivo e restano visibili solo con il PIN dei genitori. Le statistiche contano giorni di attività, non il tempo passato sull'app.
 
 ## Novità della v0.11
 - **Modifica a mano della mappa concettuale**: in "Mappa concettuale" il pulsante "Modifica la mappa" permette di toccare un nodo (o sceglierlo dall'elenco) e: cambiare il testo e la frase del collegamento, spostarlo sotto un altro nodo, cambiarne l'ordine (Su/Giù), aggiungere un nodo figlio, creare o togliere collegamenti tratteggiati tra rami diversi, eliminare un nodo con i suoi sotto-nodi. "Annulla ultima modifica" riporta indietro fino a 30 passi. Le modifiche si salvano da sole e finiscono anche nella stampa e nella copia dei dati.

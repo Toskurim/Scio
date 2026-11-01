@@ -144,3 +144,19 @@ input[type=range]{width:100%;min-height:36px}
 .mp-n.mp-sel{stroke:var(--ink);stroke-width:5}
 #mp-pannello ul{padding-left:20px}
 #mp-pannello li{margin-bottom:6px}
+
+/* v0.12: statistiche per i genitori */
+.st-svg{display:block;max-width:100%;height:auto}
+.st-bar{fill:var(--accent)} .st-zero{fill:var(--border)}
+.st-ok{fill:var(--accent)} .st-basso{fill:var(--card);stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3}
+.st-t{font-size:10px;fill:var(--ink);font-family:inherit} .st-d{fill:var(--muted)}
+.st-soglia{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4}
+.st-scroll{overflow-x:auto}
+.st-tab{border-collapse:collapse;width:100%;font-size:.95rem}
+.st-tab th,.st-tab td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left}
+[dir=rtl] .st-tab th,[dir=rtl] .st-tab td{text-align:right}
+@media print{
+  #stampa .st-bar,#stampa .st-ok{fill:#333} #stampa .st-basso{fill:#fff;stroke:#000} #stampa .st-t{fill:#000} #stampa .st-zero{fill:#999} #stampa .st-soglia{stroke:#000}
+  #stampa .st-tab{border-collapse:collapse;width:100%} #stampa .st-tab th,#stampa .st-tab td{border-bottom:1px solid #888;padding:3pt 6pt;text-align:left}
+  #stampa .st-svg{max-width:100%;height:auto;break-inside:avoid} #stampa h3{break-after:avoid}
+}
