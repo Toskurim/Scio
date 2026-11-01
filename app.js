@@ -2,7 +2,8 @@
 /* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.8.1';
+const VERSIONE = '0.9';
+const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
 const LS_VECCHIO = 'scio.v0.1';
@@ -140,7 +141,7 @@ function pulisciDati(o) {
   if (!grezzi) throw new Error('non valido');
   const figli = grezzi.filter(f => f && typeof f === 'object' && f.profilo && typeof f.profilo === 'object').slice(0, 12).map(c => {
     const pr = c.profilo;
-    const profilo = { nome: Tx(pr.nome, 60), livello: pr.livello === 'media' ? 'media' : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '' };
+    const profilo = { nome: Tx(pr.nome, 60), livello: LIVELLI.includes(pr.livello) ? pr.livello : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '' };
     Object.keys(DSA).forEach(k => { if (pr.dsa && pr.dsa[k] === true) profilo.dsa[k] = true; });
     const capitoli = A(c.capitoli).filter(x => x && typeof x === 'object').slice(0, 500).map(x => ({
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
@@ -191,14 +192,20 @@ function applicaTema() {
 }
 function consigliato(livello, dsa) {
   if (dsa && (dsa.dislessia || dsa.discalculia || dsa.disortografia || dsa.disgrafia)) return 'calmo';
-  return livello === 'media' ? 'gioco' : 'calmo';
+  return (livello === 'media' || livello === 'elementari') ? 'gioco' : 'calmo';
 }
 
 /* ===== Collegamento all'AI ===== */
+const TESTO_LIVELLO = {
+  elementari: 'scuola elementare (6-10 anni). ADATTA TUTTO A UN BAMBINO: frasi corte (al massimo 12 parole), parole semplici e concrete, niente gergo; ogni spiegazione al massimo 3 frasi con un esempio dalla vita di tutti i giorni; riassunto_breve di 3 frasi; nel glossario definizioni con parole da bambino; tono giocoso e incoraggiante; il test ha da 10 a 15 domande (invece di 20-30), con domande molto semplici e dirette',
+  media: 'scuola media (11-13 anni)',
+  superiori: 'scuola superiore (14-18 anni)',
+  universita: 'università (19 anni e oltre). ADATTA TUTTO A UNO STUDENTE ADULTO: registro tecnico e rigoroso, terminologia disciplinare corretta, definizioni precise, spiegazioni più approfondite con collegamenti tra concetti e con la teoria più ampia; nel test privilegia domande di ragionamento e applicazione rispetto alla memoria'
+};
 function profiloTesto() {
   const p = S.profilo;
   const dsa = Object.keys(DSA).filter(k => p.dsa && p.dsa[k]).map(k => DSA[k]);
-  return 'Studente: ' + p.nome + ', ' + (p.livello === 'media' ? 'scuola media (11-13 anni)' : 'scuola superiore (14-18 anni)') + '.\n' +
+  return 'Studente: ' + p.nome + ', ' + TESTO_LIVELLO[p.livello || 'superiori'] + '.\n' +
     (dsa.length ? 'Adattamenti obbligatori per DSA:\n- ' + dsa.join('\n- ') : 'Nessun adattamento DSA particolare.') +
     (p.colori
       ? '\nEvidenziazione a colori, SOLO in riassunto_breve e riassunto_completo: racchiudi tra [[c:...]] i concetti e le definizioni chiave, tra [[d:...]] le date, i numeri, le quantità e le formule da ricordare, tra [[p:...]] i nomi di persone, i luoghi e i termini tecnici. Non usare il doppio asterisco. Non evidenziare più di un sesto del testo.'
@@ -753,7 +760,7 @@ function vSetup() {
   const p = f ? f.profilo : { nome: '', livello: 'superiori', dsa: {}, tema: '', fs: 1, lingua: 'it', font: 'tema', lh: 0, ls: 0, ws: 0, vel: 0.9, pin: '' };
   return barra() + '<div class="card"><h1>' + (f ? esc(p.nome) : t('aggiungi_figlio')) + '</h1></div>' +
     '<div class="card"><label class="f">' + t('nome') + '<input type="text" id="nome" value="' + esc(p.nome) + '" autocomplete="off"></label>' +
-    '<label class="f">' + t('livello') + '<select id="livello"><option value="media"' + (p.livello === 'media' ? ' selected' : '') + '>' + t('media') + '</option><option value="superiori"' + (p.livello === 'superiori' ? ' selected' : '') + '>' + t('superiori') + '</option></select></label>' +
+    '<label class="f">' + t('livello') + '<select id="livello">' + LIVELLI.map(k => '<option value="' + k + '"' + (p.livello === k ? ' selected' : '') + '>' + t(k) + '</option>').join('') + '</select></label>' +
     '<p class="muted">' + t('primaria_dopo') + '</p>' +
     '<label class="f">' + t('lingua_figlio') + '<select id="lingua-fig">' + LINGUE_ORD.map(l => '<option value="' + l + '"' + ((p.lingua || 'it') === l ? ' selected' : '') + '>' + LINGUE[l] + '</option>').join('') + '</select></label><p class="muted">' + t('lingua_nota') + '</p></div>' +
     '<div class="card"><h2>' + t('come_studia') + '</h2><p class="muted">' + t('piu_profili') + '</p>' +
@@ -1126,7 +1133,7 @@ const AZ = {
     const dsa = {}; document.querySelectorAll('[data-dsa]').forEach(x => { if (x.checked) dsa[x.dataset.dsa] = true; });
     const g = k => { const e = document.querySelector('[data-pref="' + k + '"]'); return e ? e.value : ''; };
     const num = (k, d) => { const v = parseFloat(g(k)); return isFinite(v) ? v : d; };
-    const livello = document.getElementById('livello').value === 'media' ? 'media' : 'superiori';
+    const livello = LIVELLI.includes(document.getElementById('livello').value) ? document.getElementById('livello').value : 'superiori';
     const lg2 = document.getElementById('lingua-fig').value;
     const rm = document.getElementById('rmpin');
     const prof = { nome: nome, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: (document.querySelector('input[name=tema]:checked') || {}).value || consigliato(livello, dsa), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
