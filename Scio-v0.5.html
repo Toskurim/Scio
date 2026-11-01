@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scio v0.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fs:1}
+[data-tema=calmo]{--bg:#F6F3EC;--card:#FFFFFF;--ink:#1F2A37;--muted:#4A5565;--accent:#2F5FA8;--acc-ink:#FFFFFF;--border:#D8D1C0;--soft:#DCE8F7;--mark:#FFE9A8;--mark-ink:#1F2A37;--ok:#D9EEE3;--ok-ink:#14543A;--warn:#FBE7C2;--warn-ink:#6B4208;--font:'Lexend',system-ui,sans-serif;--r:16px;--bw:2px;--shadow:none}
+[data-tema=gioco]{--bg:#FFF1CC;--card:#FFFFFF;--ink:#2B1B4D;--muted:#4B3A74;--accent:#6C3FC5;--acc-ink:#FFFFFF;--border:#2B1B4D;--soft:#EFE8FF;--mark:#FFC93C;--mark-ink:#2B1B4D;--ok:#B8F0D2;--ok-ink:#2B1B4D;--warn:#FFD9A0;--warn-ink:#2B1B4D;--font:'Atkinson Hyperlegible',system-ui,sans-serif;--r:22px;--bw:3px;--shadow:0 5px 0 #2B1B4D}
+[data-tema=notte]{--bg:#161B24;--card:#212936;--ink:#E6EAF0;--muted:#B4BDCB;--accent:#5ED1C0;--acc-ink:#0C1F1C;--border:#3A465A;--soft:#2A3342;--mark:#F2B84B;--mark-ink:#1B1500;--ok:#1F3D36;--ok-ink:#BFF0E6;--warn:#4A3A1A;--warn-ink:#F6D58F;--font:'Andika',system-ui,sans-serif;--r:16px;--bw:2px;--shadow:none}
+*{box-sizing:border-box}
+html{font-size:calc(16px * var(--fs))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6}
+#app{max-width:880px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:1.6rem;line-height:1.3;margin:0}
+h2{font-size:1.25rem;line-height:1.4;margin:0 0 8px}
+h3{font-size:1.1rem;margin:0 0 6px}
+p{margin:0 0 10px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:1.4rem;color:var(--accent)}
+.brand{background:none;border:0;padding:4px 8px;margin-left:-8px;border-radius:10px;cursor:pointer;font-family:inherit;text-align:left;min-height:44px}
+.brand:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.brand small{font-size:.7rem;color:var(--muted);font-weight:400;margin-left:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{background:var(--card);border:var(--bw) solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.btn{min-height:48px;padding:0 18px;border:var(--bw) solid var(--accent);border-radius:calc(var(--r) - 4px);background:var(--accent);color:var(--acc-ink);font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.sec{background:var(--card);color:var(--accent)}
+.btn.full{width:100%}
+.btn.small{min-height:44px;padding:0 12px;font-size:.9rem}
+.btn:disabled{opacity:.5;cursor:default}
+.chip{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--ink);font-size:.85rem;font-weight:700;border:2px solid transparent}
+.chip.ok{background:var(--ok);color:var(--ok-ink)}
+.chip.warn{background:var(--warn);color:var(--warn-ink)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
+.tab{min-height:44px;padding:0 16px;border:var(--bw) solid var(--border);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+.tab.on{background:var(--accent);color:var(--acc-ink);border-color:var(--accent)}
+label.f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;font-weight:600}
+input[type=text],input[type=password],input[type=number],select,textarea{font:inherit;padding:10px 12px;border:2px solid var(--border);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:80px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 12px;border:2px solid var(--border);border-radius:12px;margin-bottom:6px;background:var(--card);font-weight:600}
+.chk input{width:22px;height:22px;accent-color:var(--accent)}
+mark{background:var(--mark);color:var(--mark-ink);padding:0 4px;border-radius:4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+mark.m-d{background:#BFDDF5;color:#10243A;font-weight:700}
+mark.m-p{background:#C8EBC9;color:#10301A;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.legenda{margin:10px 0;padding:8px 12px;border:var(--bw) solid var(--border);border-radius:12px;font-size:.95rem;line-height:2}
+.dsainfo{margin:2px 0 12px 32px;padding:10px 14px;border-left:4px solid var(--accent);background:var(--soft);border-radius:8px;font-size:.95rem}
+.dsainfo ul{margin:4px 0 4px 18px;padding:0}
+.muted{color:var(--muted);font-size:.9rem}
+.opt{display:block;width:100%;text-align:left;min-height:52px;padding:10px 14px;margin-bottom:8px;border:var(--bw) solid var(--border);border-radius:calc(var(--r) - 4px);background:var(--card);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.opt.sel{border-color:var(--accent);background:var(--soft)}
+.opt.good{background:var(--ok);color:var(--ok-ink);border-color:var(--ok-ink)}
+.opt.bad{background:var(--warn);color:var(--warn-ink);border-color:var(--warn-ink)}
+.fb{padding:12px 14px;border-radius:calc(var(--r) - 4px);margin:10px 0;border:2px solid var(--border);background:var(--soft)}
+.fb.ok{background:var(--ok);color:var(--ok-ink)}
+.fb.warn{background:var(--warn);color:var(--warn-ink)}
+ #stampa{display:none}
+@media print{
+  body{background:#fff!important;color:#000!important}
+  #app,.toast{display:none!important}
+  #stampa{display:block;color:#000;background:#fff;font-size:12pt;line-height:1.55}
+  #stampa h1{font-size:21pt;margin:0 0 2pt} #stampa .meta{color:#444;margin:0 0 10pt;font-size:10pt}
+  #stampa h2{font-size:14pt;margin:16pt 0 6pt;border-bottom:1px solid #888;padding-bottom:2pt;break-after:avoid}
+  #stampa h3{font-size:12pt;margin:8pt 0 2pt;break-after:avoid}
+  #stampa mark{background:#ffe9a0;color:#000;padding:0 1pt}
+  #stampa mark.m-d{background:#BFDDF5;font-weight:700} #stampa mark.m-p{background:#C8EBC9;text-decoration:underline}
+  #stampa .legenda{border:1px solid #777;border-radius:6pt;padding:4pt 8pt;margin:6pt 0 10pt;font-size:10pt;line-height:2}
+  #stampa .nuova{break-before:page}
+  #stampa h3{break-after:avoid}
+  #stampa .ramo{break-inside:avoid;border:1px solid #777;border-radius:6pt;padding:5pt 10pt;margin:6pt 0}
+  #stampa .radice{display:inline-block;border:2px solid #000;border-radius:8pt;padding:4pt 12pt;font-weight:700;margin-bottom:6pt}
+  #stampa ul{margin:2pt 0 2pt 16pt;padding:0} #stampa p{margin:3pt 0}
+  @page{margin:16mm}
+}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.mat{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-height:96px;padding:14px 16px;border:var(--bw) solid var(--border);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer;box-shadow:var(--shadow)}
+.mat b{font-size:1.15rem}
+.mat:focus-visible,.mat:hover{border-color:var(--accent)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.th{position:relative;width:140px}
+.th img{width:140px;height:140px;object-fit:cover;border-radius:12px;border:2px solid var(--border)}
+.th .row{margin-top:4px;gap:2px;flex-wrap:nowrap}
+.th button{min-width:44px;min-height:44px;border:2px solid var(--border);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;cursor:pointer}
+.tree{border-left:4px solid var(--accent);padding-left:14px;margin:8px 0 16px}
+.tree ul{margin:6px 0;padding-left:20px}
+.step{display:flex;gap:10px;align-items:flex-start}
+.num{min-width:30px;height:30px;border-radius:15px;background:var(--accent);color:var(--acc-ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.num.done{background:var(--ok-ink);color:var(--ok)}
+.spin{width:28px;height:28px;border:4px solid var(--soft);border-top-color:var(--accent);border-radius:50%;animation:g 1s linear infinite;display:inline-block}
+@keyframes g{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;max-width:90%;z-index:9}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body data-tema="calmo">
+<div id="app"></div>
+<div id="stampa" aria-hidden="true"></div>
+<script>
+'use strict';
+/* ===== Scio v0.5 — prototipo web (un solo file) ===== */
+const VERSIONE = '0.5';
+const LS = 'scio.v0.2';
+const LS_VECCHIO = 'scio.v0.1';
+/* Servizi "compatibili OpenAI": stesso formato, cambia solo l'indirizzo. */
+const PRESET = {
+  ollama:   { nome: 'Ollama sul mio PC (gratis, privato)', url: 'http://localhost:11434/v1', modello: 'gemma4:26b', chiave: false },
+  lmstudio: { nome: 'LM Studio sul mio PC (gratis, privato)', url: 'http://localhost:1234/v1', modello: '', chiave: false },
+  gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-2.5-flash', chiave: true },
+  groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true },
+  altro:    { nome: 'Altro indirizzo (compatibile OpenAI)', url: '', modello: '', chiave: false }
+};
+const DSA = {
+  discalculia: 'Discalculia: spiegazioni di numeri e calcoli passo passo, un passaggio per volta, con esempi concreti e visivi prima delle formule; numeri piccoli negli esempi; nei test valuta il ragionamento e non la velocità o il calcolo mentale.',
+  dislessia: 'Dislessia: frasi brevi (al massimo 15 parole), una sola idea per frase, parole semplici, elenchi puntati, parole chiave evidenziate con **doppio asterisco**; evita incisi e periodi lunghi.',
+  disortografia: 'Disortografia: nei test non penalizzare gli errori di scrittura; se serve, spiega la regola ortografica con un esempio; evita domande che chiedono di scrivere parole difficili.',
+  disgrafia: 'Disgrafia: preferisci risposte a scelta o molto brevi; poche domande a risposta scritta.'
+};
+const TEMI = { calmo: 'Calmo', gioco: 'Gioco', notte: 'Notte' };
+const MATERIE = ['Italiano','Storia','Geografia','Scienze','Matematica','Fisica','Chimica','Biologia','Inglese','Latino','Greco','Filosofia','Scienze umane','Arte','Tecnologia','Musica','Educazione civica','Religione','Altro'];
+
+let S = caricaStato();
+let V = { vista: S.profilo ? 'home' : 'setup', tab: 'riassunto', foto: [], busy: false, errore: '', test: null, es: null, bozza: '', cap: null, genitoriOk: false };
+
+function caricaStato() {
+  try { const r = JSON.parse(localStorage.getItem(LS) || localStorage.getItem(LS_VECCHIO)); if (r && typeof r === 'object') return Object.assign({ profilo: null, capitoli: [], esercizi: [] }, r); } catch (e) {}
+  return { profilo: null, capitoli: [], esercizi: [] };
+}
+function salva() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Non riesco a salvare: lo spazio è pieno.'); } }
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function coloriOn() { return !!(S.profilo && S.profilo.colori); }
+function md(s) {
+  const col = coloriOn();
+  return esc(s)
+    .replace(/\[\[([dcp]):(.+?)\]\]/g, (m, k, x) => '<mark class="' + (col ? 'm-' + k : '') + '">' + x + '</mark>')
+    .replace(/\*\*(.+?)\*\*/g, (m, x) => '<mark class="' + (col ? 'm-c' : '') + '">' + x + '</mark>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\n/g, '<br>').replace(/(<\/h3>)<br>/g, '$1');
+}
+function legendaColori() {
+  return coloriOn() ? '<div class="legenda" role="note"><b>Legenda dei colori:</b> <mark class="m-c">concetti e definizioni</mark> <mark class="m-d">date e numeri da ricordare</mark> <mark class="m-p">nomi, luoghi e termini tecnici</mark></div>' : '';
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
+function applicaTema() {
+  const p = S.profilo;
+  document.body.setAttribute('data-tema', p && TEMI[p.tema] ? p.tema : 'calmo');
+  document.documentElement.style.setProperty('--fs', p && p.fs ? p.fs : 1);
+}
+function consigliato(livello, dsa) {
+  if (dsa && (dsa.dislessia || dsa.discalculia || dsa.disortografia || dsa.disgrafia)) return 'calmo';
+  return livello === 'media' ? 'gioco' : 'calmo';
+}
+
+/* ===== Collegamento all'AI ===== */
+function profiloTesto() {
+  const p = S.profilo;
+  const dsa = Object.keys(DSA).filter(k => p.dsa && p.dsa[k]).map(k => DSA[k]);
+  return 'Studente: ' + p.nome + ', ' + (p.livello === 'media' ? 'scuola media (11-13 anni)' : 'scuola superiore (14-18 anni)') + '.\n' +
+    (dsa.length ? 'Adattamenti obbligatori per DSA:\n- ' + dsa.join('\n- ') : 'Nessun adattamento DSA particolare.') +
+    (p.colori
+      ? '\nEvidenziazione a colori, SOLO in riassunto_breve e riassunto_completo: racchiudi tra [[c:...]] i concetti e le definizioni chiave, tra [[d:...]] le date, i numeri, le quantità e le formule da ricordare, tra [[p:...]] i nomi di persone, i luoghi e i termini tecnici. Non usare il doppio asterisco. Non evidenziare più di un sesto del testo.'
+      : '\nEvidenzia le parole chiave con **doppio asterisco** (un solo tipo di evidenziazione, senza colori diversi).') +
+    '\nUsa un linguaggio adatto all\'età, sempre incoraggiante, mai giudicante.';
+}
+async function chiamaAI(system, testo, immagini, cfg, json) {
+  const a = cfg || S.profilo.ai || {};
+  const compat = a.provider === 'compat';
+  if (a.provider === 'demo' || (!a.key && !compat)) throw new Error('NODEMO');
+  if (compat && !a.url) throw new Error('Manca l\'indirizzo del servizio (Area genitori › Impostazioni).');
+  if (a.provider === 'anthropic') {
+    const content = (immagini || []).map(u => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: u.split(',')[1] } }));
+    content.push({ type: 'text', text: testo });
+    const corpo = Object.assign({ model: a.model || 'claude-haiku-5-5', max_tokens: json ? 16000 : 8000, system: json ? system.replace(/Rispondi SOLO con (un )?JSON( valido)?(, senza testo prima o dopo, con questa struttura)?:?/g, 'Struttura dei dati da consegnare:') + '\n\nConsegna il risultato chiamando lo strumento "consegna" e compila OGNI campo separatamente: testo nei campi di testo, elenchi negli elenchi. Non scrivere MAI JSON o nomi di campo dentro un campo di testo.' : system, messages: [{ role: 'user', content: content }] },
+      json ? { tools: [{ name: 'consegna', description: 'Consegna il risultato strutturato', input_schema: (typeof json === 'object' ? json : { type: 'object', additionalProperties: true }) }], tool_choice: { type: 'tool', name: 'consegna' } } : {});
+    const chiama = c => fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': a.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify(c)
+    });
+    /* temperatura 0: a parità di foto, risultati il più possibile uguali tra una generazione e l'altra */
+    let r = await chiama(Object.assign({ temperature: 0 }, corpo));
+    if (!r.ok && r.status === 400) { const t0 = await r.clone().text(); if (/temperature/i.test(t0)) r = await chiama(corpo); }
+    if (!r.ok) throw new Error('Errore ' + r.status + ': ' + (await r.text()).slice(0, 300));
+    const j = await r.json();
+    if (json) {
+      if (j.stop_reason === 'max_tokens') throw new Error('La risposta è diventata troppo lunga e si è interrotta. Usa meno foto alla volta oppure scrivi un "Focus" per limitare gli argomenti.');
+      const tu = (j.content || []).find(c => c.type === 'tool_use');
+      if (tu && tu.input) return JSON.stringify(tu.input);
+    }
+    return (j.content || []).map(c => c.text || '').join('');
+  }
+  const content = [{ type: 'text', text: testo }].concat((immagini || []).map(u => ({ type: 'image_url', image_url: { url: u } })));
+  const url = compat ? a.url.replace(/\/+$/, '') + '/chat/completions' : 'https://openrouter.ai/api/v1/chat/completions';
+  const head = { 'content-type': 'application/json' };
+  if (a.key) head.authorization = 'Bearer ' + a.key;
+  if (!compat) head['x-title'] = 'Scio';
+  let r;
+  try {
+    r = await fetch(url, { method: 'POST', headers: head,
+      body: JSON.stringify({ model: a.model || (compat ? undefined : 'google/gemini-2.5-flash'), temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }) });
+  } catch (e) {
+    throw new Error(compat ? 'Non riesco a raggiungere ' + a.url + '. Controlla che il programma sia acceso e che accetti collegamenti dal browser (vedi guida).' : 'Rete non raggiungibile: ' + e.message);
+  }
+  if (!r.ok) throw new Error('Errore ' + r.status + ': ' + (await r.text()).slice(0, 300));
+  const j = await r.json();
+  if (!j.choices || !j.choices[0]) throw new Error('Risposta vuota dal servizio AI.');
+  return j.choices[0].message.content || '';
+}
+function leggiJSON(t) {
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b < 0) throw new Error('La risposta dell\'AI non è nel formato atteso. Riprova.');
+  const g = t.slice(a, b + 1);
+  try { return JSON.parse(g); } catch (e) { return JSON.parse(g.replace(/,\s*([}\]])/g, '$1')); }
+}
+
+/* Schemi dei risultati: con Claude l'API obbliga a compilare tutti i campi. */
+const T = { type: 'string' }, LS_ = { type: 'array', items: { type: 'string' } };
+const OBJ = (properties, required) => ({ type: 'object', properties, required: required || Object.keys(properties) });
+const SCHEMA_CAPITOLO = OBJ({
+  inventario: Object.assign({ description: 'COMPILA PER PRIMO: elenco completo di argomenti, definizioni, date, nomi, tecniche e termini evidenziati nelle pagine (anche riquadri, box e didascalie)' }, LS_),
+  titolo: T, avvisi: LS_, riassunto_breve: LS_, riassunto_completo: Object.assign({ description: 'Riassunto in sezioni, una per ogni paragrafo del libro, ciascuna con riga "### Titolo"; nessun argomento saltato' }, T),
+  schema: OBJ({ radice: T, rami: { type: 'array', items: OBJ({ titolo: T, punti: LS_ }) } }),
+  spiegazioni: { type: 'array', description: 'Almeno 5 concetti spiegati in modo semplice, ciascuno con un esempio pratico', items: OBJ({ concetto: T, spiegazione: T, esempio: T }) },
+  glossario: { type: 'array', description: 'Almeno 8 termini chiave', items: OBJ({ termine: T, definizione: T }) },
+  test: { type: 'array', description: 'Esattamente 8 domande: 6 con tipo "scelta" (4 opzioni) e 2 con tipo "vf"', items: OBJ({ tipo: { type: 'string', enum: ['scelta', 'vf'] }, argomento: T, domanda: T, opzioni: Object.assign({ description: 'Solo per tipo scelta: 4 opzioni' }, LS_), corretta: { description: 'Per scelta: indice 0-3 dell\'opzione giusta. Per vf: true o false' }, spiegazione: T }, ['tipo', 'argomento', 'domanda', 'corretta', 'spiegazione']) }
+});
+const SCHEMA_ESERCIZIO = OBJ({
+  materia: T, richiesta: T,
+  passi: { type: 'array', description: '3-6 passi di ragionamento', items: OBJ({ titolo: T, domanda: T, obiettivo: T, indizi: Object.assign({ description: 'Esattamente 3 indizi dal più leggero al più chiaro, senza la soluzione' }, LS_), esempio_simile: T }) }
+});
+const SCHEMA_VALUTA = OBJ({ esito: { type: 'string', enum: ['giusto', 'quasi', 'da_rivedere'] }, feedback: T });
+
+/* ===== Stampa e download ===== */
+function dispensaHTML(c) {
+  const li = a => '<ul>' + arr(a).map(x => '<li>' + md(x) + '</li>').join('') + '</ul>';
+  const intest = '<p class="meta">' + esc(c.titolo) + ' · ' + esc(c.materia) + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con Scio</p>';
+  const sezioni = [];
+  sezioni.push('<h1>' + esc(c.titolo) + '</h1>' + intest + legendaColori() + '<h2>In breve</h2>' + li(c.riassunto_breve) + '<h2>Riassunto</h2><p>' + md(c.riassunto_completo) + '</p>');
+  if (arr(c.schema && c.schema.rami).length) sezioni.push(intest + '<h2>Schema</h2><div class="radice">' + esc(c.schema.radice || c.titolo) + '</div>' + arr(c.schema.rami).map(r => '<div class="ramo"><h3>' + md(r.titolo) + '</h3>' + li(r.punti) + '</div>').join(''));
+  if (arr(c.spiegazioni).length) sezioni.push(intest + '<h2>Spiegazioni</h2>' + c.spiegazioni.map(x => '<h3>' + md(x.concetto) + '</h3><p>' + md(x.spiegazione) + '</p><p><b>Esempio:</b> ' + md(x.esempio) + '</p>').join(''));
+  if (arr(c.glossario).length) sezioni.push(intest + '<h2>Glossario</h2>' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join(''));
+  return sezioni.map((x, n) => '<section' + (n ? ' class="nuova"' : '') + '>' + x + '</section>').join('');
+}
+function dispensaTesto(c) {
+  const pulisci = t => String(t == null ? '' : t).replace(/\[\[[dcp]:(.+?)\]\]/g, '$1').replace(/\*\*/g, '').replace(/^### /gm, '');
+  const r = [c.titolo, c.materia + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con Scio', '', 'IN BREVE'].concat(arr(c.riassunto_breve).map(x => '- ' + pulisci(x)));
+  r.push('', 'RIASSUNTO', pulisci(c.riassunto_completo));
+  if (arr(c.schema && c.schema.rami).length) { r.push('', 'SCHEMA', pulisci(c.schema.radice || c.titolo)); c.schema.rami.forEach(x => { r.push('  ' + pulisci(x.titolo)); arr(x.punti).forEach(p => r.push('    - ' + pulisci(p))); }); }
+  if (arr(c.spiegazioni).length) { r.push('', 'SPIEGAZIONI'); c.spiegazioni.forEach(x => r.push(pulisci(x.concetto), '  ' + pulisci(x.spiegazione), '  Esempio: ' + pulisci(x.esempio), '')); }
+  if (arr(c.glossario).length) { r.push('GLOSSARIO'); c.glossario.forEach(g => r.push(pulisci(g.termine) + ': ' + pulisci(g.definizione))); }
+  return r.join('\n');
+}
+const SYS_COMPLETA = `Sei Scio, un tutor di studio per ragazzi italiani. Ti viene dato il riassunto di un capitolo. Prepara le parti mancanti SOLO a partire da quel testo, senza inventare nulla che non sia nel riassunto: schema, spiegazioni, glossario e test, con le stesse regole del materiale di studio (italiano semplice, parole chiave con **doppio asterisco**, test di 8 domande: 6 a scelta e 2 vero/falso). Nei campi titolo, riassunto_breve e riassunto_completo ripeti il testo ricevuto.`;
+/* Ripara i capitoli in cui l'AI ha scritto il resto dei dati dentro il testo del riassunto. */
+function riparaCapitolo(c) {
+  const rc = String(c.riassunto_completo || '');
+  const m = /["”]\s*,\s*"(spiegazioni|schema|glossario|test)"\s*:/.exec(rc);
+  if (!m) return false;
+  const head = rc.slice(0, m.index);
+  const tail = rc.slice(m.index).replace(/^["”]\s*,\s*/, '').replace(/\r?\n/g, ' ');
+  let o = null;
+  for (const cand of ['{' + tail, '{' + tail + '}', '{' + tail.replace(/\}\s*$/, ''), '{' + tail.replace(/\}\s*$/, '') + '}']) { try { o = JSON.parse(cand); break; } catch (e) { /* si prova la forma successiva */ } }
+  c.riassunto_completo = head;
+  if (o) {
+    if (o.schema && arr(o.schema.rami).length && !arr(c.schema && c.schema.rami).length) c.schema = o.schema;
+    ['spiegazioni', 'glossario', 'test'].forEach(k => { if (arr(o[k]).length && !arr(c[k]).length) c[k] = o[k]; });
+  }
+  return true;
+}
+/* Chiede un risultato in JSON; se la risposta è malformata, riprova una volta da sola. */
+async function chiediJSON(system, testo, immagini, schema) {
+  let ultimo;
+  for (let n = 0; n < 2; n++) {
+    try { const r = leggiJSON(await chiamaAI(system, testo, immagini, undefined, schema || true)); if (r && typeof r.riassunto_completo === 'string') riparaCapitolo(r); return r; }
+    catch (e) { ultimo = e; if (e instanceof SyntaxError || /formato atteso/.test(e.message)) continue; throw e; }
+  }
+  throw new Error('L\'AI ha risposto in un formato non valido anche al secondo tentativo (' + ultimo.message + '). Riprova, magari con meno foto.');
+}
+(function () { let m = false; (S.capitoli || []).forEach(c => { if (riparaCapitolo(c)) m = true; }); if (m) salva(); })();
+/* ===== Materie ===== */
+function pl(n, uno, molti) { return n + ' ' + (n === 1 ? uno : molti); }
+function sameM(a, b) { return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase(); }
+function migraMaterie() {
+  S.materie = arr(S.materie).filter(x => typeof x === 'string' && x.trim());
+  arr(S.capitoli).concat(arr(S.esercizi)).forEach(x => { if (x.materia && !S.materie.some(m => sameM(m, x.materia))) S.materie.push(x.materia); });
+}
+function elementiMateria(m) { return { cap: S.capitoli.filter(c => sameM(c.materia, m)), es: S.esercizi.filter(e => sameM(e.materia, m)) }; }
+migraMaterie();
+(function () { const p = S.profilo; if (p && p.colori === undefined) { p.colori = !(p.dsa && p.dsa.dislessia); salva(); } })();
+function arr(x) { return Array.isArray(x) ? x : []; }
+
+const SYS_CAPITOLO = `Sei Scio, un tutor di studio per ragazzi italiani. Ricevi le foto delle pagine di un capitolo di un libro di scuola.
+Regole:
+- Scrivi sempre in italiano.
+- Usa SOLO i contenuti presenti nelle pagine. Non inventare. Se una parte è illeggibile o tagliata, scrivilo in "avvisi".
+- Le foto sono scattate con il telefono e spesso compresse (es. WhatsApp): ignora lo sfondo e gli oggetti attorno al libro, leggi con attenzione anche il testo piccolo e le didascalie, e segnala in "avvisi" solo le parti davvero illeggibili.
+- Se è indicato un focus, lavora SOLO su quei paragrafi o argomenti.
+- COPERTURA TOTALE: il riassunto completo segue l'ordine del libro e deve toccare TUTTI gli argomenti trattati, dall'inizio all'ultima pagina, anche se le pagine sono tante (17 o più). Per OGNI paragrafo o titolo del libro scrivi una sezione che inizia con una riga "### Titolo del paragrafo" seguita dal testo. Meglio sezioni brevi di un argomento mancante.
+- COMPLETEZZA: prima compila "inventario" elencando TUTTO ciò che le pagine contengono di importante: ogni argomento, definizione, data, nome, luogo, tecnica e parola evidenziata (grassetto, colori, riquadri di approfondimento, box laterali, didascalie, note). Poi assicurati che OGNI voce dell'inventario compaia nel riassunto completo e abbia una spiegazione o una voce di glossario. I riquadri di approfondimento (per esempio un metodo o una tecnica) hanno una spiegazione dedicata. Non omettere mai ciò che il libro mette in evidenza: è quello che l'insegnante chiede.
+- Spiega in modo semplice e pratico, con esempi concreti e analogie.
+- Evidenzia le parole chiave nel modo indicato nel profilo dello studente (sotto).
+- Rispondi SOLO con un JSON valido, senza testo prima o dopo, con questa struttura:
+{"inventario":["..."],"titolo":"...","avvisi":["..."],"riassunto_breve":["5 frasi brevi al massimo"],"riassunto_completo":"testo con paragrafi separati da \\n\\n","schema":{"radice":"concetto centrale","rami":[{"titolo":"...","punti":["...","..."]}]},"spiegazioni":[{"concetto":"...","spiegazione":"...","esempio":"..."}],"glossario":[{"termine":"...","definizione":"..."}],"test":[{"tipo":"scelta","argomento":"...","domanda":"...","opzioni":["a","b","c","d"],"corretta":0,"spiegazione":"..."},{"tipo":"vf","argomento":"...","domanda":"...","corretta":true,"spiegazione":"..."}]}
+- Spiegazioni: almeno 5; glossario: almeno 8 termini; il test copre argomenti diversi dell'inventario.
+- Il test ha 8 domande: 6 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e 2 vero/falso. Le domande verificano la comprensione, non la memoria di dettagli. Le spiegazioni sono gentili e spiegano il perché.`;
+
+const SYS_ESERCIZIO = `Sei Scio, un tutor che GUIDA IL RAGIONAMENTO. Ricevi la foto di un esercizio (matematica, fisica, latino, greco o altro).
+REGOLA ASSOLUTA: non dare MAI la soluzione, né il risultato finale, né la traduzione completa. Lo studente deve arrivarci da solo.
+Dividi l'esercizio in 3-6 passi di ragionamento (cosa chiede, cosa so, quale regola o metodo serve, come si combinano, controllo finale).
+Per matematica e fisica controlla con cura i calcoli per te stesso. Per latino e greco guida l'analisi (verbo, soggetto, casi, complementi) senza tradurre.
+Rispondi SOLO con un JSON valido:
+{"materia":"...","richiesta":"l'esercizio riscritto in modo chiaro","passi":[{"titolo":"...","domanda":"domanda guida per lo studente","obiettivo":"cosa deve aver capito o ottenuto (SOLO per te, può contenere la risposta attesa)","indizi":["indizio leggero","indizio medio","indizio più chiaro ma senza soluzione"],"esempio_simile":"un esempio breve con dati diversi che mostra il metodo, senza risolvere questo esercizio"}]}
+Scrivi in italiano, con tono incoraggiante.`;
+
+const SYS_VALUTA = `Sei Scio, tutor che guida il ragionamento. Ricevi un passo di un esercizio con il suo obiettivo (riservato) e la risposta dello studente.
+Valuta se la risposta raggiunge l'obiettivo. Non rivelare MAI la soluzione o il risultato. Se la risposta è sbagliata o incompleta, individua il punto in cui il ragionamento si inceppa e fai UNA domanda che lo aiuti a rendersene conto.
+Rispondi SOLO con JSON: {"esito":"giusto"|"quasi"|"da_rivedere","feedback":"massimo 3 frasi, tono incoraggiante, in italiano"}`;
+
+/* ===== Esempi per la modalità demo ===== */
+const DEMO_CAP = {
+  titolo: 'Le civiltà fluviali', avvisi: [],
+  riassunto_breve: ['Le prime grandi civiltà nascono vicino ai **fiumi**.', 'Il fiume porta acqua e **terra fertile**: si coltiva di più.', 'Con l\'**irrigazione** i raccolti crescono e nascono i villaggi, poi le città.', 'Servono regole e una **scrittura** per contare i raccolti.', 'Esempi: Mesopotamia, Egitto, valle dell\'Indo, Cina.'],
+  riassunto_completo: 'Le prime grandi civiltà si sviluppano lungo i grandi **fiumi**: il Tigri e l\'Eufrate in Mesopotamia, il Nilo in Egitto, l\'Indo in India e il Fiume Giallo in Cina.\n\nIl fiume porta acqua e **terra fertile**. Con l\'**irrigazione**, cioè canali che portano l\'acqua ai campi, i raccolti aumentano. Così molte persone possono vivere nello stesso luogo e nascono villaggi e città.\n\nPer organizzare il lavoro e contare i raccolti servono regole, funzionari e una **scrittura**.',
+  schema: { radice: 'Civiltà fluviali', rami: [{ titolo: 'Dove nascono', punti: ['Tigri ed Eufrate (Mesopotamia)', 'Nilo (Egitto)', 'Indo', 'Fiume Giallo (Cina)'] }, { titolo: 'Perché lì', punti: ['Acqua', 'Terra fertile', 'Irrigazione e più raccolti'] }, { titolo: 'Cosa porta', punti: ['Villaggi e città', 'Regole e funzionari', 'Scrittura'] }] },
+  spiegazioni: [{ concetto: 'Irrigazione', spiegazione: 'Sono canali che portano l\'acqua del fiume fino ai campi lontani.', esempio: 'Come un annaffiatoio gigante: invece di portare l\'acqua a mano, la fai arrivare da sola.' }, { concetto: 'Perché serve la scrittura', spiegazione: 'Con tanti raccolti e tante persone, bisogna ricordare chi ha dato e chi ha ricevuto cosa.', esempio: 'È come un quaderno dei conti del negozio, ma per un\'intera città.' }],
+  glossario: [{ termine: 'Civiltà fluviale', definizione: 'Società nata lungo un grande fiume.' }, { termine: 'Irrigazione', definizione: 'Portare l\'acqua ai campi con canali.' }, { termine: 'Scriba', definizione: 'Chi sapeva scrivere e teneva i conti.' }],
+  test: [
+    { tipo: 'scelta', argomento: 'Dove nascono', domanda: 'Perché le prime civiltà nascono vicino ai fiumi?', opzioni: ['Perché i fiumi portano acqua e terra fertile', 'Perché lì fa sempre freddo', 'Perché non servono case', 'Perché ci sono più montagne'], corretta: 0, spiegazione: 'L\'acqua e la terra fertile permettono di coltivare molto cibo.' },
+    { tipo: 'scelta', argomento: 'Dove nascono', domanda: 'Quale fiume appartiene all\'Egitto?', opzioni: ['Indo', 'Nilo', 'Eufrate', 'Fiume Giallo'], corretta: 1, spiegazione: 'Il Nilo è il fiume dell\'Egitto.' },
+    { tipo: 'vf', argomento: 'Perché lì', domanda: 'L\'irrigazione serve a portare l\'acqua ai campi.', corretta: true, spiegazione: 'Sì: sono canali che portano l\'acqua dove serve.' },
+    { tipo: 'scelta', argomento: 'Cosa porta', domanda: 'A cosa serviva la scrittura?', opzioni: ['A decorare i templi', 'A contare e ricordare i raccolti', 'A giocare', 'A costruire canali'], corretta: 1, spiegazione: 'Serviva soprattutto a tenere i conti.' },
+    { tipo: 'vf', argomento: 'Cosa porta', domanda: 'Le prime città nascono prima dei villaggi.', corretta: false, spiegazione: 'Prima nascono i villaggi, poi crescono e diventano città.' }
+  ]
+};
+const DEMO_ES = {
+  materia: 'Matematica', richiesta: 'Risolvi l\'equazione (x² − 4) / (x − 2) = 0.',
+  passi: [
+    { titolo: 'Cosa ti chiede?', domanda: 'Con parole tue: che cosa devi trovare?', obiettivo: 'Trovare i valori di x che rendono vera l\'uguaglianza.', indizi: ['Rileggi la richiesta: c\'è una lettera sconosciuta.', 'Cerca il simbolo =: quale valore deve avere la frazione?', 'Devi trovare x.'], esempio_simile: 'In 2x = 10 devi trovare il numero x che moltiplicato per 2 dà 10.' },
+    { titolo: 'Cosa non può succedere?', domanda: 'In una frazione c\'è un numero che non può mai valere zero. Quale, e perché?', obiettivo: 'Il denominatore non può essere zero, quindi x ≠ 2.', indizi: ['Pensa a cosa significa dividere per zero.', 'Guarda la parte sotto la linea della frazione.', 'Quel numero non può essere 0: che valore di x lo renderebbe 0?'], esempio_simile: 'In 5/(x+1) il denominatore non può essere 0, quindi x non può essere −1.' },
+    { titolo: 'Quando una frazione vale zero?', domanda: 'Che cosa deve succedere al numeratore perché tutta la frazione faccia zero?', obiettivo: 'Il numeratore deve essere zero: x² − 4 = 0.', indizi: ['Pensa a 0 diviso 5: quanto fa?', 'Una frazione è zero quando la parte sopra è zero.', 'Scrivi la condizione sul numeratore.'], esempio_simile: 'La frazione (x − 3)/4 vale zero quando x − 3 = 0, cioè x = 3.' },
+    { titolo: 'Metti insieme tutto', domanda: 'Quali valori di x vanno bene, tenendo conto della condizione del passo 2?', obiettivo: 'x² − 4 = 0 dà x = 2 oppure x = −2; x = 2 è escluso, quindi la soluzione è x = −2.', indizi: ['Risolvi la condizione sul numeratore.', 'Controlla ogni valore con la condizione trovata prima.', 'Un valore trovato potrebbe essere escluso.'], esempio_simile: 'Se trovi x = 1 e x = 4 ma x ≠ 4, la soluzione è solo x = 1.' }
+  ]
+};
+
+/* ===== Foto ===== */
+function leggiComeUrl(file) {
+  return new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => ko(new Error('lettura del file non riuscita')); r.readAsDataURL(file); });
+}
+function caricaImg(src) {
+  return new Promise((ok, ko) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ko(new Error('il browser non riesce a decodificare l\'immagine')); im.src = src; });
+}
+async function riduci(file) {
+  const tipo = file.type || '';
+  if (/heic|heif/i.test(tipo) || /\.(heic|heif)$/i.test(file.name || '')) throw new Error('formato HEIC non supportato: scatta o salva la foto in JPG');
+  let sorgente, w, h;
+  try { sorgente = await createImageBitmap(file, { imageOrientation: 'from-image' }); w = sorgente.width; h = sorgente.height; }
+  catch (e1) {
+    try { sorgente = await caricaImg(await leggiComeUrl(file)); w = sorgente.width; h = sorgente.height; }
+    catch (e2) { sorgente = null; }
+  }
+  if (sorgente && w && h) {
+    /* foto già piccola (es. WhatsApp): si invia l'originale, senza ricomprimerla e perdere altra nitidezza */
+    if (tipo === 'image/jpeg' && Math.max(w, h) <= 1600 && file.size < 6 * 1024 * 1024) {
+      try { const o = await leggiComeUrl(file); if (o) return o; } catch (e0) { /* si prosegue */ }
+    }
+    try {
+      const k = Math.min(1, 1600 / Math.max(w, h));
+      const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+      c.getContext('2d').drawImage(sorgente, 0, 0, c.width, c.height);
+      const u = c.toDataURL('image/jpeg', 0.9);
+      if (u && u.length > 2000) return u;
+    } catch (e3) { /* si passa all'originale */ }
+  }
+  /* ultima strada: l'immagine originale, senza ridurla (se è un JPEG o PNG normale) */
+  if (/^image\/(jpeg|png|webp|gif)$/.test(tipo) && file.size < 6 * 1024 * 1024) {
+    const u = await leggiComeUrl(file); if (u) return u;
+  }
+  throw new Error('formato o file non leggibile dal browser');
+}
+async function aggiungiFoto(files) {
+  files = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name || ''));
+  if (files.length > 1) files.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it', { numeric: true }));
+  for (const f of files) { try { V.foto.push(await riduci(f)); } catch (e) { toast('Una foto non si apre: ' + e.message); } }
+  render();
+}
+
+/* ===== Elaborazione ===== */
+async function preparaCapitolo() {
+  const materia = V.materia;
+  const focus = document.getElementById('focus').value.trim();
+  V.bozza = { materia, focus };
+  if (!V.foto.length && S.profilo.ai.provider !== 'demo') { toast('Aggiungi almeno una foto.'); return; }
+  V.busy = true; V.errore = ''; render();
+  try {
+    let c;
+    if (S.profilo.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 900)); c = JSON.parse(JSON.stringify(DEMO_CAP)); }
+    else {
+      c = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + ' Genera il materiale di studio.', V.foto, SCHEMA_CAPITOLO);
+    }
+    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: arr(c.test), risultati: [] };
+    S.capitoli.unshift(cap); salva();
+    V.foto = []; V.cap = cap.id; V.tab = 'riassunto'; V.vista = 'capitolo'; V.busy = false; render();
+  } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
+}
+async function preparaEsercizio() {
+  const materia = V.materia;
+  if (!V.foto.length && S.profilo.ai.provider !== 'demo') { toast('Aggiungi la foto dell\'esercizio.'); return; }
+  V.busy = true; V.errore = ''; render();
+  try {
+    let c;
+    if (S.profilo.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 700)); c = JSON.parse(JSON.stringify(DEMO_ES)); }
+    else { c = await chiediJSON(SYS_ESERCIZIO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. Guida lo studente passo per passo.', V.foto, SCHEMA_ESERCIZIO); }
+    const es = { id: uid(), data: new Date().toISOString(), materia: materia, richiesta: c.richiesta || '', passi: arr(c.passi), i: 0, indizi: 0, indiziTotali: 0, fatti: [], finito: false };
+    if (!es.passi.length) throw new Error('Non sono riuscito a dividere l\'esercizio in passi. Prova con una foto più chiara.');
+    S.esercizi.unshift(es); salva();
+    V.foto = []; V.es = es.id; V.vista = 'esercizio'; V.busy = false; V.fb = null; V.mostra = {}; V.bozza = ''; render();
+  } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave (Area genitori › Impostazioni).' : e.message; render(); }
+}
+async function controllaIdea() {
+  const es = S.esercizi.find(x => x.id === V.es); const p = es.passi[es.i];
+  const ris = document.getElementById('idea').value.trim();
+  if (ris.length < 2) { toast('Scrivi prima la tua idea, anche solo a metà.'); return; }
+  V.bozza = ris; V.busy = true; V.errore = ''; render();
+  try {
+    let r;
+    if (S.profilo.ai.provider === 'demo') { await new Promise(x => setTimeout(x, 500)); r = ris.length > 14 ? { esito: 'giusto', feedback: 'Ben ragionato! Passiamo al passo successivo.' } : { esito: 'quasi', feedback: 'Ci sei vicino. Prova a spiegarlo con una frase intera: cosa succede e perché?' }; }
+    else { r = await chiediJSON(SYS_VALUTA + '\n\n' + profiloTesto(), 'Esercizio: ' + es.richiesta + '\nPasso: ' + p.titolo + '\nDomanda: ' + p.domanda + '\nObiettivo (riservato): ' + p.obiettivo + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA); }
+    V.busy = false;
+    if (r.esito === 'giusto') { es.fatti.push({ i: es.i, risposta: ris }); V.fb = { tipo: 'ok', testo: r.feedback || 'Giusto!' }; V.passoOk = true; }
+    else { V.fb = { tipo: 'warn', testo: r.feedback || 'Quasi: riprova.' }; V.passoOk = false; }
+    salva(); render();
+  } catch (e) { V.busy = false; V.errore = e.message; render(); }
+}
+
+/* ===== Viste ===== */
+function barra() {
+  const p = S.profilo;
+  return '<div class="bar">' + (p ? '<button class="brand" data-act="home" aria-label="Torna alla home di Scio">Scio<small>v' + VERSIONE + '</small></button>' : '<div class="brand">Scio<small>v' + VERSIONE + '</small></div>') + '<div class="row">' +
+    (p ? '<button class="btn sec small" data-act="home">Studio</button><button class="btn sec small" data-act="fs-" aria-label="Testo più piccolo">A−</button><button class="btn sec small" data-act="fs+" aria-label="Testo più grande">A+</button><button class="btn sec small" data-act="genitori">Genitori</button>' : '') + '</div></div>';
+}
+function cardCap(c) {
+  const ult = c.risultati[c.risultati.length - 1];
+  return '<div class="card"><div class="row" style="justify-content:space-between"><div><b>' + esc(c.titolo) + '</b><div class="muted">' + esc(c.materia) + (c.focus ? ' · focus: ' + esc(c.focus) : '') + '</div></div>' +
+    (ult ? '<span class="chip ' + (ult.punti / ult.totale >= .7 ? 'ok' : 'warn') + '">Test ' + ult.punti + '/' + ult.totale + '</span>' : '<span class="chip">Test da fare</span>') + '</div><p></p><button class="btn sec small" data-act="apri-cap" data-id="' + c.id + '">Apri</button></div>';
+}
+function cardEs(e) {
+  return '<div class="card"><b>' + esc(e.materia) + '</b><div class="muted">' + esc(e.richiesta).slice(0, 90) + '</div><p></p><span class="chip ' + (e.finito ? 'ok' : '') + '">' + (e.finito ? 'Completato' : 'Passo ' + (e.i + 1) + ' di ' + e.passi.length) + '</span> <button class="btn sec small" data-act="apri-es" data-id="' + e.id + '">Apri</button></div>';
+}
+function boxSposta(item, tipo) {
+  const altre = S.materie.filter(m => !sameM(m, item.materia));
+  return '<div class="card"><h3>Sbagliata la materia?</h3>' + (altre.length ? '<div class="row"><select id="spostaM" aria-label="Materia di destinazione">' + altre.map(m => '<option>' + esc(m) + '</option>').join('') + '</select><button class="btn sec small" data-act="sposta" data-k="' + tipo + '" data-id="' + item.id + '">Sposta in questa materia</button></div>' : '<p class="muted">Crea prima un\'altra materia dalla home, poi potrai spostare qui il lavoro.</p>') +
+    '<p></p><button class="btn sec small" data-act="elimina-' + tipo + '" data-id="' + item.id + '">Elimina questo lavoro</button></div>';
+}
+function vMateria() {
+  const m = V.materia; if (!S.materie.some(x => sameM(x, m))) return vHome();
+  const e = elementiMateria(m);
+  return barra() + '<div class="card"><button class="btn sec small" data-act="home">‹ Tutte le materie</button><p></p><h1>' + esc(m) + '</h1></div>' +
+    '<div class="row" style="margin-bottom:12px"><button class="btn" style="flex:1" data-act="nuovo-cap">Fotografa un capitolo</button><button class="btn sec" style="flex:1" data-act="nuovo-es">Ho un esercizio</button></div>' +
+    '<h2>Capitoli</h2>' + (e.cap.length ? e.cap.map(cardCap).join('') : '<div class="card muted">Ancora nessun capitolo in questa materia.</div>') +
+    (e.es.length ? '<h2>Esercizi</h2>' + e.es.map(cardEs).join('') : '') +
+    '<div class="card"><button class="btn sec small" data-act="elimina-materia">Elimina questa materia</button></div>';
+}
+const DSA_INFO = {
+  dislessia: ['Testi con frasi brevi (al massimo 15 parole), una sola idea per frase, parole semplici ed elenchi puntati.', 'Poche parole chiave evidenziate, con un solo colore.', 'Schema come formato principale, riassunto "in breve" prima di quello completo.', 'Lettura ad alta voce (pulsante Ascolta), testo ingrandibile (A− e A+) e caratteri ad alta leggibilità.'],
+  disortografia: ['Nei test gli errori di scrittura non vengono penalizzati.', 'Se serve, Scio spiega la regola ortografica con un esempio, senza giudicare.', 'Evita domande che chiedono di scrivere parole difficili.'],
+  disgrafia: ['Nei test preferisce risposte a scelta o molto brevi.', 'Poche domande a risposta scritta.'],
+  discalculia: ['Spiegazioni di numeri e calcoli passo passo, un passaggio per volta, con esempi concreti prima delle formule.', 'Numeri piccoli negli esempi.', 'Nei test e negli esercizi conta il ragionamento, non la velocità né il calcolo a mente.', 'Negli esercizi Scio guida con domande e indizi a livelli, senza mai dare la soluzione.']
+};
+function infoDsa(k) { return '<b>Come lavorerà Scio</b><ul>' + DSA_INFO[k].map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
+function vSetup() {
+  const p = S.profilo || { nome: '', livello: 'superiori', dsa: {}, tema: 'calmo', fs: 1, ai: { provider: 'demo', key: '', model: '' }, pin: '' };
+  const cons = consigliato(p.livello, p.dsa);
+  return barra() + '<div class="card"><h1>Benvenuto in Scio</h1><p class="muted">Un aiuto per studiare: da foto di pagine a riassunti, schemi, spiegazioni e test. Prima di iniziare, serve un genitore.</p></div>' +
+    '<div class="card"><h2>1. Chi studia?</h2><label class="f">Nome<input type="text" id="nome" value="' + esc(p.nome) + '" autocomplete="off"></label>' +
+    '<label class="f">Livello<select id="livello"><option value="media"' + (p.livello === 'media' ? ' selected' : '') + '>Scuola media (11–13)</option><option value="superiori"' + (p.livello === 'superiori' ? ' selected' : '') + '>Scuola superiore (14–18)</option></select></label>' +
+    '<p class="muted">Primaria e università arriveranno dopo.</p></div>' +
+    '<div class="card"><h2>2. Come studia meglio</h2><p class="muted">Puoi scegliere più profili insieme.</p>' +
+    Object.keys(DSA).map(k => '<label class="chk"><input type="checkbox" data-dsa="' + k + '"' + (p.dsa && p.dsa[k] ? ' checked' : '') + '>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><div class="dsainfo" id="info-' + k + '"' + (p.dsa && p.dsa[k] ? '' : ' hidden') + '>' + infoDsa(k) + '</div>').join('') +
+    '<p class="muted">Sono istruzioni date all\'intelligenza artificiale: conviene controllare insieme al ragazzo se funzionano e, se possibile, con uno specialista. Scio non dà mai la soluzione degli esercizi.</p>' +
+    '<label class="chk"><input type="checkbox" id="colori"' + (p.colori === undefined ? (p.dsa && p.dsa.dislessia ? '' : ' checked') : (p.colori ? ' checked' : '')) + '>Evidenzia con colori diversi nel riassunto (concetti, date e numeri, nomi)</label>' +
+    '<p class="muted" id="notacolori">Con la dislessia il suggerimento è di tenere un solo colore, per non affaticare la lettura: per questo parte spento. Si può cambiare quando vuoi.</p></div>' +
+    '<div class="card"><h2>3. Aspetto</h2><p class="muted" id="cons">Consigliato in base alle scelte: <b>' + TEMI[cons] + '</b>. Si può cambiare quando vuoi.</p>' +
+    Object.keys(TEMI).map(k => '<label class="chk"><input type="radio" name="tema" value="' + k + '"' + (p.tema === k ? ' checked' : '') + '>' + TEMI[k] + '</label>').join('') + '</div>' +
+    '<div class="card"><h2>4. Collegamento all\'AI</h2><label class="f">Servizio<select id="prov">' +
+      [['demo', 'Modalità demo (nessuna chiave, esempi fissi)'], ['compat', 'PC di casa, Gemini o altro servizio compatibile OpenAI'], ['openrouter', 'OpenRouter (anche modelli gratuiti)'], ['anthropic', 'Claude (chiave Anthropic)']].map(o => '<option value="' + o[0] + '"' + (p.ai.provider === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>' +
+    '<div id="boxcompat"' + (p.ai.provider === 'compat' ? '' : ' hidden') + '><label class="f">Quale?<select id="preset">' + Object.keys(PRESET).map(k => '<option value="' + k + '"' + ((p.ai.preset || 'ollama') === k ? ' selected' : '') + '>' + PRESET[k].nome + '</option>').join('') + '</select></label>' +
+    '<label class="f">Indirizzo del servizio<input type="text" id="url" value="' + esc(p.ai.url || PRESET.ollama.url) + '" autocomplete="off"></label></div>' +
+    '<label class="f">Chiave API (se il servizio la richiede)<input type="password" id="chiave" value="' + esc(p.ai.key) + '" autocomplete="off"></label>' +
+    '<label class="f">Modello (opzionale)<input type="text" id="modello" value="' + esc(p.ai.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-haiku-5-5 · Ollama: gemma4:26b"></label>' +
+    '<button class="btn sec" type="button" data-act="prova-ai">Prova il collegamento</button><p class="muted" id="esitoprova" role="status"></p>' +
+    '<p class="muted">Il modello deve saper leggere le immagini. La chiave resta solo su questo dispositivo. Con il PC di casa le foto non escono dalla tua rete.</p>' +
+    '<details><summary>Guida: usare il PC di casa</summary><p class="muted"><b>Ollama</b>: installalo, poi da terminale <code>ollama pull gemma4:26b</code> (serve una scheda video da circa 16 GB; con meno memoria prova un modello più piccolo). Per far parlare il browser con Ollama imposta la variabile <code>OLLAMA_ORIGINS=*</code> e riavvia Ollama. <b>LM Studio</b>: scarica un modello con visione, apri la scheda Developer, attiva il server e abilita CORS.<br>Il PC deve restare acceso e raggiungibile da dove usi Scio. Dal telefono serve l\'indirizzo del PC in rete (es. http://192.168.1.20:11434/v1) e il PC configurato per accettare collegamenti dalla rete di casa.</p></details></div>' +
+    '<div class="card"><h2>5. PIN dei genitori</h2><label class="f">4 cifre<input type="password" id="pin" inputmode="numeric" maxlength="4" value="' + esc(p.pin) + '" autocomplete="off"></label></div>' +
+    '<button class="btn full" data-act="salva-setup">Salva e inizia</button>' + (S.profilo ? '<p></p><button class="btn sec full" data-act="genitori">Annulla</button>' : '');
+}
+function vHome() {
+  const p = S.profilo;
+  const ultimi = S.capitoli.slice(0, 3);
+  const mancanti = MATERIE.filter(m => m !== 'Altro' && !S.materie.some(x => sameM(x, m)));
+  return barra() + (p.ai && p.ai.provider === 'demo' ? '<div class="fb warn" role="status"><b>Modalità demo.</b> Le foto non vengono lette: compaiono sempre gli stessi esempi. Per usare l\'AI vera: Genitori › Impostazioni › Collegamento all\'AI, scegli il servizio, incolla la chiave e premi "Salva e inizia".</div>' : '') +
+    '<div class="card"><h1>Ciao ' + esc(p.nome) + '</h1><p class="muted">Scegli la materia da cui partire.</p></div>' +
+    '<h2>Le tue materie</h2>' + (S.materie.length ? '<div class="mat-grid">' + S.materie.map(m => { const e = elementiMateria(m); return '<button class="mat" data-act="apri-materia" data-m="' + esc(m) + '"><b>' + esc(m) + '</b><span class="muted">' + pl(e.cap.length, 'capitolo', 'capitoli') + ' · ' + pl(e.es.length, 'esercizio', 'esercizi') + '</span></button>'; }).join('') + '</div>' : '<div class="card muted">Non c\'è ancora nessuna materia: aggiungine una qui sotto.</div>') +
+    '<div class="card"><h3>Aggiungi una materia</h3>' + (mancanti.length ? '<div class="row" style="margin-bottom:8px">' + mancanti.map(m => '<button class="btn sec small" data-act="aggiungi-materia" data-m="' + esc(m) + '">+ ' + esc(m) + '</button>').join('') + '</div>' : '') +
+    '<label class="f">Un\'altra materia<input type="text" id="nuovaM" maxlength="40" placeholder="Per esempio: Educazione civica" autocomplete="off"></label><button class="btn sec small" data-act="aggiungi-materia">Aggiungi</button></div>' +
+    (ultimi.length ? '<h2>Continua da dove eri</h2>' + ultimi.map(cardCap).join('') : '');
+}
+function vNuovo(tipo) {
+  const demo = S.profilo.ai.provider === 'demo';
+  return barra() + '<div class="card"><h1>' + (tipo === 'cap' ? 'Nuovo capitolo' : 'Nuovo esercizio') + '</h1>' +
+    (demo ? '<div class="fb">Sei in <b>modalità demo</b>: senza foto, Scio usa un esempio fisso per farti vedere come funziona.</div>' : '') +
+    '<p><span class="muted">Materia:</span> <b>' + esc(V.materia) + '</b> <button class="btn sec small" data-act="home">Cambia materia</button></p>' +
+    (tipo === 'cap' ? '<label class="f">Focus (facoltativo)<input type="text" id="focus" placeholder="Per esempio: paragrafo 2 e 3, oppure la scrittura"></label><p class="muted">Se lo scrivi, Scio prepara tutto solo su quegli argomenti.</p>' : '') +
+    '<div class="row"><label class="btn sec">Scatta foto<input type="file" accept="image/*" capture="environment" id="f1" hidden></label><label class="btn sec">Scegli le foto (anche tutte insieme)<input type="file" accept="image/*" multiple id="f2" hidden></label></div>' +
+    '<p class="muted">Dal PC: nella finestra selezioni più foto con Ctrl+A, oppure le trascini qui, oppure le incolli con Ctrl+V. Le pagine vengono messe in ordine di nome.</p>' +
+    '<div class="thumbs">' + V.foto.map((u, i) => '<div class="th"><img src="' + u + '" alt="Pagina ' + (i + 1) + '"><div class="row"><button data-act="su" data-i="' + i + '" aria-label="Sposta prima">↑</button><button data-act="giu" data-i="' + i + '" aria-label="Sposta dopo">↓</button><button data-act="del" data-i="' + i + '" aria-label="Togli">✕</button></div></div>').join('') + '</div>' +
+    (V.errore ? '<div class="fb warn" role="alert">' + esc(V.errore) + '</div>' : '') +
+    (V.busy ? '<p><span class="spin"></span> Scio sta leggendo e preparando tutto…</p>' : '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? 'Prepara il mio studio' : 'Guidami nell\'esercizio') + '</button>') +
+    '<p class="muted">Le foto non vengono salvate: restano solo i contenuti preparati.</p></div>';
+}
+function mancano(c) {
+  const m = [];
+  if (!arr(c.schema && c.schema.rami).length) m.push('schema');
+  if (!arr(c.spiegazioni).length) m.push('spiegazioni');
+  if (!arr(c.glossario).length) m.push('glossario');
+  if (!arr(c.test).length) m.push('test');
+  return m.join(', ');
+}
+function vCapitolo() {
+  const c = S.capitoli.find(x => x.id === V.cap); if (!c) return vHome();
+  const T = [['riassunto', 'Riassunto'], ['schema', 'Schema'], ['spiegazioni', 'Spiegazioni'], ['glossario', 'Glossario'], ['test', 'Test']];
+  let corpo = '';
+  if (V.tab === 'riassunto') corpo = legendaColori() + '<div class="card"><h2>In breve</h2><ul>' + c.riassunto_breve.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></div><div class="card"><h2>Riassunto completo</h2>' + md(c.riassunto_completo) + '</div>' + (arr(c.inventario).length ? '<details class="card"><summary><b>Cosa ho trovato nelle pagine</b> (' + c.inventario.length + ' voci)</summary><ul>' + c.inventario.map(x => '<li>' + md(x) + '</li>').join('') + '</ul><p class="muted">Se manca qualcosa che per te è importante, scrivilo nel campo Focus e rigenera.</p></details>' : '');
+  else if (V.tab === 'schema') corpo = '<div class="card"><h2>' + esc(c.schema.radice || c.titolo) + '</h2>' + arr(c.schema.rami).map(r => '<div class="tree"><h3>' + md(r.titolo) + '</h3><ul>' + arr(r.punti).map(p => '<li>' + md(p) + '</li>').join('') + '</ul></div>').join('') + '</div>';
+  else if (V.tab === 'spiegazioni') corpo = c.spiegazioni.map((s, i) => '<div class="card"><h3>' + md(s.concetto) + '</h3><p>' + md(s.spiegazione) + '</p><div class="fb"><b>Esempio:</b> ' + md(s.esempio) + '</div><button class="btn sec small" data-act="meglio" data-i="' + i + '">Spiegamelo meglio</button><div id="m' + i + '"></div></div>').join('') || '<div class="card muted">Nessuna spiegazione.</div>';
+  else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
+  else corpo = vTestPartenza(c);
+  return barra() + '<div class="card"><div class="muted">' + esc(c.materia) + '</div><h1>' + esc(c.titolo) + '</h1>' + (c.avvisi.length ? '<div class="fb warn">' + c.avvisi.map(esc).join('<br>') + '</div>' : '') +
+    (mancano(c) ? '<div class="fb warn" role="alert"><b>Mancano alcune parti</b> (' + mancano(c) + '). <button class="btn small" data-act="completa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? 'Un momento…' : 'Prepara le parti mancanti') + '</button></div>' : '') +
+    '<div class="row" style="margin-top:8px"><button class="btn sec small" data-act="apri-materia" data-m="' + esc(c.materia) + '">‹ ' + esc(c.materia) + '</button><button class="btn small" data-act="ascolta">Ascolta</button><button class="btn sec small" data-act="stop">Ferma</button><button class="btn sec small" data-act="stampa">Stampa o salva PDF</button><button class="btn sec small" data-act="scarica">Scarica testo</button></div></div>' +
+    '<div class="tabs" role="tablist">' + T.map(t => '<button class="tab' + (V.tab === t[0] ? ' on' : '') + '" role="tab" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>' + corpo + boxSposta(c, 'cap');
+}
+function vTestPartenza(c) {
+  if (V.test && V.test.cap === c.id) return vTest(c);
+  const ult = c.risultati[c.risultati.length - 1];
+  return '<div class="card"><h2>Test finale</h2><p>' + c.test.length + ' domande per capire se è tutto chiaro. Nessun tempo limite.</p>' + (ult ? '<p class="muted">Ultimo risultato: ' + ult.punti + ' su ' + ult.totale + '.</p>' : '') + '<button class="btn" data-act="inizia-test">' + (ult ? 'Rifai il test' : 'Inizia il test') + '</button></div>';
+}
+function vTest(c) {
+  const t = V.test;
+  if (t.fine) {
+    const errati = [...new Set(t.errati.map(i => c.test[i].argomento).filter(Boolean))];
+    return '<div class="card"><h2>Hai finito!</h2><p><b>' + t.punti + ' su ' + t.dom.length + '</b></p>' +
+      (errati.length ? '<div class="fb warn"><b>Da ripassare:</b> ' + errati.map(esc).join(', ') + '</div>' : '<div class="fb ok">Tutto chiaro, bravo!</div>') +
+      '<div class="row">' + (t.errati.length ? '<button class="btn" data-act="solo-errori">Ripeti solo gli errori</button>' : '') + '<button class="btn sec" data-act="chiudi-test">Chiudi</button></div></div>';
+  }
+  const q = c.test[t.dom[t.i]]; const opz = q.tipo === 'vf' ? ['Vero', 'Falso'] : arr(q.opzioni);
+  const corr = q.tipo === 'vf' ? (q.corretta ? 0 : 1) : q.corretta;
+  return '<div class="card"><div class="muted">Domanda ' + (t.i + 1) + ' di ' + t.dom.length + '</div><h2>' + md(q.domanda) + '</h2>' +
+    opz.map((o, i) => { let cl = 'opt'; if (t.scelta != null) { if (i === corr) cl += ' good'; else if (i === t.scelta) cl += ' bad'; } return '<button class="' + cl + '" data-act="rispondi" data-i="' + i + '"' + (t.scelta != null ? ' disabled' : '') + '>' + md(o) + (t.scelta != null && i === corr ? ' ✓' : '') + '</button>'; }).join('') +
+    (t.scelta != null ? '<div class="fb ' + (t.scelta === corr ? 'ok' : 'warn') + '"><b>' + (t.scelta === corr ? 'Giusto!' : 'Quasi!') + '</b> ' + md(q.spiegazione) + '</div><button class="btn" data-act="avanti">' + (t.i + 1 >= t.dom.length ? 'Vedi il risultato' : 'Avanti') + '</button>' : '') + '</div>';
+}
+function vEsercizio() {
+  const es = S.esercizi.find(x => x.id === V.es); if (!es) return vHome();
+  let h = barra() + '<div class="card"><div class="muted">' + esc(es.materia) + ' · esercizio guidato</div><h2>' + md(es.richiesta) + '</h2></div>';
+  es.passi.forEach((p, i) => {
+    if (i < es.i || es.finito) h += '<div class="card"><div class="step"><span class="num done">✓</span><div><b>' + esc(p.titolo) + '</b><div class="muted">Hai scritto: ' + esc((es.fatti.find(f => f.i === i) || {}).risposta || '') + '</div></div></div></div>';
+    else if (i === es.i) {
+      const sh = V.mostra || {};
+      h += '<div class="card" style="border-color:var(--accent)"><div class="step"><span class="num">' + (i + 1) + '</span><div style="flex:1"><h2>' + esc(p.titolo) + '</h2><p>' + md(p.domanda) + '</p>' +
+        (V.passoOk ? '<div class="fb ok">' + md(V.fb.testo) + '</div><button class="btn" data-act="passo-avanti">' + (i + 1 >= es.passi.length ? 'Concludi' : 'Passo successivo') + '</button>' :
+          '<label class="f">La tua idea<textarea id="idea" placeholder="Scrivi qui cosa pensi, anche se non sei sicuro">' + esc(V.bozza || '') + '</textarea></label>' +
+          (V.fb ? '<div class="fb warn">' + md(V.fb.testo) + '</div>' : '') +
+          arr(p.indizi).slice(0, sh.n || 0).map((x, k) => '<div class="fb"><b>Indizio ' + (k + 1) + ':</b> ' + md(x) + '</div>').join('') +
+          (sh.es ? '<div class="fb"><b>Esempio simile:</b> ' + md(p.esempio_simile) + '</div>' : '') +
+          (V.errore ? '<div class="fb warn" role="alert">' + esc(V.errore) + '</div>' : '') +
+          (V.busy ? '<p><span class="spin"></span> Scio sta pensando…</p>' : '<div class="row"><button class="btn" data-act="controlla">Controlla la mia idea</button><button class="btn sec" data-act="indizio"' + ((sh.n || 0) >= arr(p.indizi).length ? ' disabled' : '') + '>Dammi un indizio (' + (sh.n || 0) + ' di ' + arr(p.indizi).length + ')</button><button class="btn sec" data-act="esempio">Esempio simile</button></div>')) +
+        '</div></div></div>';
+    } else h += '<div class="card muted"><b>' + (i + 1) + '. ' + esc(p.titolo) + '</b> · si sblocca dopo il passo precedente</div>';
+  });
+  if (es.finito) h += '<div class="card"><div class="fb ok"><b>Esercizio completato!</b> Ci sei arrivato con il tuo ragionamento. Indizi usati: ' + es.indiziTotali + '.</div><button class="btn" data-act="home">Torna allo studio</button></div>';
+  return h + '<div class="row" style="margin-bottom:12px"><button class="btn sec small" data-act="apri-materia" data-m="' + esc(es.materia) + '">‹ ' + esc(es.materia) + '</button></div>' + boxSposta(es, 'es') + '<p class="muted" style="text-align:center">Scio non ti dà la soluzione: ti aiuta a trovarla.</p>';
+}
+function vGenitori() {
+  if (!V.genitoriOk) return barra() + '<div class="card"><h1>Area genitori</h1><label class="f">PIN<input type="password" id="pinin" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn" data-act="pin-ok">Entra</button></div>';
+  const rr = []; S.capitoli.forEach(c => c.risultati.forEach(r => rr.push({ c, r })));
+  return barra() + '<div class="card"><h1>Area genitori</h1><div class="row"><span class="chip">' + S.capitoli.length + ' capitoli</span><span class="chip">' + rr.length + ' test fatti</span><span class="chip">' + S.esercizi.length + ' esercizi</span></div></div>' +
+    '<div class="card"><h2>Test e argomenti da rinforzare</h2>' + (rr.length ? rr.sort((a, b) => b.r.data.localeCompare(a.r.data)).slice(0, 10).map(x => '<p><b>' + esc(x.c.titolo) + '</b> · ' + x.r.punti + '/' + x.r.totale + ' · ' + new Date(x.r.data).toLocaleDateString('it-IT') + (x.r.errati.length ? '<br><span class="muted">Da ripassare: ' + esc(x.r.errati.join(', ')) + '</span>' : '') + '</p>').join('') : '<p class="muted">Ancora nessun test.</p>') + '</div>' +
+    '<div class="card"><h2>Contenuti</h2>' + (S.capitoli.length ? S.capitoli.map(c => '<p><b>' + esc(c.titolo) + '</b> <span class="muted">(' + esc(c.materia) + ')</span> <button class="btn sec small" data-act="apri-cap" data-id="' + c.id + '">Vedi</button></p>').join('') : '<p class="muted">Nessun capitolo.</p>') +
+    S.esercizi.map(e => '<p><b>' + esc(e.materia) + '</b>: ' + esc(e.richiesta).slice(0, 70) + ' <span class="chip">' + e.indiziTotali + ' indizi</span> <span class="chip ' + (e.finito ? 'ok' : 'warn') + '">' + (e.finito ? 'completato' : 'in corso') + '</span></p>').join('') + '</div>' +
+    '<div class="card"><h2>Impostazioni</h2><div class="row"><button class="btn sec" data-act="modifica">Profilo, DSA, aspetto, AI, PIN</button><button class="btn sec" data-act="esporta">Salva una copia dei dati</button><label class="btn sec">Ripristina copia<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" data-act="azzera">Cancella tutto</button></div></div>';
+}
+function render() {
+  applicaTema();
+  const v = V.vista; let h = '';
+  if (v === 'setup') h = vSetup(); else if (v === 'home') h = vHome(); else if (v === 'nuovo-cap') h = vNuovo('cap'); else if (v === 'nuovo-es') h = vNuovo('es');
+  else if (v === 'materia') h = vMateria(); else if (v === 'capitolo') h = vCapitolo(); else if (v === 'esercizio') h = vEsercizio(); else if (v === 'genitori') h = vGenitori(); else h = vHome();
+  document.getElementById('app').innerHTML = h;
+  const f1 = document.getElementById('f1'), f2 = document.getElementById('f2');
+  if (f1) f1.onchange = e => aggiungiFoto([...e.target.files]);
+  if (f2) f2.onchange = e => aggiungiFoto([...e.target.files]);
+  const imp = document.getElementById('imp');
+  if (imp) imp.onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { const o = JSON.parse(t); if (!o.profilo) throw 0; S = Object.assign({ profilo: null, capitoli: [], esercizi: [] }, o); migraMaterie(); salva(); V.vista = 'home'; V.genitoriOk = false; render(); toast('Copia ripristinata.'); } catch (x) { toast('File non valido.'); } }); };
+  if (v === 'setup') {
+    const agg = () => { const dsa = {}; document.querySelectorAll('[data-dsa]').forEach(x => dsa[x.dataset.dsa] = x.checked); const c = consigliato(document.getElementById('livello').value, dsa); document.getElementById('cons').innerHTML = 'Consigliato in base alle scelte: <b>' + TEMI[c] + '</b>. Si può cambiare quando vuoi.'; };
+    let coloriToccato = false;
+    document.getElementById('colori').onchange = () => { coloriToccato = true; };
+    document.querySelectorAll('[data-dsa]').forEach(x => x.onchange = () => {
+      agg(); document.getElementById('info-' + x.dataset.dsa).hidden = !x.checked;
+      if (!coloriToccato) document.getElementById('colori').checked = !document.querySelector('[data-dsa=dislessia]').checked;
+    }); document.getElementById('livello').onchange = agg;
+    const prov = document.getElementById('prov'), preset = document.getElementById('preset');
+    document.getElementById('chiave').oninput = () => { const a = leggiAi(); if (a.provider !== prov.value) { prov.value = a.provider; prov.onchange(); toast('Ho riconosciuto la chiave: servizio impostato su ' + prov.options[prov.selectedIndex].text + '.'); } };
+    prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat'; };
+    preset.onchange = () => { const x = PRESET[preset.value]; document.getElementById('url').value = x.url; if (x.modello) document.getElementById('modello').value = x.modello; };
+  }
+}
+
+/* ===== Azioni ===== */
+function indovinaServizio(a) {
+  if (a.provider === 'demo' && a.key) {
+    if (/^sk-ant-/.test(a.key)) a.provider = 'anthropic';
+    else if (/^sk-or-/.test(a.key)) a.provider = 'openrouter';
+  }
+  return a;
+}
+function leggiAi() {
+  const g = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  return indovinaServizio({ provider: g('prov'), key: g('chiave'), model: g('modello'), preset: g('preset') || 'ollama', url: g('url') });
+}
+const AZ = {
+  'prova-ai': async () => {
+    const out = document.getElementById('esitoprova'); const a = leggiAi();
+    if (a.provider === 'demo') { out.textContent = 'In modalità demo non serve nessun collegamento.'; return; }
+    out.textContent = 'Provo…';
+    try { const t = await chiamaAI('Rispondi solo con la parola OK.', 'Rispondi OK.', [], a); out.textContent = 'Collegamento riuscito. Risposta: ' + t.slice(0, 40); }
+    catch (e) { out.textContent = e.message === 'NODEMO' ? 'Manca la chiave API.' : e.message; }
+  },
+  'home': () => { V.vista = 'home'; V.test = null; },
+  'genitori': () => { V.vista = 'genitori'; if (!S.profilo.pin) V.genitoriOk = true; },
+  'fs+': () => { S.profilo.fs = Math.min(1.5, (S.profilo.fs || 1) + .1); salva(); },
+  'fs-': () => { S.profilo.fs = Math.max(.9, (S.profilo.fs || 1) - .1); salva(); },
+  'nuovo-cap': () => { if (!V.materia) { V.vista = 'home'; return; } V.vista = 'nuovo-cap'; V.foto = []; V.errore = ''; },
+  'nuovo-es': () => { if (!V.materia) { V.vista = 'home'; return; } V.vista = 'nuovo-es'; V.foto = []; V.errore = ''; },
+  'apri-materia': el => { V.materia = el.dataset.m; V.vista = 'materia'; V.test = null; },
+  'aggiungi-materia': el => {
+    let n = el.dataset.m; if (!n) { const i = document.getElementById('nuovaM'); n = i ? i.value : ''; }
+    n = String(n || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    if (!n) { toast('Scrivi il nome della materia.'); return 'async'; }
+    n = n.charAt(0).toUpperCase() + n.slice(1);
+    if (S.materie.some(m => sameM(m, n))) { toast('Questa materia c\'è già.'); return 'async'; }
+    S.materie.push(n); salva();
+  },
+  'elimina-materia': () => {
+    const m = V.materia, e = elementiMateria(m), n = e.cap.length + e.es.length;
+    const msg = n ? 'Eliminare la materia "' + m + '" insieme a ' + pl(e.cap.length, 'capitolo', 'capitoli') + ' e ' + pl(e.es.length, 'esercizio', 'esercizi') + '? Non si può annullare. Per tenerli, spostali prima in un\'altra materia.' : 'Eliminare la materia "' + m + '"?';
+    if (!confirm(msg)) return 'async';
+    S.materie = S.materie.filter(x => !sameM(x, m)); S.capitoli = S.capitoli.filter(c => !sameM(c.materia, m)); S.esercizi = S.esercizi.filter(x => !sameM(x.materia, m));
+    salva(); V.vista = 'home'; V.materia = '';
+  },
+  'sposta': el => {
+    const sel = document.getElementById('spostaM'); if (!sel || !sel.value) return 'async';
+    const lista = el.dataset.k === 'es' ? S.esercizi : S.capitoli; const it = lista.find(x => x.id === el.dataset.id); if (!it) return 'async';
+    it.materia = sel.value; V.materia = sel.value; salva(); toast('Spostato in ' + sel.value + '.');
+  },
+  'elimina-cap': el => { const it = S.capitoli.find(x => x.id === el.dataset.id); if (!it || !confirm('Eliminare il capitolo "' + it.titolo + '"? Non si può annullare.')) return 'async'; S.capitoli = S.capitoli.filter(x => x.id !== it.id); salva(); V.materia = it.materia; V.vista = 'materia'; },
+  'elimina-es': el => { const it = S.esercizi.find(x => x.id === el.dataset.id); if (!it || !confirm('Eliminare questo esercizio? Non si può annullare.')) return 'async'; S.esercizi = S.esercizi.filter(x => x.id !== it.id); salva(); V.materia = it.materia; V.vista = 'materia'; },
+  'su': el => { const i = +el.dataset.i; if (i > 0) [V.foto[i - 1], V.foto[i]] = [V.foto[i], V.foto[i - 1]]; },
+  'giu': el => { const i = +el.dataset.i; if (i < V.foto.length - 1) [V.foto[i + 1], V.foto[i]] = [V.foto[i], V.foto[i + 1]]; },
+  'del': el => { V.foto.splice(+el.dataset.i, 1); },
+  'prepara-cap': () => { preparaCapitolo(); return 'async'; },
+  'prepara-es': () => { preparaEsercizio(); return 'async'; },
+  'apri-cap': el => { V.cap = el.dataset.id; V.tab = 'riassunto'; V.test = null; V.vista = 'capitolo'; },
+  'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
+  'tab': el => { V.tab = el.dataset.t; },
+  'ascolta': () => { const c = S.capitoli.find(x => x.id === V.cap); const t = V.tab === 'riassunto' ? c.riassunto_breve.join(' ') + ' ' + c.riassunto_completo : V.tab === 'glossario' ? c.glossario.map(g => g.termine + ': ' + g.definizione).join('. ') : V.tab === 'spiegazioni' ? c.spiegazioni.map(s => s.concetto + '. ' + s.spiegazione + ' ' + s.esempio).join(' ') : c.titolo; parla(t); return 'async'; },
+  'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const t = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = t; return 'async'; },
+  'scarica': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; const b = new Blob(['\ufeff' + dispensaTesto(c)], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (c.titolo || 'capitolo').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) + '.txt'; document.body.appendChild(a); a.click(); a.remove(); return 'async'; },
+  'completa': async () => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
+    if (S.profilo.ai.provider === 'demo') { toast('In modalità demo non si può completare.'); return; }
+    V.busy = true; render();
+    try {
+      const n = await chiediJSON(SYS_COMPLETA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_CAPITOLO);
+      if (!arr(c.schema && c.schema.rami).length && n.schema) c.schema = n.schema;
+      if (!arr(c.spiegazioni).length) c.spiegazioni = arr(n.spiegazioni);
+      if (!arr(c.glossario).length) c.glossario = arr(n.glossario);
+      if (!arr(c.test).length) c.test = arr(n.test);
+      if (!arr(c.inventario).length) c.inventario = arr(n.inventario);
+      salva(); toast(mancano(c) ? 'Alcune parti mancano ancora: riprova.' : 'Fatto: ora c\'è tutto.');
+    } catch (e) { toast('Non sono riuscito: ' + e.message); }
+    V.busy = false; render();
+  },
+  'stop': () => { try { speechSynthesis.cancel(); } catch (e) {} return 'async'; },
+  'meglio': async el => { const c = S.capitoli.find(x => x.id === V.cap); const s = c.spiegazioni[+el.dataset.i]; const box = document.getElementById('m' + el.dataset.i); box.innerHTML = '<p><span class="spin"></span></p>';
+    try { if (S.profilo.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); box.innerHTML = '<div class="fb">In demo la spiegazione alternativa non è disponibile. Con la chiave AI, Scio la riscrive con parole e un esempio diversi.</div>'; }
+      else { const t = await chiamaAI('Sei Scio, tutor di studio. Spiega in modo diverso, più semplice, con un nuovo esempio concreto. Massimo 6 frasi brevi, in italiano. Solo testo.\n\n' + profiloTesto(), 'Concetto: ' + s.concetto + '\nSpiegazione precedente: ' + s.spiegazione, []); box.innerHTML = '<div class="fb">' + md(t) + '</div>'; } }
+    catch (e) { box.innerHTML = '<div class="fb warn">' + esc(e.message) + '</div>'; } return 'async'; },
+  'inizia-test': () => { const c = S.capitoli.find(x => x.id === V.cap); V.test = { cap: c.id, dom: c.test.map((_, i) => i), i: 0, punti: 0, errati: [], scelta: null, fine: false }; },
+  'rispondi': el => { const t = V.test; if (t.scelta != null) return; const c = S.capitoli.find(x => x.id === V.cap); const q = c.test[t.dom[t.i]]; const corr = q.tipo === 'vf' ? (q.corretta ? 0 : 1) : q.corretta; t.scelta = +el.dataset.i; if (t.scelta === corr) t.punti++; else t.errati.push(t.dom[t.i]); },
+  'avanti': () => { const t = V.test; const c = S.capitoli.find(x => x.id === V.cap); t.scelta = null; t.i++; if (t.i >= t.dom.length) { t.fine = true; if (!t.ripasso) { c.risultati.push({ data: new Date().toISOString(), punti: t.punti, totale: t.dom.length, errati: [...new Set(t.errati.map(i => c.test[i].argomento).filter(Boolean))] }); salva(); } } },
+  'solo-errori': () => { const t = V.test; V.test = { cap: t.cap, dom: [...new Set(t.errati)], i: 0, punti: 0, errati: [], scelta: null, fine: false, ripasso: true }; },
+  'chiudi-test': () => { V.test = null; },
+  'indizio': () => { const es = S.esercizi.find(x => x.id === V.es); const m = V.mostra = V.mostra || {}; m.n = (m.n || 0) + 1; es.indiziTotali++; salva(); V.bozza = (document.getElementById('idea') || {}).value || ''; },
+  'esempio': () => { V.mostra = V.mostra || {}; V.mostra.es = true; V.bozza = (document.getElementById('idea') || {}).value || ''; },
+  'controlla': () => { controllaIdea(); return 'async'; },
+  'passo-avanti': () => { const es = S.esercizi.find(x => x.id === V.es); es.i++; if (es.i >= es.passi.length) { es.finito = true; es.i = es.passi.length - 1; } V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; salva(); },
+  'pin-ok': () => { if (document.getElementById('pinin').value === S.profilo.pin) V.genitoriOk = true; else toast('PIN non corretto.'); },
+  'modifica': () => { V.vista = 'setup'; },
+  'esporta': () => { const b = new Blob([JSON.stringify(S)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'scio-copia-dati-v' + VERSIONE + '.json'; a.click(); return 'async'; },
+  'azzera': () => { if (confirm('Cancellare tutti i dati di Scio su questo dispositivo?')) { localStorage.removeItem(LS); S = { profilo: null, capitoli: [], esercizi: [] }; V.vista = 'setup'; V.genitoriOk = false; } },
+  'salva-setup': () => {
+    const nome = document.getElementById('nome').value.trim(); const pin = document.getElementById('pin').value.trim();
+    if (!nome) { toast('Scrivi il nome.'); return 'async'; }
+    if (!/^\d{4}$/.test(pin)) { toast('Il PIN deve avere 4 cifre.'); return 'async'; }
+    const dsa = {}; document.querySelectorAll('[data-dsa]').forEach(x => dsa[x.dataset.dsa] = x.checked);
+    const tema = (document.querySelector('input[name=tema]:checked') || {}).value || 'calmo';
+    const old = S.profilo || {};
+    S.profilo = { nome, livello: document.getElementById('livello').value, dsa, tema, fs: old.fs || 1, pin, ai: leggiAi(), colori: document.getElementById('colori').checked };
+    salva(); V.vista = 'home'; V.genitoriOk = false;
+  }
+};
+function parla(t) { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(String(t).replace(/\*\*/g, '')); u.lang = 'it-IT'; speechSynthesis.speak(u); } catch (e) { toast('La lettura ad alta voce non è disponibile.'); } }
+function inFotoView() { return V.vista === 'nuovo-cap' || V.vista === 'nuovo-es'; }
+document.addEventListener('dragover', e => { if (inFotoView()) e.preventDefault(); });
+document.addEventListener('drop', e => { if (!inFotoView()) return; e.preventDefault(); aggiungiFoto([...(e.dataTransfer && e.dataTransfer.files || [])]); });
+document.addEventListener('paste', e => { if (!inFotoView()) return; const f = [...(e.clipboardData && e.clipboardData.files || [])]; if (f.length) { e.preventDefault(); aggiungiFoto(f); } });
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const f = AZ[el.dataset.act]; if (!f) return;
+  const r = f(el);
+  if (r === 'async' || (r && typeof r.then === 'function')) return;
+  render();
+});
+render();
+</script>
+</body>
+</html>
