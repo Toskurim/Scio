@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.17';
+const VERSIONE = '0.18';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1278,7 +1278,6 @@ function vSetup() {
   return barra() + '<div class="card"><h1>' + (f ? esc(p.nome) : t('aggiungi_figlio')) + '</h1></div>' +
     '<div class="card"><label class="f">' + t('nome') + '<input type="text" id="nome" value="' + esc(p.nome) + '" autocomplete="off"></label>' +
     '<label class="f">' + t('livello') + '<select id="livello">' + LIVELLI.map(k => '<option value="' + k + '"' + (p.livello === k ? ' selected' : '') + '>' + t(k) + '</option>').join('') + '</select></label>' +
-    '<p class="muted">' + t('primaria_dopo') + '</p>' +
     '<label class="f">' + t('lingua_figlio') + '<select id="lingua-fig">' + LINGUE_ORD.map(l => '<option value="' + l + '"' + ((p.lingua || 'it') === l ? ' selected' : '') + '>' + LINGUE[l] + '</option>').join('') + '</select></label><p class="muted">' + t('lingua_nota') + '</p></div>' +
     '<div class="card"><h2>' + t('come_studia') + '</h2><p class="muted">' + t('piu_profili') + '</p>' +
     Object.keys(DSA).map(k => '<label class="chk"><input type="checkbox" data-dsa="' + k + '"' + (p.dsa && p.dsa[k] ? ' checked' : '') + '>' + t(k) + '</label><div class="dsainfo" id="info-' + k + '"' + (p.dsa && p.dsa[k] ? '' : ' hidden') + '>' + infoDsa(k) + '</div>').join('') +
