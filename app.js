@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.16';
+const VERSIONE = '0.17';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -75,7 +75,7 @@ function urlConsentito(u) {
 /* ===== Dati: una famiglia, più figli ===== */
 function aiVuoto() { return { provider: 'demo', key: '', kc: '', model: '', preset: 'ollama', url: '' }; }
 function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti() }; }
-function famVuota() { const l = String(navigator.language || 'it').slice(0, 2).toLowerCase(); return { pin: '', ai: aiVuoto(), lingua: LINGUE[l] ? l : 'it', ultimoBackup: '' }; }
+function famVuota() { const l = String(navigator.language || 'it').slice(0, 2).toLowerCase(); return { pin: '', ai: aiVuoto(), lingua: LINGUE[l] ? l : 'it', ultimoBackup: '', dsaAI: true }; }
 function caricaDB() {
   try {
     const r = JSON.parse(localStorage.getItem(LS));
@@ -168,6 +168,7 @@ function pulisciDati(o) {
   });
   const fam = famVuota();
   if (p.fam && typeof p.fam === 'object' && LINGUE[p.fam.lingua]) fam.lingua = p.fam.lingua;
+  if (p.fam && typeof p.fam === 'object') fam.dsaAI = p.fam.dsaAI !== false;
   return { v: 3, fam, figli };
 }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -185,7 +186,7 @@ function legendaColori() {
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
-function lg() { return (['genitori', 'fam', 'setup', 'scelta', 'stat'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
+function lg() { return (['genitori', 'fam', 'setup', 'scelta', 'stat', 'privacy'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
 function applicaTema() {
   const p = S.profilo, b = document.body, r = document.documentElement;
   b.setAttribute('data-tema', p ? temaValido(p) : 'calmo');
@@ -204,7 +205,7 @@ const TESTO_LIVELLO = {
 };
 function profiloTesto() {
   const p = S.profilo;
-  const dsa = Object.keys(DSA).filter(k => p.dsa && p.dsa[k]).map(k => DSA[k]);
+  const dsa = FAM.dsaAI === false ? [] : Object.keys(DSA).filter(k => p.dsa && p.dsa[k]).map(k => DSA[k]);
   /* Il nome del ragazzo non viene mai inviato al servizio AI. */
   return 'Studente: ' + TESTO_LIVELLO[p.livello || 'superiori'] + '.\n' +
     (dsa.length ? 'Adattamenti obbligatori per DSA:\n- ' + dsa.join('\n- ') : 'Nessun adattamento DSA particolare.') +
@@ -1241,6 +1242,17 @@ function vAspetto() {
   const p = S.profilo;
   return barra() + '<div class="card"><h1>' + t('aspetto') + '</h1>' + bloccoTema(p) + bloccoAspetto(p) + '<p></p><button class="btn" data-act="home">' + t('fatto') + '</button></div>';
 }
+function vPrivacy() {
+  const li = k => '<ul>' + t(k).split('|').map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  return barra() + '<div class="card"><h1>' + t('priv_titolo') + '</h1><p>' + t('priv_intro') + '</p></div>' +
+    '<div class="card"><h2>✅ ' + t('priv_dev_t') + '</h2>' + li('priv_dev') + '</div>' +
+    '<div class="card"><h2>☁️ ' + t('priv_ai_t') + '</h2>' + li('priv_ai') + '<p class="muted">' + t('priv_dsa_nota') + '</p></div>' +
+    '<div class="card"><h2>🎤 ' + t('priv_voce_t') + '</h2>' + li('priv_voce') + '</div>' +
+    '<div class="card"><h2>🌐 ' + t('priv_gh_t') + '</h2><p>' + t('priv_gh') + '</p></div>' +
+    '<div class="card"><h2>🚫 ' + t('priv_no_t') + '</h2><p>' + t('priv_no') + '</p></div>' +
+    '<div class="card"><p class="muted">' + t('priv_nota') + '</p></div>' +
+    '<button class="btn full" data-act="priv-indietro">' + t('priv_indietro') + '</button>';
+}
 function vFam() {
   const b = V.bozzaFam || {}; const a = Object.assign({}, FAM.ai, b.ai || {});
   const lingua = b.lingua || FAM.lingua;
@@ -1254,6 +1266,9 @@ function vFam() {
     '<label class="f">' + t('modello') + '<input type="text" id="modello" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
     '<button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
     '<details><summary>Guida / Guide: Ollama, LM Studio</summary><p class="muted"><b>Ollama</b>: <code>ollama pull gemma4:26b</code> (GPU ~16 GB). <code>OLLAMA_ORIGINS=' + esc(location.origin.startsWith('http') ? location.origin : 'https://toskurim.github.io') + '</code>. <b>LM Studio</b>: Developer › server + CORS.<br>Funziona solo sul PC dove girano / works only on the PC where they run.</p></details></div>' +
+    '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" type="button" data-act="priv-apri">' + t('priv_btn') + '</button>' +
+    '<label class="chk"><input type="checkbox" id="dsa-ai"' + ((b.dsaAI !== undefined ? b.dsaAI : FAM.dsaAI) === false ? '' : ' checked') + '>' + t('dsa_ai_lbl') + '</label><p class="muted">' + t('dsa_ai_nota') + '</p>' +
+    (!FAM.pin ? '<label class="chk"><input type="checkbox" id="priv-ok">' + t('priv_ho_letto') + '</label>' : '') + '</div>' +
     '<div class="card"><h2>' + t('pin_gen') + '</h2><label class="f">' + (FAM.pin ? t('pin_nuovo') : t('pin_scegli')) + '<input type="password" id="pin" inputmode="numeric" maxlength="8" value="" autocomplete="off"></label><p class="muted">' + t('pin_regole') + '</p></div>' +
     '<button class="btn full" data-act="salva-fam">' + t('salva') + '</button>' + (FAM.pin ? '<p></p><button class="btn sec full" data-act="genitori">' + t('annulla') + '</button>' : '');
 }
@@ -1291,7 +1306,7 @@ function vHome() {
 }
 function fotoBox() {
   return '<div class="row"><label class="btn sec">' + t('scatta') + '<input type="file" accept="image/*" capture="environment" id="f1" hidden></label><label class="btn sec">' + t('scegli_foto') + '<input type="file" accept="image/*" multiple id="f2" hidden></label></div>' +
-    '<p class="muted">' + t('foto_aiuto') + '</p>' +
+    '<p class="muted">' + t('foto_aiuto') + '</p><p class="muted">🔒 ' + t('priv_foto') + '</p>' +
     '<div class="thumbs">' + V.foto.map((u, i) => '<div class="th"><img src="' + u + '" alt="' + (i + 1) + '"><div class="row"><button data-act="su" data-i="' + i + '" aria-label="↑">↑</button><button data-act="giu" data-i="' + i + '" aria-label="↓">↓</button><button data-act="del" data-i="' + i + '" aria-label="✕">✕</button></div></div>').join('') + '</div>' +
     (V.errore ? '<div class="fb warn" role="alert">' + esc(V.errore) + '</div>' : '');
 }
@@ -1487,6 +1502,7 @@ function vGenitori() {
   return barra() + '<div class="card"><h1>' + t('area_gen') + '</h1></div><h2>' + t('figli') + '</h2>' + (figli || '<div class="card muted">' + t('nessun_profilo') + '</div>') +
     '<div class="card"><button class="btn" data-act="aggiungi-figlio">+ ' + t('aggiungi_figlio') + '</button></div>' +
     '<div class="card"><h2>' + t('imp_famiglia') + '</h2><p class="muted">' + t('lingua_gen') + ': <b>' + LINGUE[FAM.lingua] + '</b> · ' + t('ai_titolo') + ': <b>' + esc(FAM.ai.provider) + '</b></p><button class="btn sec" data-act="modifica-fam">' + t('modifica') + '</button></div>' +
+    '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" data-act="priv-apri">' + t('priv_btn') + '</button></div>' +
     '<div class="card"><h2>' + t('dati_sic') + '</h2><p class="muted">' + t('dati_info') + '</p><p class="muted">' + bk + '</p><div class="row"><button class="btn sec" data-act="esporta">' + t('salva_copia') + '</button><label class="btn sec">' + t('ripristina') + '<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" id="installa" data-act="installa"' + (promptInstalla ? '' : ' hidden') + '>' + t('installa') + '</button><button class="btn sec" data-act="azzera">' + t('cancella_tutto') + '</button></div></div>';
 }
 function render() {
@@ -1494,10 +1510,10 @@ function render() {
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
   if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
-  if (!['genitori', 'fam', 'setup', 'stat'].includes(V.vista)) V.genitoriOk = false;
+  if (!['genitori', 'fam', 'setup', 'stat', 'privacy'].includes(V.vista)) V.genitoriOk = false;
   applicaTema();
   const v = V.vista;
-  const M = { fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
+  const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
   document.getElementById('app').oninput = null;
   document.getElementById('app').innerHTML = (M[v] || vHome)();
   if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit) fitMappa(); }
@@ -1890,8 +1906,11 @@ const AZ = {
   },
   'installa': async () => { if (promptInstalla) { promptInstalla.prompt(); try { await promptInstalla.userChoice; } catch (e) { /* annullato */ } promptInstalla = null; } render(); return 'async'; },
   'rimuovi-chiave': () => { delete FAM.ai.key; delete FAM.ai.kc; if (FAM.ai.provider !== 'compat') FAM.ai.provider = 'demo'; salva(); toast(t('chiave_rimossa')); },
+  'priv-apri': () => { V.privBack = V.vista; if (V.vista === 'fam') { try { V.bozzaFam = Object.assign({}, V.bozzaFam || {}, { dsaAI: !!document.getElementById('dsa-ai').checked, lingua: document.getElementById('lingua-gen').value }); } catch (e) {} } V.vista = 'privacy'; },
+  'priv-indietro': () => { V.vista = V.privBack || (FAM.pin ? 'genitori' : 'fam'); V.privBack = null; },
   'salva-fam': async () => {
     const pin = document.getElementById('pin').value.trim();
+    if (!FAM.pin) { const ok = document.getElementById('priv-ok'); if (ok && !ok.checked) { toast(t('priv_obbl')); return 'async'; } }
     if (pin || !FAM.pin) {
       if (!/^\d{4,8}$/.test(pin)) { toast(t('pin_cifre')); return 'async'; }
       if (pinBanale(pin)) { toast(t('pin_debole')); return 'async'; }
@@ -1900,7 +1919,7 @@ const AZ = {
     if (ai.provider === 'compat' && !urlConsentito(ai.url)) { toast(t('url_no')); return 'async'; }
     if (ai.key) { ai.kc = await cifra(ai.key); ai.key = ''; }
     else { ai.kc = FAM.ai.kc || ''; ai.key = ''; if (FAM.ai.key) ai.kc = await cifra(FAM.ai.key); }
-    FAM.ai = ai; const l = document.getElementById('lingua-gen').value; FAM.lingua = LINGUE[l] ? l : 'it';
+    FAM.ai = ai; FAM.dsaAI = !!document.getElementById('dsa-ai').checked; const l = document.getElementById('lingua-gen').value; FAM.lingua = LINGUE[l] ? l : 'it';
     if (pin) FAM.pin = await hashPin(pin);
     V.bozzaFam = null; V.genitoriOk = true; salva();
     V.vista = DB.figli.length ? 'genitori' : 'setup'; V.edit = null; render(); return 'async';
