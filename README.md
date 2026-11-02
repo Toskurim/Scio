@@ -1,4 +1,4 @@
-# AI.st.ain v0.18 — app di studio installabile (PWA)
+# AI.st.ain v0.19 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,9 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.19
+- Durante le attese ("AI.st.ain sta leggendo e preparando tutto…") compare l'omino di AI.st.ain che dondola e "pensa" con i fumetti, al posto del cerchio che gira (fermo se il dispositivo chiede meno animazioni).
 
 ## Novità della v0.18
 - Tolta la vecchia dicitura "Primaria e università arriveranno dopo" dalla scheda del profilo (i due livelli ci sono già).
@@ -77,8 +80,8 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.17 a v0.18)
-1. Dalla v0.17 cambiano solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
+## Aggiornare il sito su GitHub (da v0.18 a v0.19)
+1. Dalla v0.18 cambiano `style.css`, solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
 2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.
 4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione pronta".
