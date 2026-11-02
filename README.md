@@ -1,10 +1,24 @@
-# Scio v0.13 — app di studio installabile (PWA)
+# AI.st.ain v0.14 — app di studio installabile (PWA)
+
+**AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
+Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
 
 Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, si installa come app su telefono, tablet e PC e, dopo la prima apertura, parte anche senza rete (le funzioni AI richiedono comunque internet, oppure Ollama sul PC di casa).
 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
-Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio è maiuscola).
+Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.14
+- **Nuovo nome e nuova icona**: AI.st.ain, con un omino dai capelli bianchi scarmigliati.
+- **Temi per livello**: "Gioco" solo alle elementari; dalle medie in su "Calmo" e "Notte".
+- **Aspetto automatico**: se il genitore sceglie un DSA, carattere, dimensione, interlinea e spaziatura di lettere e parole si adattano da soli (dislessia, disortografia, discalculia, disgrafia). Senza DSA restano carattere e spaziatura standard. Si può cambiare a mano; "Ripristina le impostazioni consigliate" riporta tutto com'era.
+- **Mappa concettuale**: si adatta da sola allo schermo; in modifica si trascinano con dito o mouse i riquadri e le etichette dei collegamenti (oppure frecce e "Riordina da solo"); stampa su un foglio orizzontale adattata al foglio, anche da sola ("Stampa la mappa").
+- **Stampa**: meno pagine vuote, sezioni di seguito, esercizi con lo spazio per rispondere.
+- **Test corretti**: l'AI non deve più fare domande sull'esercizio in sé ("è vero che nell'esercizio devi..."); un filtro nell'app scarta anche quelle rimaste, nei test nuovi e in quelli già salvati. Gli esercizi del libro servono solo da spunto.
+- **Nuova sezione "Allenamento"**: esercizi di pratica sugli stessi argomenti, con controllo della risposta e 3 indizi; la soluzione non viene mai data. Si può nascondere dal profilo come le altre sezioni.
+- **Altri test e difficoltà**: a fine test si chiedono altre domande o si sale (o si scende) di livello: Base, Medio, Avanzato, Esperto, Maestro.
+- **Punti, gradi e traguardi**: punti per ogni risposta giusta, gradi (Curioso, Studioso, Scienziato, Genio, Einstain) e medaglie, nella schermata iniziale di ogni ragazzo.
 
 ## Novità della v0.13
 - Il genitore sceglie, per ciascun figlio, quali sezioni sono disponibili: riassunto, schema, mappa concettuale, spiegazioni, glossario (Area genitori › Modifica profilo). Il test è sempre disponibile.
@@ -30,13 +44,13 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio �
 - Funziona anche per i capitoli già fatti: basta aprirli e premere "Crea la mappa concettuale".
 
 ## Novità della v0.9
-- Quattro livelli scolastici per ogni profilo: **elementari (6-10)**, media (11-13), superiori (14-18) e **università (19+)**. Alle elementari Scio usa frasi corte, parole semplici, test da 10 a 15 domande e il tema "Gioco" consigliato; all'università usa un registro tecnico e rigoroso e domande di ragionamento. I profili esistenti restano invariati.
+- Quattro livelli scolastici per ogni profilo: **elementari (6-10)**, media (11-13), superiori (14-18) e **università (19+)**. Alle elementari AI.st.ain usa frasi corte, parole semplici, test da 10 a 15 domande e il tema "Gioco" consigliato; all'università usa un registro tecnico e rigoroso e domande di ragionamento. I profili esistenti restano invariati.
 
 ## Novità della v0.8.1
 - Correzione dell'aggiornamento automatico: l'app scarica sempre i file nuovi e non resta più sulla versione vecchia.
 
 ## Novità della v0.8
-- Lettura ad alta voce: Scio sceglie da solo la voce migliore del dispositivo (quelle “naturali” o di rete prima di quelle metalliche) e, in "Aspetto", si può scegliere una voce a mano e provarla. Se una voce online non risponde, ripiega su una del dispositivo.
+- Lettura ad alta voce: AI.st.ain sceglie da solo la voce migliore del dispositivo (quelle “naturali” o di rete prima di quelle metalliche) e, in "Aspetto", si può scegliere una voce a mano e provarla. Se una voce online non risponde, ripiega su una del dispositivo.
 
 ## Novità della v0.7
 - Un profilo per ogni figlio (PIN personale facoltativo) e un'unica area genitori con PIN.
@@ -48,11 +62,11 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di Scio �
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.7 a v0.8)
-1. Dalla v0.7 cambiano solo quattro file: `app.js`, `i18n.js`, `sw.js` e `README.md`.
-2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
+## Aggiornare il sito su GitHub (da v0.13 a v0.14)
+1. Cambiano tutti i file tranne i font: `index.html`, `app.js`, `i18n.js`, `style.css`, `sw.js`, `manifest.webmanifest`, `README.md` e la cartella `icons`.
+2. Nel repository su github.com: **Add file › Upload files**, trascina i file (stessi nomi: vengono sostituiti) e la cartella `icons`.
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.
-4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione di Scio pronta".
+4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione pronta".
 
 ## Sicurezza
 - Politica di sicurezza della pagina (CSP) restrittiva: nessuno script esterno, nessun inline; collegamenti solo ad Anthropic, OpenRouter, Gemini, Groq e al PC locale.

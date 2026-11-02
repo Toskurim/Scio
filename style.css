@@ -160,3 +160,24 @@ input[type=range]{width:100%;min-height:36px}
   #stampa .st-tab{border-collapse:collapse;width:100%} #stampa .st-tab th,#stampa .st-tab td{border-bottom:1px solid #888;padding:3pt 6pt;text-align:left}
   #stampa .st-svg{max-width:100%;height:auto;break-inside:avoid} #stampa h3{break-after:avoid}
 }
+
+/* v0.14 */
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.badge{padding:6px 10px;border:1px solid var(--border);border-radius:999px;font-size:.9rem;color:var(--muted)}
+.badge.on{background:var(--soft);color:var(--ink);border-color:var(--accent);font-weight:600}
+progress{width:100%;height:14px;accent-color:var(--accent)}
+.mappa-wrap.edit .mp-drag{cursor:grab}
+.mp-drag,.mp-drag *{touch-action:none}
+.mappa-wrap.edit .mp-dlab .mp-lab{stroke:var(--accent);stroke-dasharray:3 2}
+@media print{
+  @page mappa{size:landscape;margin:12mm}
+  #stampa .mappa-pg{page:mappa;break-before:page;break-after:page}
+  #stampa section:first-child .mappa-pg,#stampa .mappa-pg:first-child{break-before:auto}
+  #stampa .mappa-pg .mp-svg{width:100%;height:152mm;max-width:100%}
+  #stampa .nuova-pg{break-before:page}
+  #stampa p,#stampa li{orphans:3;widows:3}
+  #stampa li{break-inside:avoid}
+  #stampa .es-pr{break-inside:avoid;margin-bottom:8pt}
+  #stampa .rispo{height:26mm;border-bottom:1px dotted #888}
+  #stampa section{break-inside:auto}
+}

@@ -1,9 +1,9 @@
 'use strict';
-/* ===== Scio v0.8.1 — app web installabile (PWA) ===== */
-/* Anti-clickjacking: Scio non si lascia incorniciare in altre pagine. */
-if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Scio non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.13';
-const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario'];
+/* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
+/* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
+const VERSIONE = '0.14';
+const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'pratica'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -74,7 +74,7 @@ function urlConsentito(u) {
 }
 /* ===== Dati: una famiglia, più figli ===== */
 function aiVuoto() { return { provider: 'demo', key: '', kc: '', model: '', preset: 'ollama', url: '' }; }
-function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0 }; }
+function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti() }; }
 function famVuota() { const l = String(navigator.language || 'it').slice(0, 2).toLowerCase(); return { pin: '', ai: aiVuoto(), lingua: LINGUE[l] ? l : 'it', ultimoBackup: '' }; }
 function caricaDB() {
   try {
@@ -145,14 +145,15 @@ function pulisciDati(o) {
     const profilo = { nome: Tx(pr.nome, 60), livello: LIVELLI.includes(pr.livello) ? pr.livello : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '', sezioni: {} };
     SEZ.forEach(k => { profilo.sezioni[k] = !(pr.sezioni && pr.sezioni[k] === false); });
     Object.keys(DSA).forEach(k => { if (pr.dsa && pr.dsa[k] === true) profilo.dsa[k] = true; });
+    profilo.tema = temaValido(profilo); profilo.auto = pr.auto !== false;
     const capitoli = A(c.capitoli).filter(x => x && typeof x === 'object').slice(0, 500).map(x => ({
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
       riassunto_breve: L(x.riassunto_breve, 1500), riassunto_completo: Tx(x.riassunto_completo),
       schema: { radice: Tx(x.schema && x.schema.radice, 300), rami: A(x.schema && x.schema.rami).filter(r => r && typeof r === 'object').map(r => ({ titolo: Tx(r.titolo, 300), punti: L(r.punti, 800) })) },
-      mappa: pulisciMappa(x.mappa),
+      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica),
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
-      test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000) })),
+      test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000), d: Math.max(1, Math.min(5, Math.floor(N(q.d)) || 1)) })),
       risultati: A(x.risultati).filter(r => r && typeof r === 'object').map(r => ({ data: Tx(r.data, 40), punti: N(r.punti), totale: N(r.totale) || 1, errati: L(r.errati, 300) }))
     }));
     const esercizi = A(c.esercizi).filter(e => e && typeof e === 'object').slice(0, 500).map(e => ({
@@ -163,7 +164,7 @@ function pulisciDati(o) {
     const ripetizioni = {};
     if (c.rip && typeof c.rip === 'object') Object.keys(c.rip).slice(0, 3000).forEach(k => { const r = c.rip[k]; if (/^[A-Za-z0-9_-]{1,40}\|\d{1,4}$/.test(k) && r && typeof r === 'object' && DATA(r.next)) ripetizioni[k] = { b: Math.max(0, Math.min(6, Math.floor(N(r.b)))), next: DATA(r.next) }; });
     const verifiche = A(c.verifiche).filter(v => v && typeof v === 'object' && DATA(v.data)).slice(0, 200).map(v => ({ id: ID(v.id), materia: Tx(v.materia, 60), data: DATA(v.data), argomento: Tx(v.argomento, 120) }));
-    return { id: ID(c.id), profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))) };
+    return { id: ID(c.id), profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))), premi: pulisciPremi(c.premi) };
   });
   const fam = famVuota();
   if (p.fam && typeof p.fam === 'object' && LINGUE[p.fam.lingua]) fam.lingua = p.fam.lingua;
@@ -187,15 +188,11 @@ function toast(t) { const d = document.createElement('div'); d.className = 'toas
 function lg() { return (['genitori', 'fam', 'setup', 'scelta', 'stat'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
 function applicaTema() {
   const p = S.profilo, b = document.body, r = document.documentElement;
-  b.setAttribute('data-tema', p && TEMI[p.tema] ? p.tema : 'calmo');
+  b.setAttribute('data-tema', p ? temaValido(p) : 'calmo');
   r.style.setProperty('--fs', p && p.fs ? p.fs : 1);
   const set = (k, v) => { if (v) b.style.setProperty(k, v); else b.style.removeProperty(k); };
   set('--font', p && FONT_STACK[p.font]); set('--lh', p && p.lh); set('--ls', p && p.ls ? p.ls + 'em' : ''); set('--ws', p && p.ws ? p.ws + 'em' : '');
   const l = lg(); LINGUA_CORRENTE = l; r.lang = l; r.dir = l === 'ar' ? 'rtl' : 'ltr';
-}
-function consigliato(livello, dsa) {
-  if (dsa && (dsa.dislessia || dsa.discalculia || dsa.disortografia || dsa.disgrafia)) return 'calmo';
-  return (livello === 'media' || livello === 'elementari') ? 'gioco' : 'calmo';
 }
 
 /* ===== Collegamento all'AI ===== */
@@ -222,7 +219,7 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
   const compat = a.provider === 'compat';
   if (a.provider === 'demo' || (!haChiave(a) && !compat)) throw new Error('NODEMO');
   if (compat && !a.url) throw new Error('Manca l\'indirizzo del servizio (Area genitori › Impostazioni).');
-  if (compat && !urlConsentito(a.url)) throw new Error('Indirizzo non consentito: per sicurezza Scio parla solo con il PC di casa (localhost), Gemini e Groq. Scegli uno dei servizi dell\'elenco.');
+  if (compat && !urlConsentito(a.url)) throw new Error('Indirizzo non consentito: per sicurezza AI.st.ain parla solo con il PC di casa (localhost), Gemini e Groq. Scegli uno dei servizi dell\'elenco.');
   const chiave = await chiavePiena(a);
   if (a.provider === 'anthropic') {
     const content = (immagini || []).map(u => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: u.split(',')[1] } }));
@@ -250,7 +247,7 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
   const url = compat ? a.url.replace(/\/+$/, '') + '/chat/completions' : 'https://openrouter.ai/api/v1/chat/completions';
   const head = { 'content-type': 'application/json' };
   if (chiave) head.authorization = 'Bearer ' + chiave;
-  if (!compat) head['x-title'] = 'Scio';
+  if (!compat) head['x-title'] = 'AI.st.ain';
   let r;
   try {
     r = await fetch(url, { method: 'POST', headers: head,
@@ -278,9 +275,11 @@ const SCHEMA_CAPITOLO = OBJ({
   titolo: T, avvisi: LS_, riassunto_breve: LS_, riassunto_completo: Object.assign({ description: 'Riassunto in sezioni, una per ogni paragrafo del libro, ciascuna con riga "### Titolo"; nessun argomento saltato' }, T),
   schema: OBJ({ radice: T, rami: { type: 'array', items: OBJ({ titolo: T, punti: LS_ }) } }),
   spiegazioni: { type: 'array', description: 'Almeno 5 concetti spiegati in modo semplice, ciascuno con un esempio pratico', items: OBJ({ concetto: T, spiegazione: T, esempio: T }) },
+  pratica: { type: 'array', description: 'Da 4 a 8 esercizi di allenamento ispirati agli esercizi del libro (dati diversi), con soluzione riservata e 3 indizi', items: OBJ({ testo: T, soluzione: T, indizi: LS_ }) },
   glossario: { type: 'array', description: 'Almeno 8 termini chiave', items: OBJ({ termine: T, definizione: T }) },
-  test: { type: 'array', description: 'Da 20 a 30 domande (più il capitolo è lungo, più domande): circa 7 su 10 con tipo "scelta" (4 opzioni) e le altre con tipo "vf"', items: OBJ({ tipo: { type: 'string', enum: ['scelta', 'vf'] }, argomento: T, domanda: T, opzioni: Object.assign({ description: 'Solo per tipo scelta: 4 opzioni' }, LS_), corretta: { description: 'Per scelta: indice 0-3 dell\'opzione giusta. Per vf: true o false' }, spiegazione: T }, ['tipo', 'argomento', 'domanda', 'corretta', 'spiegazione']) }
+  test: { type: 'array', description: 'NON fare domande sugli esercizi del libro (cosa chiedono): solo sui concetti. Da 20 a 30 domande (più il capitolo è lungo, più domande): circa 7 su 10 con tipo "scelta" (4 opzioni) e le altre con tipo "vf"', items: OBJ({ tipo: { type: 'string', enum: ['scelta', 'vf'] }, argomento: T, domanda: T, opzioni: Object.assign({ description: 'Solo per tipo scelta: 4 opzioni' }, LS_), corretta: { description: 'Per scelta: indice 0-3 dell\'opzione giusta. Per vf: true o false' }, spiegazione: T }, ['tipo', 'argomento', 'domanda', 'corretta', 'spiegazione']) }
 });
+SCHEMA_CAPITOLO.required = SCHEMA_CAPITOLO.required.filter(k => k !== 'pratica');
 const SCHEMA_ESERCIZIO = OBJ({
   materia: T, richiesta: T,
   passi: { type: 'array', description: '3-6 passi di ragionamento', items: OBJ({ titolo: T, domanda: T, obiettivo: T, indizi: Object.assign({ description: 'Esattamente 3 indizi dal più leggero al più chiaro, senza la soluzione' }, LS_), esempio_simile: T }) }
@@ -293,10 +292,11 @@ function pulisciMappa(m) {
   const A = x => Array.isArray(x) ? x : [];
   const Tx = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
   const vistiId = new Set();
-  const nodi = A(m && m.nodi).filter(n => n && typeof n === 'object').slice(0, 60).map(n => ({ id: Tx(n.id, 20).replace(/[^A-Za-z0-9_-]/g, ''), testo: Tx(n.testo, 120).trim() }))
+  const P = (x, a, b) => { x = Number(x); return Number.isFinite(x) ? Math.max(a, Math.min(b, Math.round(x))) : null; };
+  const nodi = A(m && m.nodi).filter(n => n && typeof n === 'object').slice(0, 60).map(n => { const o = { id: Tx(n.id, 20).replace(/[^A-Za-z0-9_-]/g, ''), testo: Tx(n.testo, 120).trim() }; const px = P(n.px, 0, 5000), py = P(n.py, 0, 5000); if (px !== null && py !== null) { o.px = px; o.py = py; } return o; })
     .filter(n => n.id && n.testo && !vistiId.has(n.id) && vistiId.add(n.id));
-  const relazioni = A(m && m.relazioni).filter(r => r && typeof r === 'object').slice(0, 120).map(r => ({ da: Tx(r.da, 20).replace(/[^A-Za-z0-9_-]/g, ''), a: Tx(r.a, 20).replace(/[^A-Za-z0-9_-]/g, ''), etichetta: Tx(r.etichetta, 60).trim(), x: r.x === true }))
-    .filter(r => vistiId.has(r.da) && vistiId.has(r.a) && r.da !== r.a);
+  const relazioni = A(m && m.relazioni).filter(r => r && typeof r === 'object').slice(0, 120).map(r => ({ da: Tx(r.da, 20).replace(/[^A-Za-z0-9_-]/g, ''), a: Tx(r.a, 20).replace(/[^A-Za-z0-9_-]/g, ''), etichetta: Tx(r.etichetta, 60).trim(), x: r.x === true, ldx: P(r.ldx, -1500, 1500) || 0, ldy: P(r.ldy, -1500, 1500) || 0 }))
+    .filter(r => vistiId.has(r.da) && vistiId.has(r.a) && r.da !== r.a).map(r => { if (!r.ldx) delete r.ldx; if (!r.ldy) delete r.ldy; return r; });
   return { nodi, relazioni };
 }
 const haMappa = c => !!(c && c.mappa && Array.isArray(c.mappa.nodi) && c.mappa.nodi.length >= 2);
@@ -319,21 +319,23 @@ function mappaDaSchema(c) {
 }
 function mappaLayout(m) {
   const nodo = {}; m.nodi.forEach(n => { nodo[n.id] = { id: n.id, righe: spezza(senzaMarc(n.testo), 24, 4) }; });
-  const rel = m.relazioni.map((r, i) => ({ da: r.da, a: r.a, etichetta: senzaMarc(r.etichetta), albero: false, x: !!r.x, i })).filter(r => nodo[r.da] && nodo[r.a] && r.da !== r.a);
+  const rel = m.relazioni.map((r, i) => ({ da: r.da, a: r.a, etichetta: senzaMarc(r.etichetta), albero: false, x: !!r.x, i, ldx: Number(r.ldx) || 0, ldy: Number(r.ldy) || 0 })).filter(r => nodo[r.da] && nodo[r.a] && r.da !== r.a);
   const esplicito = rel.some(r => r.x); /* struttura già esplicita: i collegamenti trasversali non fanno da ramo */
   const radice = m.nodi[0].id; /* il primo nodo è sempre il concetto centrale */
   const figli = {}, prof = {}; prof[radice] = 0;
   const coda = [radice];
   while (coda.length) { const id = coda.shift(); rel.forEach(r => { if (r.da === id && !(r.a in prof) && !(esplicito && r.x)) { prof[r.a] = prof[id] + 1; r.albero = true; (figli[id] = figli[id] || []).push(r.a); coda.push(r.a); } }); }
-  m.nodi.forEach(n => { if (!(n.id in prof)) { prof[n.id] = 1; (figli[radice] = figli[radice] || []).push(n.id); rel.push({ da: radice, a: n.id, etichetta: '', albero: true, x: false, i: -1 }); } });
+  m.nodi.forEach(n => { if (!(n.id in prof)) { prof[n.id] = 1; (figli[radice] = figli[radice] || []).push(n.id); rel.push({ da: radice, a: n.id, etichetta: '', albero: true, x: false, i: -1, ldx: 0, ldy: 0 }); } });
   const maxRighe = Math.max.apply(null, Object.keys(nodo).map(k => nodo[k].righe.length));
   const h = 18 + maxRighe * 18, slot = h + 14;
   let cursore = 10;
   const posiziona = id => { const k = figli[id] || [], n = nodo[id]; if (!k.length) { n.y = cursore + h / 2; cursore += slot; return; } k.forEach(posiziona); n.y = (nodo[k[0]].y + nodo[k[k.length - 1]].y) / 2; };
   posiziona(radice);
-  let maxD = 0;
-  Object.keys(nodo).forEach(k => { nodo[k].d = prof[k]; nodo[k].x = 10 + prof[k] * (MP.W + MP.GAP); if (prof[k] > maxD) maxD = prof[k]; });
-  return { nodo, rel, h, W: 20 + (maxD + 1) * MP.W + maxD * MP.GAP, H: cursore - 14 + 10, radice };
+  Object.keys(nodo).forEach(k => { nodo[k].d = prof[k]; nodo[k].x = 10 + prof[k] * (MP.W + MP.GAP); });
+  /* posizioni scelte a mano (trascinando i nodi) */
+  m.nodi.forEach(n => { if (Number.isFinite(n.px) && Number.isFinite(n.py)) { nodo[n.id].x = n.px; nodo[n.id].y = n.py; nodo[n.id].libero = true; } });
+  const tutti = Object.keys(nodo).map(k => nodo[k]);
+  return { nodo, rel, h, W: Math.max.apply(null, tutti.map(o => o.x)) + MP.W + 10, H: Math.max.apply(null, tutti.map(o => o.y)) + h / 2 + 10, radice };
 }
 function mappaSVG(m, zoom, titolo, edit, sel) {
   const L = mappaLayout(m), W = MP.W;
@@ -341,19 +343,20 @@ function mappaSVG(m, zoom, titolo, edit, sel) {
   L.rel.forEach(r => {
     const a = L.nodo[r.da], b = L.nodo[r.a];
     let x1, x2, c1, c2, lx;
-    if (b.x > a.x) { x1 = a.x + W; x2 = b.x; c1 = c2 = (x1 + x2) / 2; lx = c1; }
-    else if (b.x < a.x) { x1 = a.x; x2 = b.x + W; c1 = c2 = (x1 + x2) / 2; lx = c1; }
+    if (b.x > a.x + 4) { x1 = a.x + W; x2 = b.x; c1 = c2 = (x1 + x2) / 2; lx = c1; }
+    else if (b.x < a.x - 4) { x1 = a.x; x2 = b.x + W; c1 = c2 = (x1 + x2) / 2; lx = c1; }
     else { x1 = a.x; x2 = b.x; c1 = c2 = x1 - 70; lx = x1 - 52; }
     archi += '<path class="mp-arco' + (r.albero ? '' : ' mp-cross') + '" d="M' + x1 + ' ' + a.y + ' C' + c1 + ' ' + a.y + ' ' + c2 + ' ' + b.y + ' ' + x2 + ' ' + b.y + '" marker-end="url(#mpfr)"/>';
     if (r.etichetta) {
-      const rg = spezza(r.etichetta, 16, 2), w = Math.max.apply(null, rg.map(x => x.length)) * 6.6 + 10, hh = rg.length * 14 + 4, ly = (a.y + b.y) / 2;
-      etich += '<g><rect class="mp-lab" x="' + (lx - w / 2) + '" y="' + (ly - hh / 2) + '" width="' + w + '" height="' + hh + '" rx="4"/><text class="mp-lt" text-anchor="middle">' +
+      const rg = spezza(r.etichetta, 16, 2), w = Math.max.apply(null, rg.map(x => x.length)) * 6.6 + 10, hh = rg.length * 14 + 4, ly = (a.y + b.y) / 2 + r.ldy;
+      lx += r.ldx;
+      etich += '<g' + (edit && r.i >= 0 ? ' class="mp-drag mp-dlab" data-drag="lab" data-i="' + r.i + '"' : '') + '><rect class="mp-lab" x="' + (lx - w / 2) + '" y="' + (ly - hh / 2) + '" width="' + w + '" height="' + hh + '" rx="4"/><text class="mp-lt" text-anchor="middle">' +
         rg.map((x, i) => '<tspan x="' + lx + '" y="' + (ly - hh / 2 + 13 + i * 14) + '">' + esc(x) + '</tspan>').join('') + '</text></g>';
     }
   });
   Object.keys(L.nodo).forEach(k => {
     const n = L.nodo[k], y0 = n.y - L.h / 2, top = n.y - (n.righe.length - 1) * 9 + 5;
-    nodi += '<g' + (edit ? ' class="mp-click" data-act="mappa-sel" data-id="' + esc(k) + '"' : '') + '><rect class="mp-n mp-d' + Math.min(n.d, 3) + (edit && k === sel ? ' mp-sel' : '') + '" x="' + n.x + '" y="' + y0 + '" width="' + W + '" height="' + L.h + '" rx="10"/><text class="mp-t mp-td' + Math.min(n.d, 3) + '" text-anchor="middle">' +
+    nodi += '<g' + (edit ? ' class="mp-click mp-drag" data-act="mappa-sel" data-drag="nodo" data-id="' + esc(k) + '"' : '') + '><rect class="mp-n mp-d' + Math.min(n.d, 3) + (edit && k === sel ? ' mp-sel' : '') + '" x="' + n.x + '" y="' + y0 + '" width="' + W + '" height="' + L.h + '" rx="10"/><text class="mp-t mp-td' + Math.min(n.d, 3) + '" text-anchor="middle">' +
       n.righe.map((x, i) => '<tspan x="' + (n.x + W / 2) + '" y="' + (top + i * 18) + '">' + esc(x) + '</tspan>').join('') + '</text></g>';
   });
   const dim = zoom ? ' width="' + Math.round(L.W * zoom) + '" height="' + Math.round(L.H * zoom) + '"' : ' width="100%"';
@@ -380,6 +383,52 @@ function rinfresca() {
   render();
   const n = document.querySelector('.mappa-wrap'); if (n) { n.scrollLeft = sx; n.scrollTop = sy; } window.scrollTo(0, py);
 }
+function fitMappa() {
+  const w = document.querySelector('.mappa-wrap'), sv = w && w.querySelector('svg'); if (!sv) return;
+  const dw = +sv.dataset.w, dh = +sv.dataset.h;
+  V.mz = Math.max(0.3, Math.min(1, (w.clientWidth - 8) / dw, (Math.max(240, window.innerHeight * 0.66) - 8) / dh));
+  sv.setAttribute('width', Math.round(dw * V.mz)); sv.setAttribute('height', Math.round(dh * V.mz));
+}
+function ripitturaMappa(c) {
+  const w = document.querySelector('.mappa-wrap'); if (!w) return;
+  const sx = w.scrollLeft, sy = w.scrollTop;
+  w.innerHTML = mappaSVG(c.mappa, V.mz || 1, c.titolo, true, V.mSel);
+  w.scrollLeft = sx; w.scrollTop = sy;
+}
+/* Trascinamento dei nodi e delle etichette dei collegamenti (mouse, penna e dito) */
+(function () {
+  let d = null;
+  const trova = () => d && document.querySelector(d.tipo === 'nodo' ? '.mappa-wrap [data-drag="nodo"][data-id="' + d.id + '"]' : '.mappa-wrap [data-drag="lab"][data-i="' + d.i + '"]');
+  document.addEventListener('pointerdown', e => {
+    if (!V.mEdit || V.vista !== 'capitolo' || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const g = e.target.closest && e.target.closest('.mappa-wrap [data-drag]'); if (!g) return;
+    const c = mappaCorr(); const sv = g.closest('svg'); if (!c || !sv) return;
+    const L = mappaLayout(c.mappa), vb = sv.viewBox.baseVal, rect = sv.getBoundingClientRect();
+    d = { tipo: g.dataset.drag, id: g.dataset.id, i: +g.dataset.i, x0: e.clientX, y0: e.clientY, k: rect.width / vb.width, mosso: false, snap: JSON.stringify(c.mappa), pid: e.pointerId, ymin: 10 + L.h / 2 };
+    if (d.tipo === 'nodo') { const n = L.nodo[d.id]; if (!n) { d = null; return; } d.base = [n.x, n.y]; V.mSel = d.id; }
+    else { const r = c.mappa.relazioni[d.i]; if (!r) { d = null; return; } d.base = [Number(r.ldx) || 0, Number(r.ldy) || 0]; }
+    try { g.setPointerCapture(e.pointerId); } catch (x) { /* non disponibile */ }
+  });
+  document.addEventListener('pointermove', e => {
+    if (!d || e.pointerId !== d.pid) return;
+    const dx = (e.clientX - d.x0) / d.k, dy = (e.clientY - d.y0) / d.k;
+    if (!d.mosso && Math.abs(e.clientX - d.x0) + Math.abs(e.clientY - d.y0) < 5) return;
+    const c = mappaCorr(); if (!c) { d = null; return; }
+    if (!d.mosso) { d.mosso = true; V.mundo = V.mundo || []; V.mundo.push(d.snap); if (V.mundo.length > 30) V.mundo.shift(); }
+    if (d.tipo === 'nodo') { const n = c.mappa.nodi.find(x => x.id === d.id); if (n) { n.px = Math.max(10, Math.min(5000, Math.round(d.base[0] + dx))); n.py = Math.max(d.ymin, Math.min(5000, Math.round(d.base[1] + dy))); } }
+    else { const r = c.mappa.relazioni[d.i]; if (r) { r.ldx = Math.max(-1500, Math.min(1500, Math.round(d.base[0] + dx))); r.ldy = Math.max(-1500, Math.min(1500, Math.round(d.base[1] + dy))); } }
+    ripitturaMappa(c);
+    const g = trova(); if (g) { try { g.setPointerCapture(d.pid); } catch (x) { /* non disponibile */ } }
+    e.preventDefault();
+  });
+  const fine = e => {
+    if (!d || e.pointerId !== d.pid) return;
+    const mosso = d.mosso; d = null;
+    if (mosso) { const c = mappaCorr(); if (c) { c.mappa = pulisciMappa(c.mappa); salva(); rinfresca(); } }
+  };
+  document.addEventListener('pointerup', fine);
+  document.addEventListener('pointercancel', fine);
+})();
 function nuovoIdNodo(m) { const u = new Set(m.nodi.map(n => n.id)); let id; do { id = 'u' + (Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36)).slice(-9); } while (u.has(id)); return id; }
 function vPannelloMappa(c) {
   const m = c.mappa, radice = m.nodi[0].id;
@@ -397,6 +446,7 @@ function vPannelloMappa(c) {
     '<div class="row"><button class="btn small" data-act="mappa-salva">' + t('mappa_salva') + '</button>' +
     (gi >= 0 ? '<button class="btn sec small" data-act="mappa-ordine" data-d="-1"' + (pos <= 0 ? ' disabled' : '') + '>↑ ' + t('mappa_su') + '</button><button class="btn sec small" data-act="mappa-ordine" data-d="1"' + (pos >= fratelli.length - 1 ? ' disabled' : '') + '>↓ ' + t('mappa_giu') + '</button>' : '') + '</div>' +
     (gi >= 0 ? '<label class="f" style="margin-top:12px">' + t('mappa_sposta') + '<select id="mp-genitore">' + m.nodi.filter(n => n.id !== sel.id && !desc.has(n.id)).map(n => '<option value="' + esc(n.id) + '"' + (n.id === m.relazioni[gi].da ? ' selected' : '') + '>' + nome(n) + '</option>').join('') + '</select></label><button class="btn sec small" data-act="mappa-sposta">' + t('mappa_sposta_btn') + '</button>' : '') +
+    '<h3 style="margin-top:16px">' + t('mappa_muovi') + '</h3><div class="row"><button class="btn sec small" data-act="mappa-muovi" data-dx="0" data-dy="-30" aria-label="↑">↑</button><button class="btn sec small" data-act="mappa-muovi" data-dx="0" data-dy="30" aria-label="↓">↓</button><button class="btn sec small" data-act="mappa-muovi" data-dx="-30" data-dy="0" aria-label="←">←</button><button class="btn sec small" data-act="mappa-muovi" data-dx="30" data-dy="0" aria-label="→">→</button><button class="btn sec small" data-act="mappa-riordina">' + t('mappa_riordina') + '</button></div>' +
     '<h3 style="margin-top:16px">' + t('mappa_aggiungi') + '</h3><label class="f">' + t('mappa_nuovo_testo') + '<input type="text" id="mp-nuovo" maxlength="120"></label><label class="f">' + t('mappa_etich') + '<input type="text" id="mp-nuovo-et" maxlength="60"></label><button class="btn sec small" data-act="mappa-aggiungi"' + (m.nodi.length >= 60 ? ' disabled' : '') + '>' + t('mappa_aggiungi_btn') + '</button>' +
     '<h3 style="margin-top:16px">' + t('mappa_collega') + '</h3><label class="f"><select id="mp-verso">' + m.nodi.filter(n => n.id !== sel.id).map(n => '<option value="' + esc(n.id) + '">' + nome(n) + '</option>').join('') + '</select></label><label class="f">' + t('mappa_etich') + '<input type="text" id="mp-verso-et" maxlength="60"></label><button class="btn sec small" data-act="mappa-collega">' + t('mappa_collega_btn') + '</button>' +
     (trasv.length ? '<h3 style="margin-top:16px">' + t('mappa_trasv') + '</h3><ul>' + trasv.map(o => '<li>' + esc(nmap[o.r.da] + (o.r.etichetta ? ' — ' + senzaMarc(o.r.etichetta) + ' → ' : ' → ') + nmap[o.r.a]) + ' <button class="btn sec small" data-act="mappa-del-x" data-i="' + o.i + '" aria-label="✕">✕</button></li>').join('') + '</ul>' : '') +
@@ -409,12 +459,12 @@ function vMappa(c) {
   return '<div class="card"><div class="row"><button class="btn sec small" data-act="mappa-zoom" data-d="0.8" aria-label="' + t('mappa_meno') + '">−</button><button class="btn sec small" data-act="mappa-zoom" data-d="1.25" aria-label="' + t('mappa_piu') + '">+</button>' +
     '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button>' +
     (ed ? '<button class="btn sec small" data-act="mappa-annulla"' + (V.mundo && V.mundo.length ? '' : ' disabled') + '>↶ ' + t('mappa_annulla') + '</button>' : '<button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button>') +
-    '<button class="btn small" data-act="mappa-modifica">' + (ed ? t('mappa_fine') : t('mappa_modifica')) + '</button></div>' +
-    '<div class="mappa-wrap" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo, ed, V.mSel) + '</div></div>' +
+    '<button class="btn sec small" data-act="stampa-mappa">' + t('mappa_stampa') + '</button><button class="btn small" data-act="mappa-modifica">' + (ed ? t('mappa_fine') : t('mappa_modifica')) + '</button></div>' + (ed ? '<p class="muted">' + t('mappa_trascina') + '</p>' : '') +
+    '<div class="mappa-wrap' + (ed ? ' edit' : '') + '" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo, ed, V.mSel) + '</div></div>' +
     (ed ? vPannelloMappa(c) : '<details class="card"><summary>' + t('mappa_elenco') + '</summary><ul>' + mappaElenco(c.mappa).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></details>');
 }
 const SCHEMA_MAPPA = OBJ({ nodi: { type: 'array', items: OBJ({ id: T, testo: T }) }, relazioni: { type: 'array', items: OBJ({ da: T, a: T, etichetta: T }) } });
-const SYS_MAPPA = `Sei Scio, un tutor di studio. Ti viene dato il riassunto di un capitolo. Costruisci una MAPPA CONCETTUALE: nodi (concetti) collegati da relazioni con una breve etichetta (un verbo o una breve espressione).
+const SYS_MAPPA = `Sei AI.st.ain, un tutor di studio. Ti viene dato il riassunto di un capitolo. Costruisci una MAPPA CONCETTUALE: nodi (concetti) collegati da relazioni con una breve etichetta (un verbo o una breve espressione).
 REGOLE:
 - Usa SOLO ciò che è nel riassunto, senza inventare nulla.
 - Da 12 a 30 nodi. Ogni nodo ha "id" breve e unico (n1, n2, n3...) e "testo" di massimo 8 parole: un concetto, non una frase intera.
@@ -425,27 +475,29 @@ REGOLE:
 /* ===== Stampa e download ===== */
 function dispensaHTML(c) {
   const li = a => '<ul>' + arr(a).map(x => '<li>' + md(x) + '</li>').join('') + '</ul>';
-  const intest = '<p class="meta">' + esc(c.titolo) + ' · ' + esc(c.materia) + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con Scio</p>';
+  const intest = '<p class="meta">' + esc(c.titolo) + ' · ' + esc(c.materia) + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con AI.st.ain</p>';
   const sezioni = [];
   if (sezOk('riassunto')) sezioni.push('<h1>' + esc(c.titolo) + '</h1>' + intest + legendaColori() + '<h2>In breve</h2>' + li(c.riassunto_breve) + '<h2>Riassunto</h2><p>' + md(c.riassunto_completo) + '</p>');
   else sezioni.push('<h1>' + esc(c.titolo) + '</h1>' + intest);
-  if (sezOk('schema') && arr(c.schema && c.schema.rami).length) sezioni.push(intest + '<h2>Schema</h2><div class="radice">' + esc(c.schema.radice || c.titolo) + '</div>' + arr(c.schema.rami).map(r => '<div class="ramo"><h3>' + md(r.titolo) + '</h3>' + li(r.punti) + '</div>').join(''));
-  if (sezOk('mappa') && haMappa(c)) sezioni.push('<div class="mappa-pg">' + intest + '<h2>' + t('mappa') + '</h2>' + mappaSVG(c.mappa, 0, c.titolo) + '</div>');
-  if (sezOk('spiegazioni') && arr(c.spiegazioni).length) sezioni.push(intest + '<h2>Spiegazioni</h2>' + c.spiegazioni.map(x => '<h3>' + md(x.concetto) + '</h3><p>' + md(x.spiegazione) + '</p><p><b>Esempio:</b> ' + md(x.esempio) + '</p>').join(''));
-  if (sezOk('glossario') && arr(c.glossario).length) sezioni.push(intest + '<h2>Glossario</h2>' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join(''));
-  return sezioni.map((x, n) => '<section' + (n ? ' class="nuova"' : '') + '>' + x + '</section>').join('');
+  if (sezOk('schema') && arr(c.schema && c.schema.rami).length) sezioni.push('<h2>Schema</h2><div class="radice">' + esc(c.schema.radice || c.titolo) + '</div>' + arr(c.schema.rami).map(r => '<div class="ramo"><h3>' + md(r.titolo) + '</h3>' + li(r.punti) + '</div>').join(''));
+  if (sezOk('mappa') && haMappa(c)) sezioni.push('<div class="mappa-pg"><h1>' + esc(c.titolo) + '</h1>' + intest + '<h2>' + t('mappa') + '</h2>' + mappaSVG(c.mappa, 0, c.titolo) + '</div>');
+  if (sezOk('spiegazioni') && arr(c.spiegazioni).length) sezioni.push('<h2>Spiegazioni</h2>' + c.spiegazioni.map(x => '<h3>' + md(x.concetto) + '</h3><p>' + md(x.spiegazione) + '</p><p><b>Esempio:</b> ' + md(x.esempio) + '</p>').join(''));
+  if (sezOk('glossario') && arr(c.glossario).length) sezioni.push('<h2>Glossario</h2>' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join(''));
+  if (sezOk('pratica') && arr(c.pratica).length) sezioni.push('<div class="nuova-pg">' + intest + '<h2>' + t('pratica') + '</h2>' + c.pratica.map((e, i) => '<div class="es-pr"><h3>' + t('pr_n', { n: i + 1 }) + '</h3><p>' + md(e.testo) + '</p><div class="rispo"></div></div>').join('') + '</div>');
+  return sezioni.map(x => /^<(div class="(mappa-pg|nuova-pg)")/.test(x) ? x : '<section>' + x + '</section>').join('');
 }
 function dispensaTesto(c) {
   const pulisci = t => String(t == null ? '' : t).replace(/\[\[[dcp]:(.+?)\]\]/g, '$1').replace(/\*\*/g, '').replace(/^### /gm, '');
-  const r = [c.titolo, c.materia + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con Scio', ''];
+  const r = [c.titolo, c.materia + ' · ' + new Date(c.data).toLocaleDateString('it-IT') + ' · preparato con AI.st.ain', ''];
   if (sezOk('riassunto')) { r.push('IN BREVE'); arr(c.riassunto_breve).forEach(x => r.push('- ' + pulisci(x))); r.push('', 'RIASSUNTO', pulisci(c.riassunto_completo)); }
   if (sezOk('schema') && arr(c.schema && c.schema.rami).length) { r.push('', 'SCHEMA', pulisci(c.schema.radice || c.titolo)); c.schema.rami.forEach(x => { r.push('  ' + pulisci(x.titolo)); arr(x.punti).forEach(p => r.push('    - ' + pulisci(p))); }); }
   if (sezOk('mappa') && haMappa(c)) { r.push('', 'MAPPA CONCETTUALE'); mappaElenco(c.mappa).forEach(x => r.push('  ' + pulisci(x))); }
   if (sezOk('spiegazioni') && arr(c.spiegazioni).length) { r.push('', 'SPIEGAZIONI'); c.spiegazioni.forEach(x => r.push(pulisci(x.concetto), '  ' + pulisci(x.spiegazione), '  Esempio: ' + pulisci(x.esempio), '')); }
+  if (sezOk('pratica') && arr(c.pratica).length) { r.push('', 'ESERCIZI DI ALLENAMENTO'); c.pratica.forEach((e, i) => r.push((i + 1) + '. ' + pulisci(e.testo), '')); }
   if (sezOk('glossario') && arr(c.glossario).length) { r.push('', 'GLOSSARIO'); c.glossario.forEach(g => r.push(pulisci(g.termine) + ': ' + pulisci(g.definizione))); }
   return r.join('\n');
 }
-const SYS_COMPLETA = `Sei Scio, un tutor di studio per ragazzi italiani. Ti viene dato il riassunto di un capitolo. Prepara le parti mancanti SOLO a partire da quel testo, senza inventare nulla che non sia nel riassunto: schema, spiegazioni, glossario e test, con le stesse regole del materiale di studio (italiano semplice, parole chiave con **doppio asterisco**, test di 20 domande: 14 a scelta e 6 vero/falso). Nei campi titolo, riassunto_breve e riassunto_completo ripeti il testo ricevuto.`;
+const SYS_COMPLETA = `Sei AI.st.ain, un tutor di studio per ragazzi italiani. Ti viene dato il riassunto di un capitolo. Prepara le parti mancanti SOLO a partire da quel testo, senza inventare nulla che non sia nel riassunto: schema, spiegazioni, glossario e test, con le stesse regole del materiale di studio (italiano semplice, parole chiave con **doppio asterisco**, test di 20 domande: 14 a scelta e 6 vero/falso, pratica con 5 esercizi di allenamento con soluzione riservata e 3 indizi). Nel test non fare MAI domande su esercizi o attività del libro (cosa chiedono, cosa si deve fare): solo domande sui concetti. Nei campi titolo, riassunto_breve e riassunto_completo ripeti il testo ricevuto.`;
 /* Ripara i capitoli in cui l'AI ha scritto il resto dei dati dentro il testo del riassunto. */
 function riparaCapitolo(c) {
   const rc = String(c.riassunto_completo || '');
@@ -484,7 +536,7 @@ migraTutti();
 (function () { DB.figli.forEach(f => { const p = f.profilo; if (p && p.colori === undefined) p.colori = !(p.dsa && p.dsa.dislessia); }); })();
 function arr(x) { return Array.isArray(x) ? x : []; }
 
-const SYS_CAPITOLO = `Sei Scio, un tutor di studio per ragazzi italiani. Ricevi le foto delle pagine di un capitolo di un libro di scuola.
+const SYS_CAPITOLO = `Sei AI.st.ain, un tutor di studio per ragazzi italiani. Ricevi le foto delle pagine di un capitolo di un libro di scuola.
 Regole:
 - Scrivi sempre in italiano.
 - Usa SOLO i contenuti presenti nelle pagine. Non inventare. Se una parte è illeggibile o tagliata, scrivilo in "avvisi".
@@ -492,14 +544,16 @@ Regole:
 - Se è indicato un focus, lavora SOLO su quei paragrafi o argomenti.
 - COPERTURA TOTALE: il riassunto completo segue l'ordine del libro e deve toccare TUTTI gli argomenti trattati, dall'inizio all'ultima pagina, anche se le pagine sono tante (17 o più). Per OGNI paragrafo o titolo del libro scrivi una sezione che inizia con una riga "### Titolo del paragrafo" seguita dal testo. Meglio sezioni brevi di un argomento mancante.
 - COMPLETEZZA: prima compila "inventario" elencando TUTTO ciò che le pagine contengono di importante: ogni argomento, definizione, data, nome, luogo, tecnica e parola evidenziata (grassetto, colori, riquadri di approfondimento, box laterali, didascalie, note). Poi assicurati che OGNI voce dell'inventario compaia nel riassunto completo e abbia una spiegazione o una voce di glossario. I riquadri di approfondimento (per esempio un metodo o una tecnica) hanno una spiegazione dedicata. Non omettere mai ciò che il libro mette in evidenza: è quello che l'insegnante chiede.
+- ESERCIZI DEL LIBRO: se le pagine contengono esercizi, verifiche o attività, usali SOLO come spunto per capire quali argomenti sono importanti e per creare in "pratica" esercizi di allenamento simili (stessi argomenti e stile, ma dati e contesto diversi). NEL TEST NON fare MAI domande sull'esercizio in sé (cosa chiede, cosa si deve fare, come è formulata la consegna, "è vero che nell'esercizio..."): fai solo domande sul concetto o sul contenuto che l'esercizio fa esercitare, comprensibili senza avere il libro davanti.
 - Spiega in modo semplice e pratico, con esempi concreti e analogie.
 - Evidenzia le parole chiave nel modo indicato nel profilo dello studente (sotto).
 - Rispondi SOLO con un JSON valido, senza testo prima o dopo, con questa struttura:
-{"inventario":["..."],"titolo":"...","avvisi":["..."],"riassunto_breve":["5 frasi brevi al massimo"],"riassunto_completo":"testo con paragrafi separati da \\n\\n","schema":{"radice":"concetto centrale","rami":[{"titolo":"...","punti":["...","..."]}]},"spiegazioni":[{"concetto":"...","spiegazione":"...","esempio":"..."}],"glossario":[{"termine":"...","definizione":"..."}],"test":[{"tipo":"scelta","argomento":"...","domanda":"...","opzioni":["a","b","c","d"],"corretta":0,"spiegazione":"..."},{"tipo":"vf","argomento":"...","domanda":"...","corretta":true,"spiegazione":"..."}]}
+{"inventario":["..."],"titolo":"...","avvisi":["..."],"riassunto_breve":["5 frasi brevi al massimo"],"riassunto_completo":"testo con paragrafi separati da \\n\\n","schema":{"radice":"concetto centrale","rami":[{"titolo":"...","punti":["...","..."]}]},"spiegazioni":[{"concetto":"...","spiegazione":"...","esempio":"..."}],"glossario":[{"termine":"...","definizione":"..."}],"pratica":[{"testo":"esercizio completo di tutti i dati","soluzione":"breve, riservata","indizi":["leggero","medio","chiaro ma senza soluzione"]}],"test":[{"tipo":"scelta","argomento":"...","domanda":"...","opzioni":["a","b","c","d"],"corretta":0,"spiegazione":"..."},{"tipo":"vf","argomento":"...","domanda":"...","corretta":true,"spiegazione":"..."}]}
 - Spiegazioni: almeno 5; glossario: almeno 8 termini; il test copre argomenti diversi dell'inventario.
+- Pratica: da 4 a 8 esercizi di allenamento sugli stessi argomenti del capitolo (ispirati agli esercizi del libro se ci sono), ciascuno con testo completo, soluzione breve (riservata) e 3 indizi graduali che non rivelano la soluzione.
 - Il test ha da 20 a 30 domande (20 per un capitolo breve, fino a 30 per uno lungo), distribuite su TUTTI gli argomenti dell'inventario: circa 7 su 10 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e le altre vero/falso. Non ripetere due volte la stessa domanda. Le domande verificano la comprensione, non la memoria di dettagli. Le spiegazioni sono gentili e spiegano il perché.`;
 
-const SYS_ESERCIZIO = `Sei Scio, un tutor che GUIDA IL RAGIONAMENTO. Ricevi la foto di un esercizio (matematica, fisica, latino, greco o altro).
+const SYS_ESERCIZIO = `Sei AI.st.ain, un tutor che GUIDA IL RAGIONAMENTO. Ricevi la foto di un esercizio (matematica, fisica, latino, greco o altro).
 REGOLA ASSOLUTA: non dare MAI la soluzione, né il risultato finale, né la traduzione completa. Lo studente deve arrivarci da solo.
 Dividi l'esercizio in 3-6 passi di ragionamento (cosa chiede, cosa so, quale regola o metodo serve, come si combinano, controllo finale).
 Per matematica e fisica controlla con cura i calcoli per te stesso. Per latino e greco guida l'analisi (verbo, soggetto, casi, complementi) senza tradurre.
@@ -507,7 +561,7 @@ Rispondi SOLO con un JSON valido:
 {"materia":"...","richiesta":"l'esercizio riscritto in modo chiaro","passi":[{"titolo":"...","domanda":"domanda guida per lo studente","obiettivo":"cosa deve aver capito o ottenuto (SOLO per te, può contenere la risposta attesa)","indizi":["indizio leggero","indizio medio","indizio più chiaro ma senza soluzione"],"esempio_simile":"un esempio breve con dati diversi che mostra il metodo, senza risolvere questo esercizio"}]}
 Scrivi in italiano, con tono incoraggiante.`;
 
-const SYS_VALUTA = `Sei Scio, tutor che guida il ragionamento. Ricevi un passo di un esercizio con il suo obiettivo (riservato) e la risposta dello studente.
+const SYS_VALUTA = `Sei AI.st.ain, tutor che guida il ragionamento. Ricevi un passo di un esercizio con il suo obiettivo (riservato) e la risposta dello studente.
 Valuta se la risposta raggiunge l'obiettivo. Non rivelare MAI la soluzione o il risultato. Se la risposta è sbagliata o incompleta, individua il punto in cui il ragionamento si inceppa e fai UNA domanda che lo aiuti a rendersene conto.
 Rispondi SOLO con JSON: {"esito":"giusto"|"quasi"|"da_rivedere","feedback":"massimo 3 frasi, tono incoraggiante, in italiano"}`;
 
@@ -588,11 +642,11 @@ async function preparaCapitolo() {
   V.busy = true; V.errore = ''; render();
   try {
     let c;
-    if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 900)); c = JSON.parse(JSON.stringify(DEMO_CAP)); }
+    if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 900)); c = JSON.parse(JSON.stringify(DEMO_CAP)); c.pratica = JSON.parse(JSON.stringify(DEMO_PRATICA)); }
     else {
       c = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + ' Genera il materiale di studio.', V.foto, SCHEMA_CAPITOLO);
     }
-    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: arr(c.test), risultati: [] };
+    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica) };
     S.capitoli.unshift(cap); salva();
     V.foto = []; V.cap = cap.id; V.genVede = false; V.tab = primoTab(); V.vista = 'capitolo'; V.busy = false; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
@@ -626,6 +680,145 @@ async function controllaIdea() {
     salva(); render();
   } catch (e) { V.busy = false; V.errore = e.message; render(); }
 }
+
+/* ===== v0.14: domande, difficoltà, esercizi di allenamento, premi ===== */
+const LIV_TEST = 5;
+const RANGHI = [0, 60, 200, 450, 900];
+const BADGE = ['primo', 'dieci', 'perfetto', 'liv3', 'liv5', 'allenato'];
+function premiVuoti() { return { xp: 0, test: 0, perfetti: 0, maxLiv: 1, pratica: 0, badge: [] }; }
+function pulisciPremi(p) {
+  const n = x => { x = Math.floor(Number(x)); return isFinite(x) && x > 0 ? Math.min(x, 1000000) : 0; };
+  const r = premiVuoti(); if (!p || typeof p !== 'object') return r;
+  r.xp = n(p.xp); r.test = n(p.test); r.perfetti = n(p.perfetti); r.pratica = n(p.pratica); r.maxLiv = Math.max(1, Math.min(LIV_TEST, n(p.maxLiv) || 1));
+  r.badge = (Array.isArray(p.badge) ? p.badge : []).filter((b, i, a) => BADGE.includes(b) && a.indexOf(b) === i);
+  return r;
+}
+function premi() { if (!S.premi) S.premi = premiVuoti(); return S.premi; }
+function rango(xp) { let r = 0; RANGHI.forEach((s, i) => { if (xp >= s) r = i; }); return r; }
+/* Domande che parlano dell'esercizio in sé ("è vero che nell'esercizio devi...") non servono: si scartano. */
+const META_ES = [/\besercizi\w*\b[^.?!]{0,60}\b(chied\w*|richied\w*|devi|dice|propone|prevede|domanda)\b/i, /\b(ti|ci|vi) chied\w+/i, /\bchiede di\b/i, /\b(nella|della|dalla|secondo la) (consegna|traccia)\b/i, /\b(pag\.|pagina|esercizio) ?n?\.? ?\d+/i, /\bnell['’]attivit[àa]\b/i, /\b(nel|dal) (libro|testo) (si )?(chied\w*|dice)\b/i];
+function domandaOk(q) { const s = String(q.domanda || '') + ' ' + arr(q.opzioni).join(' '); return !META_ES.some(r => r.test(s)); }
+function normDomande(lista, d) {
+  const T = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
+  const out = arr(lista).filter(q => q && typeof q === 'object').map(q => {
+    const tipo = q.tipo === 'vf' ? 'vf' : 'scelta';
+    const o = { tipo: tipo, argomento: T(q.argomento, 300), domanda: T(q.domanda, 2000), spiegazione: T(q.spiegazione, 3000), d: Math.max(1, Math.min(LIV_TEST, Math.floor(Number(q.d)) || d || 1)) };
+    if (tipo === 'vf') { o.opzioni = []; o.corretta = q.corretta === true || q.corretta === 'true' || q.corretta === 'vero'; }
+    else { o.opzioni = arr(q.opzioni).map(x => T(String(x), 800)); o.corretta = Math.floor(Number(q.corretta)); }
+    return o;
+  }).filter(q => q.domanda && (q.tipo === 'vf' || (q.opzioni.length >= 2 && q.corretta >= 0 && q.corretta < q.opzioni.length)));
+  const buone = out.filter(domandaOk);
+  return buone.length >= Math.min(8, out.length) ? buone : out;
+}
+function normPratica(lista) {
+  const T = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
+  return arr(lista).filter(e => e && typeof e === 'object').slice(0, 30).map(e => {
+    const indizi = arr(e.indizi).map(x => T(String(x), 1000)).slice(0, 3);
+    return { testo: T(e.testo, 3000), soluzione: T(e.soluzione, 3000), indizi: indizi, ok: e.ok === true, ind: Math.max(0, Math.min(indizi.length, Math.floor(Number(e.ind)) || 0)), tent: Math.max(0, Math.min(1000, Math.floor(Number(e.tent)) || 0)) };
+  }).filter(e => e.testo);
+}
+function idxLivello(c, liv) {
+  const tutti = arr(c.test).map((q, i) => i).filter(i => domandaOk(c.test[i]));
+  const sel = tutti.filter(i => (c.test[i].d || 1) === liv);
+  return sel.length || liv !== 1 ? sel : tutti;
+}
+function campiona(dom, n) {
+  if (dom.length <= n) return dom.slice();
+  const a = dom.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const x = a[i]; a[i] = a[j]; a[j] = x; }
+  return a.slice(0, n).sort((x, y) => x - y);
+}
+const DIFF = ['',
+  'Livello 1 (Base): ricordo e comprensione di definizioni e fatti principali; le opzioni sbagliate sono chiaramente diverse da quella giusta.',
+  'Livello 2 (Medio): comprensione con parole diverse da quelle del libro, collegamento fra due informazioni, opzioni sbagliate plausibili.',
+  'Livello 3 (Avanzato): cause e conseguenze, confronti fra concetti, applicazione a un caso nuovo.',
+  'Livello 4 (Esperto): ragionamento in più passaggi, casi nuovi, riconoscere l\'errore in un\'affermazione, opzioni sbagliate molto vicine a quella giusta.',
+  'Livello 5 (Maestro): sintesi e valutazione: collegare più parti del capitolo, ragionare su situazioni nuove, spiegare il perché.'];
+const SYS_NUOVE = `Sei AI.st.ain, un tutor di studio. Ti viene dato il riassunto di un capitolo e l'elenco delle domande già fatte. Scrivi NUOVE domande di test SOLO sui contenuti del capitolo, senza inventare nulla.
+Regole:
+- Non ripetere né riformulare le domande già fatte.
+- Ogni domanda verifica la comprensione di un concetto, di una causa, di un collegamento o di un'applicazione e si capisce senza avere il libro davanti.
+- Non fare MAI domande sugli esercizi o sulle attività del libro (cosa chiede un esercizio, cosa si deve fare, come è scritta una consegna, "è vero che nell'esercizio..."): gli esercizi sono solo uno spunto per gli argomenti.
+- Circa 7 domande su 10 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e le altre vero/falso.
+- Spiegazione gentile che dice perché la risposta è quella giusta.
+Difficoltà richiesta: `;
+async function generaDomande(c, liv, n) {
+  if (FAM.ai.provider === 'demo') throw new Error('NODEMO');
+  const gia = arr(c.test).map(q => '- ' + q.domanda).slice(-80).join('\n');
+  const sch = OBJ({ test: Object.assign({}, SCHEMA_CAPITOLO.properties.test, { description: 'Esattamente ' + n + ' domande nuove' }) });
+  const r = await chiediJSON(SYS_NUOVE + DIFF[liv] + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nQuante domande: ' + n + '\n\nRiassunto completo:\n' + c.riassunto_completo + '\n\nArgomenti:\n' + arr(c.inventario).join('; ') + '\n\nDomande già fatte (da non ripetere):\n' + gia, [], sch);
+  const nuove = normDomande(r.test, liv).map(q => Object.assign(q, { d: liv }));
+  if (nuove.length < 4) throw new Error('Non sono riuscito a preparare nuove domande valide: riprova.');
+  return nuove;
+}
+async function nuoviTest(c, liv) {
+  V.busy = true; render();
+  try {
+    const nuove = await generaDomande(c, liv, 15);
+    const base = c.test.length; nuove.forEach(q => c.test.push(q)); c.lvl = liv; salva();
+    fermaVoce(); V.voce = false; V.test = { cap: c.id, dom: nuove.map((_, i) => base + i), i: 0, punti: 0, errati: [], scelta: null, fine: false, liv: liv }; V.tab = 'test';
+  } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); }
+  V.busy = false; render();
+}
+const SYS_PRATICA = `Sei AI.st.ain, un tutor che GUIDA IL RAGIONAMENTO. Dal riassunto di un capitolo prepara esercizi di allenamento sullo STESSO argomento, nello stile degli esercizi dei libri di scuola per la materia (completare, spiegare, collegare, riconoscere, mini-problemi, analisi di un breve caso o testo).
+Regole:
+- 6 esercizi di difficoltà crescente, svolgibili senza avere il libro davanti: il testo contiene tutti i dati.
+- "soluzione" è RISERVATA: breve e corretta, serve solo a controllare la risposta dello studente.
+- 3 indizi in ordine, dal più leggero al più chiaro, senza mai dire la soluzione.
+- Per matematica e scienze: numeri semplici e ragionamento; controlla con cura i calcoli.
+- Usa SOLO contenuti del capitolo. Scrivi in italiano, tono incoraggiante.`;
+const SCHEMA_PRATICA = OBJ({ pratica: { type: 'array', description: '6 esercizi di allenamento', items: OBJ({ testo: T, soluzione: T, indizi: Object.assign({ description: 'Esattamente 3 indizi graduali, senza la soluzione' }, LS_) }) } });
+const SYS_VALUTA_PRATICA = `Sei AI.st.ain, tutor che guida il ragionamento. Ricevi un esercizio, la sua soluzione (RISERVATA) e la risposta dello studente.
+Valuta se la risposta è corretta nella sostanza: accetta formulazioni diverse da quella della soluzione. Non rivelare MAI la soluzione. Se la risposta è sbagliata o incompleta, individua il punto in cui il ragionamento si inceppa e fai UNA domanda che aiuti lo studente a rendersene conto.
+Rispondi SOLO con JSON: {"esito":"giusto"|"quasi"|"da_rivedere","feedback":"massimo 3 frasi, tono incoraggiante, in italiano"}`;
+const DEMO_PRATICA = [
+  { testo: 'Spiega con parole tue perché le prime civiltà sono nate vicino ai fiumi.', soluzione: 'I fiumi danno acqua e terra fertile: si coltiva di più e si può vivere in gruppi numerosi.', indizi: ['Pensa a cosa serve per far crescere le piante.', 'Cosa porta un fiume quando straripa?', 'Acqua e terra fertile permettono di avere più...?'] },
+  { testo: 'A cosa serve l\'irrigazione? Fai un esempio.', soluzione: 'Porta l\'acqua del fiume ai campi lontani con canali, così i raccolti crescono.', indizi: ['È una parola legata all\'acqua e ai campi.', 'Pensa ai canali.', 'I canali portano l\'acqua dove i campi sono lontani dal fiume.'] }
+];
+function assegnaPremi(c, ts) {
+  const P = premi(), vecchio = rango(P.xp), liv = ts.liv || 1, pct = ts.punti / Math.max(1, ts.dom.length), nuovi = [];
+  let xp = ts.punti * (1 + liv);
+  if (!ts.ripasso) {
+    const perfetto = pct === 1 && ts.dom.length >= 8;
+    if (pct >= 0.8) xp += 10 * liv;
+    if (perfetto) xp += 10;
+    P.test++; if (perfetto) P.perfetti++;
+    if (pct >= 0.8) P.maxLiv = Math.max(P.maxLiv, liv);
+    const dai = b => { if (!P.badge.includes(b)) { P.badge.push(b); nuovi.push(b); } };
+    dai('primo'); if (P.test >= 10) dai('dieci'); if (P.perfetti >= 1) dai('perfetto'); if (pct >= 0.8 && liv >= 3) dai('liv3'); if (pct >= 0.8 && liv >= 5) dai('liv5');
+  }
+  P.xp += xp; ts.xp = xp; ts.nuovi = nuovi; ts.pct = pct; ts.rangoNuovo = rango(P.xp) > vecchio ? rango(P.xp) : -1;
+}
+function vTraguardi() {
+  const P = premi(), r = rango(P.xp), prox = RANGHI[r + 1];
+  const testo = prox != null ? t('verso_rango', { r: t('rango_' + (r + 1)), n: prox - P.xp }) : t('rango_max');
+  return '<div class="card"><h2>' + t('traguardi') + '</h2><p><b>⭐ ' + esc(t('rango_' + r)) + '</b> · ' + t('n_punti', { n: P.xp }) + '</p>' +
+    (prox != null ? '<progress max="' + (prox - RANGHI[r]) + '" value="' + (P.xp - RANGHI[r]) + '" aria-label="' + esc(testo) + '"></progress>' : '') + '<p class="muted">' + esc(testo) + '</p>' +
+    '<div class="badges">' + BADGE.map(b => { const on = P.badge.includes(b); return '<span class="badge' + (on ? ' on' : '') + '" title="' + esc(t('badge_' + b + '_d')) + '">' + (on ? '🏅 ' : '🔒 ') + esc(t('badge_' + b)) + '</span>'; }).join('') + '</div></div>';
+}
+function vPratica(c) {
+  const lista = arr(c.pratica);
+  if (!lista.length) return '<div class="card"><h2>' + t('pratica') + '</h2><p>' + t('pr_vuota') + '</p><button class="btn" data-act="crea-pratica"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('pr_crea')) + '</button> ' + (V.busy ? '<span class="spin"></span>' : '') + '</div>';
+  V.prFb = V.prFb || {}; V.prBozza = V.prBozza || {};
+  return '<div class="card"><h2>' + t('pratica') + '</h2><p class="muted">' + t('pr_aiuto') + '</p><button class="btn sec small" data-act="crea-pratica"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('pr_altri')) + '</button></div>' +
+    lista.map((e, i) => { const fb = V.prFb[i]; return '<div class="card"><h3>' + t('pr_n', { n: i + 1 }) + (e.ok ? ' ✓' : '') + '</h3><p>' + md(e.testo) + '</p>' +
+      (e.ind ? '<div class="fb"><b>' + t('pr_indizio') + '</b>' + e.indizi.slice(0, e.ind).map((x, j) => '<p>' + (j + 1) + '. ' + md(x) + '</p>').join('') + '</div>' : '') +
+      '<label class="f">' + t('pr_tua') + '<textarea id="pr' + i + '" rows="3" maxlength="3000">' + esc(V.prBozza[i] || '') + '</textarea></label>' +
+      '<div class="row"><button class="btn small" data-act="pratica-controlla" data-i="' + i + '"' + (V.busy ? ' disabled' : '') + '>' + t('pr_controlla') + '</button>' + (e.ind < e.indizi.length ? '<button class="btn sec small" data-act="pratica-indizio" data-i="' + i + '">' + t('pr_dammi_indizio') + '</button>' : '') + '</div>' +
+      (fb ? '<div class="fb ' + fb.tipo + '" role="status">' + md(fb.testo) + '</div>' : '') + '</div>'; }).join('');
+}
+function salvaBozzePratica(c) { V.prBozza = V.prBozza || {}; arr(c.pratica).forEach((_, i) => { const el = document.getElementById('pr' + i); if (el) V.prBozza[i] = el.value; }); }
+/* ===== v0.14: aspetto automatico per livello e DSA ===== */
+function temiPer(livello) { return livello === 'elementari' ? ['gioco'] : ['calmo', 'notte']; }
+function temaValido(p) { const ok = temiPer(p && p.livello); return p && ok.includes(p.tema) ? p.tema : ok[0]; }
+function aspettoConsigliato(livello, dsa) {
+  const d = dsa || {}, r = { tema: livello === 'elementari' ? 'gioco' : 'calmo', font: 'tema', fs: 1, lh: 1.6, ls: 0, ws: 0 };
+  if (d.dislessia) Object.assign(r, { font: 'lexend', fs: 1.1, lh: 1.9, ls: 0.06, ws: 0.15 });
+  else if (d.disortografia) Object.assign(r, { font: 'andika', fs: 1.05, lh: 1.7, ls: 0.03, ws: 0.08 });
+  else if (d.discalculia) Object.assign(r, { font: 'atkinson', lh: 1.7 });
+  else if (d.disgrafia) Object.assign(r, { lh: 1.7 });
+  return r;
+}
+function consigliato(livello, dsa) { return aspettoConsigliato(livello, dsa).tema; }
 
 /* ===== Date, ripasso e verifiche ===== */
 function zero(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -691,7 +884,7 @@ let TOKEN = 0;
 function plain(s) { return String(s == null ? '' : s).replace(/\[\[[dcp]:/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '').replace(/^### /gm, '').replace(/\s+/g, ' ').trim(); }
 function voceDi() { return LINGUE_VOCE[(S.profilo && S.profilo.lingua) || 'it']; }
 /* Ogni dispositivo ha voci diverse: quelle "naturali" o di rete suonano molto meglio di quelle di base (metalliche).
-   Scio le ordina per qualità; la persona può comunque sceglierne una a mano nelle impostazioni. */
+   AI.st.ain le ordina per qualità; la persona può comunque sceglierne una a mano nelle impostazioni. */
 function punteggioVoce(v, lang) {
   const l = String(v.lang || '').replace('_', '-').toLowerCase(), n = String(v.name || ''), L = String(lang).toLowerCase();
   let p = 0;
@@ -826,7 +1019,7 @@ function voceTick() {
 /* ===== Viste ===== */
 function barra() {
   const p = S.profilo;
-  const brand = p ? '<button class="brand" data-act="home" aria-label="' + esc(t('torna_home')) + '">Scio<small>v' + VERSIONE + '</small></button>' : '<div class="brand">Scio<small>v' + VERSIONE + '</small></div>';
+  const brand = p ? '<button class="brand" data-act="home" aria-label="' + esc(t('torna_home')) + '">AI.st.ain<small>v' + VERSIONE + '</small></button>' : '<div class="brand">AI.st.ain<small>v' + VERSIONE + '</small></div>';
   return '<div class="bar">' + brand + '<div class="row">' +
     (p ? '<button class="btn sec small" data-act="home">' + t('studio') + '</button><button class="btn sec small" data-act="fs-" aria-label="' + esc(t('testo_piccolo')) + '">A−</button><button class="btn sec small" data-act="fs+" aria-label="' + esc(t('testo_grande')) + '">A+</button><button class="btn sec small" data-act="aspetto">' + t('aspetto_btn') + '</button>' + (DB.figli.length > 1 ? '<button class="btn sec small" data-act="scelta">' + t('cambia_profilo') + '</button>' : '') : '') +
     '<button class="btn sec small" data-act="genitori">' + t('genitori') + '</button></div></div>';
@@ -871,11 +1064,11 @@ function bloccoAspetto(p) {
     r('fs', 0.8, 1.6, 0.1, p.fs || 1, 'dimensione') + r('lh', 1.3, 2.4, 0.1, p.lh || 1.6, 'interlinea') + r('ls', 0, 0.2, 0.02, p.ls || 0, 'spaz_lettere') + r('ws', 0, 0.4, 0.05, p.ws || 0, 'spaz_parole') + r('vel', 0.5, 1.4, 0.1, p.vel || 0.9, 'vel_lettura') +
     '<label class="f">' + t('voce_scelta') + '<select data-pref="voce" id="voce-sel" data-cur="' + esc(p.voce || '') + '"><option value="">' + esc(t('voce_auto')) + '</option></select></label>' +
     '<button class="btn sec small" type="button" data-act="prova-voce">' + t('prova_voce') + '</button><p class="muted">' + t('voce_aiuto') + '</p>' +
-    '<div class="fb" id="anteprima">' + t('anteprima') + '</div>';
+    '<div class="fb" id="anteprima">' + t('anteprima') + '</div><p class="muted">' + t('aspetto_auto_nota') + '</p><button class="btn sec small" type="button" id="btn-cons" data-act="aspetto-consigliato">' + t('aspetto_ripristina') + '</button>';
 }
 function bloccoTema(p) {
-  const cons = consigliato(p.livello, p.dsa);
-  return Object.keys(TEMI).map(k => '<label class="chk"><input type="radio" name="tema" data-pref="tema" value="' + k + '"' + ((p.tema || cons) === k ? ' checked' : '') + '>' + t(k) + '</label>').join('');
+  const ok = temiPer(p.livello), cur = ok.includes(p.tema) ? p.tema : ok[0];
+  return ok.map(k => '<label class="chk"><input type="radio" name="tema" data-pref="tema" value="' + k + '"' + (cur === k ? ' checked' : '') + '>' + t(k) + '</label>').join('') + '<p class="muted">' + t(ok.length === 1 ? 'tema_solo_elem' : 'tema_dalle_medie') + '</p>';
 }
 function vAspetto() {
   const p = S.profilo;
@@ -926,7 +1119,8 @@ function vHome() {
     '<label class="f">' + t('altra_materia') + '<input type="text" id="nuovaM" maxlength="40" autocomplete="off"></label><button class="btn sec small" data-act="aggiungi-materia">' + t('aggiungi') + '</button></div>' +
     (S.capitoli.some(c => arr(c.test).length) ? '<div class="card"><h2>' + t('ripasso_oggi') + '</h2>' + (due ? '<p>' + (due === 1 ? t('una_rip') : t('n_domande_rip', { n: due })) + '</p><button class="btn" data-act="inizia-ripasso">' + t('inizia_ripasso') + '</button>' : '<p class="muted">' + t('nessun_ripasso') + '</p>') + '<p class="muted">' + t('rip_spiega') + '</p></div>' : '') +
     (ver.length ? '<h2>' + t('verifiche') + '</h2>' + ver.map(x => { const pr = pianoRipasso(x.v); const oggi = pr.giorni && pr.giorni[0] ? pr.giorni[0].righe.join(' · ') : ''; return '<div class="card"><div class="row" style="justify-content:space-between"><div><b>' + esc(x.v.materia) + '</b>' + (x.v.argomento ? ' · ' + esc(x.v.argomento) : '') + '</div><span class="chip ' + (x.d <= 3 ? 'warn' : '') + '">' + esc(quando(x.d)) + '</span></div>' + (oggi ? '<p class="muted"><b>' + t('compito_oggi') + ':</b> ' + oggi + '</p>' : '') + '<button class="btn sec small" data-act="apri-materia" data-m="' + esc(x.v.materia) + '">' + t('piano') + '</button></div>'; }).join('') : '') +
-    (ultimi.length ? '<h2>' + t('continua') + '</h2>' + ultimi.map(cardCap).join('') : '');
+    (ultimi.length ? '<h2>' + t('continua') + '</h2>' + ultimi.map(cardCap).join('') : '') +
+    vTraguardi() + '<p class="muted" style="text-align:center;margin-top:18px"><b>AI.st.ain</b> = ' + esc(t('acronimo')) + '</p>';
 }
 function fotoBox() {
   return '<div class="row"><label class="btn sec">' + t('scatta') + '<input type="file" accept="image/*" capture="environment" id="f1" hidden></label><label class="btn sec">' + t('scegli_foto') + '<input type="file" accept="image/*" multiple id="f2" hidden></label></div>' +
@@ -954,7 +1148,7 @@ function vControllo() {
     (r ? '<div class="card"><h2>' + md(r.riepilogo || '') + '</h2>' + arr(r.passi).map(x => '<div class="step"><span class="num ' + (x.esito === 'ok' ? 'done' : '') + '">' + (x.esito === 'ok' ? '✓' : x.esito === 'errore' ? '!' : '?') + '</span><div style="flex:1"><b>' + md(x.cosa_hai_fatto || '') + '</b> <span class="chip ' + cl(x.esito) + '">' + t(x.esito === 'ok' ? 'esito_ok' : x.esito === 'errore' ? 'esito_err' : 'esito_dub') + '</span>' + (x.suggerimento ? '<div class="fb ' + (x.esito === 'errore' ? 'warn' : '') + '">' + md(x.suggerimento) + '</div>' : '') + '</div></div>').join('') + (r.domanda_guida ? '<div class="fb"><b>?</b> ' + md(r.domanda_guida) + '</div>' : '') + (arr(r.passi).some(x => x.esito !== 'ok') ? '<p class="muted">' + t('prova_correggere') + '</p>' : '') + '</div>' : '');
 }
 function sezOk(k) { return k === 'test' || !!V.genVede || !S.profilo || !S.profilo.sezioni || S.profilo.sezioni[k] !== false; }
-function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'test'].filter(sezOk); }
+function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'pratica', 'test'].filter(sezOk); }
 function primoTab() { return tabsAttive()[0]; }
 function mancano(c) {
   const m = [];
@@ -972,6 +1166,7 @@ function vCapitolo() {
   if (V.tab === 'riassunto') corpo = legendaColori() + '<div class="card"><h2>' + t('in_breve') + '</h2><ul>' + c.riassunto_breve.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></div><div class="card"><h2>' + t('riass_compl') + '</h2>' + md(c.riassunto_completo) + '</div>' + (arr(c.inventario).length ? '<details class="card"><summary><b>' + t('inventario') + '</b> (' + c.inventario.length + ')</summary><ul>' + c.inventario.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></details>' : '');
   else if (V.tab === 'schema') corpo = '<div class="card"><h2>' + esc(c.schema.radice || c.titolo) + '</h2>' + arr(c.schema.rami).map(r => '<div class="tree"><h3>' + md(r.titolo) + '</h3><ul>' + arr(r.punti).map(p => '<li>' + md(p) + '</li>').join('') + '</ul></div>').join('') + '</div>';
   else if (V.tab === 'mappa') corpo = vMappa(c);
+  else if (V.tab === 'pratica') corpo = vPratica(c);
   else if (V.tab === 'spiegazioni') corpo = c.spiegazioni.map((s, i) => '<div class="card"><h3>' + md(s.concetto) + '</h3><p>' + md(s.spiegazione) + '</p><div class="fb"><b>' + t('esempio') + ':</b> ' + md(s.esempio) + '</div><button class="btn sec small" data-act="meglio" data-i="' + i + '">' + t('spiega_meglio') + '</button><div id="m' + i + '"></div></div>').join('') || '<div class="card muted">–</div>';
   else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
   else corpo = vTestPartenza(c);
@@ -983,9 +1178,11 @@ function vCapitolo() {
 }
 function vTestPartenza(c) {
   if (V.test && V.test.cap === c.id) return vTest(c);
-  const ult = c.risultati[c.risultati.length - 1];
-  return '<div class="card"><h2>' + t('test_finale') + '</h2><p>' + t('test_intro', { n: c.test.length }) + '</p>' + (ult ? '<p class="muted">' + t('ultimo_ris', { p: ult.punti, n: ult.totale }) + '</p>' : '') +
-    '<div class="row"><button class="btn" data-act="inizia-test">' + (ult ? t('rifai_test') : t('inizia_test')) + '</button><button class="btn sec" data-act="inizia-voce">' + t('quiz_voce') + '</button></div><p class="muted">' + t('voce_info') + '</p></div>';
+  const liv = c.lvl || 1, n = idxLivello(c, liv).length, ult = c.risultati[c.risultati.length - 1];
+  return '<div class="card"><h2>' + t('test_finale') + '</h2><p><b>' + t('livello_test', { n: liv, nome: t('liv_' + liv) }) + '</b></p><p>' + t('test_intro', { n: Math.min(n, 30) }) + '</p>' + (ult ? '<p class="muted">' + t('ultimo_ris', { p: ult.punti, n: ult.totale }) + '</p>' : '') +
+    '<div class="row"><button class="btn" data-act="inizia-test"' + (n ? '' : ' disabled') + '>' + (ult ? t('rifai_test') : t('inizia_test')) + '</button><button class="btn sec" data-act="inizia-voce"' + (n ? '' : ' disabled') + '>' + t('quiz_voce') + '</button></div>' +
+    '<div class="row" style="margin-top:8px"><button class="btn sec" data-act="test-nuovi"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('test_altre')) + '</button>' + (liv < LIV_TEST ? '<button class="btn sec" data-act="test-livello" data-d="1"' + (V.busy ? ' disabled' : '') + '>' + t('test_piu_difficile') + '</button>' : '') + (liv > 1 ? '<button class="btn sec" data-act="test-livello" data-d="-1"' + (V.busy ? ' disabled' : '') + '>' + t('test_piu_facile') + '</button>' : '') + '</div>' + (V.busy ? '<p><span class="spin"></span> ' + t('preparo_domande') + '</p>' : '') +
+    '<p class="muted">' + t('voce_info') + '</p></div>';
 }
 function vTest(c) {
   const ts = V.test;
@@ -993,11 +1190,13 @@ function vTest(c) {
     const errati = [...new Set(ts.errati.map(i => c.test[i].argomento).filter(Boolean))];
     return '<div class="card"><h2>' + t('hai_finito') + '</h2><p><b>' + t('p_su_n', { p: ts.punti, n: ts.dom.length }) + '</b></p>' +
       (errati.length ? '<div class="fb warn"><b>' + t('da_ripassare') + ':</b> ' + errati.map(esc).join(', ') + '</div>' : '<div class="fb ok">' + t('tutto_chiaro') + '</div>') +
+      (ts.xp != null ? '<div class="fb ok" role="status"><b>⭐ ' + t('punti_guadagnati', { n: ts.xp }) + '</b>' + (ts.rangoNuovo >= 0 ? '<br>' + t('nuovo_rango', { r: t('rango_' + ts.rangoNuovo) }) : '') + arr(ts.nuovi).map(b => '<br>🏅 ' + t('nuovo_badge', { b: t('badge_' + b) })).join('') + '</div>' : '') +
+      (ts.liv && !ts.ripasso && c.id !== '__rip' ? '<div class="row">' + (ts.pct >= 0.8 && ts.liv < LIV_TEST ? '<button class="btn" data-act="test-livello" data-d="1"' + (V.busy ? ' disabled' : '') + '>' + t('test_sali', { n: ts.liv + 1, nome: t('liv_' + (ts.liv + 1)) }) + '</button>' : '') + '<button class="btn sec" data-act="test-nuovi"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('test_altre')) + '</button>' + (ts.pct < 0.5 && ts.liv > 1 ? '<button class="btn sec" data-act="test-livello" data-d="-1"' + (V.busy ? ' disabled' : '') + '>' + t('test_piu_facile') + '</button>' : '') + '</div>' + (V.busy ? '<p><span class="spin"></span> ' + t('preparo_domande') + '</p>' : '') : '') +
       '<div class="row">' + (ts.errati.length ? '<button class="btn" data-act="solo-errori">' + t('ripeti_errori') + '</button>' : '') + '<button class="btn sec" data-act="chiudi-test">' + t('chiudi') + '</button></div></div>';
   }
   const q = c.test[ts.dom[ts.i]]; const opz = q.tipo === 'vf' ? [t('vero'), t('falso')] : arr(q.opzioni);
   const corr = q.tipo === 'vf' ? (q.corretta ? 0 : 1) : q.corretta;
-  return '<div class="card"><div class="muted">' + t('domanda_di', { i: ts.i + 1, n: ts.dom.length }) + '</div><h2>' + md(q.domanda) + '</h2>' +
+  return '<div class="card"><div class="muted">' + t('domanda_di', { i: ts.i + 1, n: ts.dom.length }) + (ts.liv ? ' · ' + t('livello_test', { n: ts.liv, nome: t('liv_' + ts.liv) }) : '') + '</div><h2>' + md(q.domanda) + '</h2>' +
     opz.map((o, i) => { let cl = 'opt'; if (ts.scelta != null) { if (i === corr) cl += ' good'; else if (i === ts.scelta) cl += ' bad'; } return '<button class="' + cl + '" data-act="rispondi" data-i="' + i + '"' + (ts.scelta != null ? ' disabled' : '') + '>' + (q.tipo === 'vf' ? '' : '<b>' + 'ABCD'[i] + '.</b> ') + md(o) + (ts.scelta != null && i === corr ? ' ✓' : '') + '</button>'; }).join('') +
     (ts.scelta != null ? '<div class="fb ' + (ts.scelta === corr ? 'ok' : 'warn') + '"><b>' + (ts.scelta === corr ? t('giusto') : t('quasi')) + '</b> ' + md(q.spiegazione) + '</div>' + (V.voce ? '' : '<button class="btn" data-act="avanti">' + (ts.i + 1 >= ts.dom.length ? t('vedi_ris') : t('avanti')) + '</button>') : '') +
     (V.voce ? '<div class="row" style="margin-top:10px"><button class="btn sec" id="mic" data-act="mic">🎤 ' + t('rispondi_voce') + '</button><button class="btn sec" data-act="esci-voce">' + t('esci_voce') + '</button></div>' : '') + '</div>';
@@ -1129,7 +1328,9 @@ function render() {
   applicaTema();
   const v = V.vista;
   const M = { fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
+  document.getElementById('app').oninput = null;
   document.getElementById('app').innerHTML = (M[v] || vHome)();
+  if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit) fitMappa(); }
   const f1 = document.getElementById('f1'), f2 = document.getElementById('f2');
   if (f1) f1.onchange = e => aggiungiFoto([...e.target.files]);
   if (f2) f2.onchange = e => aggiungiFoto([...e.target.files]);
@@ -1152,19 +1353,25 @@ function render() {
     document.getElementById('lingua-gen').onchange = e => { V.bozzaFam = { ai: leggiAi(), lingua: e.target.value }; FAM.lingua = e.target.value; render(); };
   }
   if (v === 'setup') {
-    let toccato = false;
-    document.querySelectorAll('[data-pref]').forEach(x => x.addEventListener('input', () => { toccato = true; }));
+    const fEdit = V.edit ? DB.figli.find(x => x.id === V.edit) : null;
+    let toccato = !!(fEdit && fEdit.profilo.auto === false);
+    document.getElementById('app').oninput = e => { if (e.target && e.target.dataset && e.target.dataset.pref && ['font', 'fs', 'lh', 'ls', 'ws'].includes(e.target.dataset.pref)) toccato = true; };
     document.getElementById('colori').addEventListener('change', () => { toccato = true; });
-    document.querySelectorAll('[data-dsa]').forEach(x => x.onchange = () => {
-      document.getElementById('info-' + x.dataset.dsa).hidden = !x.checked;
-      const dis = document.querySelector('[data-dsa=dislessia]').checked;
-      if (!toccato) {
-        document.getElementById('colori').checked = !dis;
-        const setv = (k, val) => { const e = document.querySelector('[data-pref="' + k + '"]'); if (e) e.value = val; };
-        if (dis) { setv('font', 'lexend'); setv('lh', 1.8); setv('ls', 0.04); setv('ws', 0.1); } else { setv('font', 'tema'); setv('lh', 1.6); setv('ls', 0); setv('ws', 0); }
-        anteprima();
-      }
-    });
+    const consiglia = forza => {
+      const dsa = {}; document.querySelectorAll('[data-dsa]').forEach(x => { if (x.checked) dsa[x.dataset.dsa] = true; });
+      const liv = document.getElementById('livello').value, r = aspettoConsigliato(liv, dsa);
+      const cur = (document.querySelector('input[name=tema]:checked') || {}).value;
+      document.getElementById('cons').innerHTML = bloccoTema({ livello: liv, tema: (!forza && cur && temiPer(liv).includes(cur)) ? cur : r.tema });
+      if (toccato && !forza) return;
+      document.getElementById('colori').checked = !dsa.dislessia;
+      const setv = (k, val) => { const e = document.querySelector('[data-pref="' + k + '"]'); if (e) e.value = val; };
+      setv('font', r.font); setv('fs', r.fs); setv('lh', r.lh); setv('ls', r.ls); setv('ws', r.ws);
+      anteprima();
+    };
+    document.querySelectorAll('[data-dsa]').forEach(x => x.onchange = () => { document.getElementById('info-' + x.dataset.dsa).hidden = !x.checked; consiglia(false); });
+    document.getElementById('livello').onchange = () => consiglia(false);
+    const bt = document.getElementById('btn-cons'); if (bt) bt.onclick = () => { toccato = false; consiglia(true); };
+    if (!fEdit) consiglia(false);
   }
   if (v === 'setup' || v === 'aspetto') { anteprima(); riempiVoci(); }
   if (v === 'setup') document.getElementById('lingua-fig').addEventListener('change', riempiVoci);
@@ -1233,15 +1440,16 @@ const AZ = {
   'del': el => { V.foto.splice(+el.dataset.i, 1); },
   'prepara-cap': () => { preparaCapitolo(); return 'async'; },
   'prepara-es': () => { preparaEsercizio(); return 'async'; },
-  'apri-cap': el => { V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
+  'apri-cap': el => { V.mzFit = true; V.prFb = {}; V.prBozza = {}; V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
   'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
-  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; },
+  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; if (V.tab === 'pratica') { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0) salvaBozzePratica(c0); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },
   'ascolta': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async';
     const tx = V.tab === 'riassunto' ? c.riassunto_breve.join('. ') + '. ' + c.riassunto_completo
       : V.tab === 'glossario' ? c.glossario.map(g => g.termine + ': ' + g.definizione).join('. ')
       : V.tab === 'spiegazioni' ? c.spiegazioni.map(x => x.concetto + '. ' + x.spiegazione + ' ' + x.esempio).join(' ')
       : V.tab === 'mappa' ? (haMappa(c) ? mappaElenco(c.mappa).join('. ') : c.titolo)
+      : V.tab === 'pratica' ? arr(c.pratica).map((e, i) => t('pr_n', { n: i + 1 }) + '. ' + e.testo).join(' ')
       : V.tab === 'schema' ? (c.schema.radice || c.titolo) + '. ' + arr(c.schema.rami).map(r => r.titolo + ': ' + arr(r.punti).join('. ')).join('. ')
       : c.titolo;
     leggiConEvidenza(tx); return 'async';
@@ -1252,7 +1460,7 @@ const AZ = {
   'stat-indietro': () => { V.vista = 'genitori'; },
   'stat-stampa': () => {
     const f = DB.figli.find(x => x.id === V.statF); if (!f) return 'async';
-    document.getElementById('stampa').innerHTML = '<section><h1>' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1><p class="meta">' + esc(new Date().toLocaleDateString(LINGUE_VOCE[LINGUA_CORRENTE])) + ' · Scio</p>' + statisticheCorpo(f, statisticheFiglio(f)) + '</section>';
+    document.getElementById('stampa').innerHTML = '<section><h1>' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1><p class="meta">' + esc(new Date().toLocaleDateString(LINGUE_VOCE[LINGUA_CORRENTE])) + ' · AI.st.ain</p>' + statisticheCorpo(f, statisticheFiglio(f)) + '</section>';
     const tt = document.title; document.title = t('stat_di', { n: f.profilo.nome }); try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
   },
   'mappa-modifica': () => {
@@ -1318,11 +1526,22 @@ const AZ = {
     if (sv) { sv.setAttribute('width', Math.round(sv.dataset.w * V.mz)); sv.setAttribute('height', Math.round(sv.dataset.h * V.mz)); }
     return 'async';
   },
-  'mappa-adatta': () => {
-    const w = document.querySelector('.mappa-wrap'), sv = w && w.querySelector('svg'); if (!sv) return 'async';
-    V.mz = Math.max(0.3, Math.min(1, (w.clientWidth - 8) / sv.dataset.w));
-    sv.setAttribute('width', Math.round(sv.dataset.w * V.mz)); sv.setAttribute('height', Math.round(sv.dataset.h * V.mz));
-    return 'async';
+  'mappa-adatta': () => { fitMappa(); return 'async'; },
+  'mappa-muovi': el => {
+    const c = mappaCorr(); if (!c) return 'async'; const n = c.mappa.nodi.find(x => x.id === V.mSel); if (!n) return 'async';
+    const L = mappaLayout(c.mappa), o = L.nodo[n.id]; mappaPrima(c);
+    n.px = Math.max(10, Math.min(5000, Math.round(o.x + (+el.dataset.dx || 0)))); n.py = Math.max(10 + L.h / 2, Math.min(5000, Math.round(o.y + (+el.dataset.dy || 0))));
+    salva(); rinfresca(); return 'async';
+  },
+  'mappa-riordina': () => {
+    const c = mappaCorr(); if (!c) return 'async'; mappaPrima(c);
+    c.mappa.nodi.forEach(n => { delete n.px; delete n.py; }); c.mappa.relazioni.forEach(r => { delete r.ldx; delete r.ldy; });
+    salva(); V.mzFit = true; rinfresca(); return 'async';
+  },
+  'stampa-mappa': () => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || !haMappa(c)) return 'async';
+    document.getElementById('stampa').innerHTML = '<section class="mappa-pg"><h1>' + esc(c.titolo) + '</h1><p class="meta">' + esc(c.materia) + ' · ' + t('mappa') + '</p>' + mappaSVG(c.mappa, 0, c.titolo) + '</section>';
+    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
   },
   'crea-mappa': async () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
@@ -1334,7 +1553,7 @@ const AZ = {
       if (FAM.ai.provider === 'demo') m = mappaDaSchema(c);
       else m = pulisciMappa(await chiediJSON(SYS_MAPPA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_MAPPA));
       if (m.nodi.length < 4 || m.relazioni.length < 3) throw new Error('la mappa è venuta troppo piccola: riprova');
-      c.mappa = m; V.mz = 1; salva();
+      c.mappa = m; V.mz = 1; V.mzFit = true; salva();
     } catch (e) { toast(e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni.' : 'Non sono riuscito: ' + e.message); }
     V.busy = false; render();
   },
@@ -1347,7 +1566,8 @@ const AZ = {
       if (!arr(c.schema && c.schema.rami).length && n.schema) c.schema = n.schema;
       if (!arr(c.spiegazioni).length) c.spiegazioni = arr(n.spiegazioni);
       if (!arr(c.glossario).length) c.glossario = arr(n.glossario);
-      if (!arr(c.test).length) c.test = arr(n.test);
+      if (!arr(c.test).length) c.test = normDomande(arr(n.test), 1);
+      if (!arr(c.pratica).length) c.pratica = normPratica(n.pratica);
       if (!arr(c.inventario).length) c.inventario = arr(n.inventario);
       salva(); toast(mancano(c) ? 'Alcune parti mancano ancora: riprova.' : 'Fatto: ora c\'è tutto.');
     } catch (e) { toast('Non sono riuscito: ' + e.message); }
@@ -1361,11 +1581,51 @@ const AZ = {
     return 'async';
   },
   'meglio': async el => { const c = S.capitoli.find(x => x.id === V.cap); const s = c.spiegazioni[+el.dataset.i]; const box = document.getElementById('m' + el.dataset.i); box.innerHTML = '<p><span class="spin"></span></p>';
-    try { if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); box.innerHTML = '<div class="fb">In demo la spiegazione alternativa non è disponibile. Con la chiave AI, Scio la riscrive con parole e un esempio diversi.</div>'; }
-      else { const t = await chiamaAI('Sei Scio, tutor di studio. Spiega in modo diverso, più semplice, con un nuovo esempio concreto. Massimo 6 frasi brevi, in italiano. Solo testo.\n\n' + profiloTesto(), 'Concetto: ' + s.concetto + '\nSpiegazione precedente: ' + s.spiegazione, []); box.innerHTML = '<div class="fb">' + md(t) + '</div>'; } }
+    try { if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); box.innerHTML = '<div class="fb">In demo la spiegazione alternativa non è disponibile. Con la chiave AI, AI.st.ain la riscrive con parole e un esempio diversi.</div>'; }
+      else { const t = await chiamaAI('Sei AI.st.ain, tutor di studio. Spiega in modo diverso, più semplice, con un nuovo esempio concreto. Massimo 6 frasi brevi, in italiano. Solo testo.\n\n' + profiloTesto(), 'Concetto: ' + s.concetto + '\nSpiegazione precedente: ' + s.spiegazione, []); box.innerHTML = '<div class="fb">' + md(t) + '</div>'; } }
     catch (e) { box.innerHTML = '<div class="fb warn">' + esc(e.message) + '</div>'; } return 'async'; },
-  'inizia-voce': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c || !arr(c.test).length) return; V.voce = true; V.lettura = null; fermaVoce(); V.test = { cap: c.id, dom: c.test.map((_, i) => i), i: 0, punti: 0, errati: [], scelta: null, fine: false }; },
-  'inizia-test': () => { const c = S.capitoli.find(x => x.id === V.cap); V.voce = false; V.test = { cap: c.id, dom: c.test.map((_, i) => i), i: 0, punti: 0, errati: [], scelta: null, fine: false }; },
+  'inizia-voce': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; const liv = c.lvl || 1, dom = campiona(idxLivello(c, liv), 25); if (!dom.length) return; V.voce = true; V.lettura = null; fermaVoce(); V.test = { cap: c.id, dom: dom, i: 0, punti: 0, errati: [], scelta: null, fine: false, liv: liv }; },
+  'inizia-test': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; const liv = c.lvl || 1, dom = campiona(idxLivello(c, liv), 25); if (!dom.length) return; V.voce = false; V.test = { cap: c.id, dom: dom, i: 0, punti: 0, errati: [], scelta: null, fine: false, liv: liv }; },
+  'test-nuovi': async () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async'; await nuoviTest(c, c.lvl || 1); return 'async'; },
+  'test-livello': async el => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async';
+    const liv = Math.max(1, Math.min(LIV_TEST, (c.lvl || 1) + (+el.dataset.d || 0))); const dom = idxLivello(c, liv);
+    if (dom.length >= 6) { c.lvl = liv; salva(); fermaVoce(); V.voce = false; V.test = { cap: c.id, dom: campiona(dom, 25), i: 0, punti: 0, errati: [], scelta: null, fine: false, liv: liv }; V.tab = 'test'; render(); return 'async'; }
+    await nuoviTest(c, liv); return 'async';
+  },
+  'crea-pratica': async () => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async';
+    salvaBozzePratica(c);
+    if (FAM.ai.provider === 'demo') { c.pratica = normPratica(DEMO_PRATICA); salva(); render(); return 'async'; }
+    V.busy = true; render();
+    try {
+      const gia = arr(c.pratica).map(e => '- ' + e.testo).join('\n');
+      const r = await chiediJSON(SYS_PRATICA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\n\nRiassunto completo:\n' + c.riassunto_completo + (gia ? '\n\nEsercizi già presenti (non ripeterli):\n' + gia : ''), [], SCHEMA_PRATICA);
+      const nuovi = normPratica(r.pratica); if (nuovi.length < 3) throw new Error('Non sono riuscito a preparare esercizi validi: riprova.');
+      c.pratica = arr(c.pratica).concat(nuovi).slice(-30); salva();
+    } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); }
+    V.busy = false; render(); return 'async';
+  },
+  'pratica-indizio': el => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; salvaBozzePratica(c); const e = arr(c.pratica)[+el.dataset.i]; if (e && e.ind < e.indizi.length) { e.ind++; salva(); } },
+  'pratica-controlla': async el => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async';
+    const i = +el.dataset.i, e = arr(c.pratica)[i]; if (!e) return 'async'; salvaBozzePratica(c);
+    const ris = (V.prBozza[i] || '').trim(); if (!ris) { toast(t('pr_scrivi')); return 'async'; }
+    V.busy = true; render();
+    try {
+      let r;
+      if (FAM.ai.provider === 'demo') r = ris.length > 12 ? { esito: 'giusto', feedback: 'Ben ragionato!' } : { esito: 'quasi', feedback: 'Ci sei vicino: prova a spiegare anche il perché.' };
+      else r = await chiediJSON(SYS_VALUTA_PRATICA + '\n\n' + profiloTesto(), 'Esercizio: ' + e.testo + '\nSoluzione (riservata): ' + e.soluzione + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA);
+      V.prFb = V.prFb || {}; e.tent++;
+      if (r.esito === 'giusto') {
+        if (!e.ok) { e.ok = true; const P = premi(); P.pratica++; P.xp += 3; if (P.pratica >= 5 && !P.badge.includes('allenato')) { P.badge.push('allenato'); toast('🏅 ' + t('nuovo_badge', { b: t('badge_allenato') })); } }
+        V.prFb[i] = { tipo: 'ok', testo: r.feedback || 'Giusto!' };
+      } else V.prFb[i] = { tipo: 'warn', testo: r.feedback || 'Quasi: riprova.' };
+      salva();
+    } catch (err) { toast(err.message); }
+    V.busy = false; render(); return 'async';
+  },
+  'aspetto-consigliato': () => { if (V.vista !== 'aspetto' || !S.profilo) return 'async'; const p = S.profilo, r = aspettoConsigliato(p.livello, p.dsa); Object.assign(p, { font: r.font, fs: r.fs, lh: r.lh, ls: r.ls, ws: r.ws, tema: r.tema, auto: true }); salva(); },
   'rispondi': el => {
     const ts = V.test; if (!ts || ts.scelta != null) return;
     const c = capCorrente(); const ix = ts.dom[ts.i]; const q = c.test[ix]; const corr = q.tipo === 'vf' ? (q.corretta ? 0 : 1) : q.corretta;
@@ -1374,7 +1634,7 @@ const AZ = {
   },
   'avanti': () => {
     const ts = V.test; if (!ts) return; const c = capCorrente(); ts.scelta = null; ts.i++;
-    if (ts.i >= ts.dom.length) { ts.fine = true; if (!ts.ripasso && c.id !== '__rip') { c.risultati.push({ data: new Date().toISOString(), punti: ts.punti, totale: ts.dom.length, errati: [...new Set(ts.errati.map(i => c.test[i].argomento).filter(Boolean))] }); salva(); } }
+    if (ts.i >= ts.dom.length) { ts.fine = true; assegnaPremi(c, ts); if (!ts.ripasso && c.id !== '__rip') { c.risultati.push({ data: new Date().toISOString(), punti: ts.punti, totale: ts.dom.length, errati: [...new Set(ts.errati.map(i => c.test[i].argomento).filter(Boolean))] }); salva(); } }
   },
   'solo-errori': () => { const ts = V.test; V.test = { cap: ts.cap, dom: [...new Set(ts.errati)], i: 0, punti: 0, errati: [], scelta: null, fine: false, ripasso: true }; V.voce = false; fermaVoce(); },
   'chiudi-test': () => { V.test = null; V.voce = false; fermaVoce(); if (V.vista === 'ripasso') V.vista = 'home'; },
@@ -1452,7 +1712,8 @@ const AZ = {
     const lg2 = document.getElementById('lingua-fig').value;
     const rm = document.getElementById('rmpin');
     const sezioni = {}; SEZ.forEach(k => { const e = document.querySelector('[data-sez="' + k + '"]'); sezioni[k] = e ? e.checked : true; });
-    const prof = { nome: nome, sezioni: sezioni, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: (document.querySelector('input[name=tema]:checked') || {}).value || consigliato(livello, dsa), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
+    const prof = { nome: nome, sezioni: sezioni, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: temaValido({ livello: livello, tema: (document.querySelector('input[name=tema]:checked') || {}).value }), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
+    { const rec = aspettoConsigliato(livello, dsa); prof.auto = prof.font === rec.font && Math.abs(prof.fs - rec.fs) < 0.01 && Math.abs(prof.lh - rec.lh) < 0.01 && Math.abs(prof.ls - rec.ls) < 0.005 && Math.abs(prof.ws - rec.ws) < 0.005; }
     if (f) f.profilo = prof; else { const n = statoVuoto(); n.profilo = prof; DB.figli.push(n); }
     salva(); V.edit = null;
     if (!f && DB.figli.length === 1) attiva(DB.figli[0].id); else { V.vista = 'genitori'; V.genitoriOk = true; }
@@ -1478,7 +1739,7 @@ const AZ = {
 
 /* ===== Controllo dello svolgimento e spiegazione per i genitori ===== */
 const attendi = ms => new Promise(r => setTimeout(r, ms));
-const SYS_CONTROLLO = `Sei Scio, un tutor che guida il ragionamento. Ricevi la foto dello svolgimento che uno studente ha scritto a mano (e, se c'è, il testo dell'esercizio).
+const SYS_CONTROLLO = `Sei AI.st.ain, un tutor che guida il ragionamento. Ricevi la foto dello svolgimento che uno studente ha scritto a mano (e, se c'è, il testo dell'esercizio).
 Leggi con attenzione ogni passaggio. Per matematica e fisica rifai i calcoli per te stesso; per latino e greco controlla l'analisi (verbo, soggetto, casi, complementi, costruzione) senza tradurre al posto dello studente.
 Regole IMPORTANTI:
 - NON scrivere MAI il risultato corretto, la soluzione, il testo corretto o la traduzione. Non riscrivere i passaggi sbagliati nella forma giusta.
@@ -1488,7 +1749,7 @@ Regole IMPORTANTI:
 - "domanda_guida": una sola domanda che aiuti lo studente a trovare da solo il primo errore (vuota se non ci sono errori).
 Tono incoraggiante, frasi brevi.`;
 const SCHEMA_CONTROLLO = OBJ({ riepilogo: T, passi: { type: 'array', description: 'Un elemento per ogni passaggio scritto dallo studente, nell\'ordine', items: OBJ({ cosa_hai_fatto: T, esito: { type: 'string', enum: ['ok', 'da_controllare', 'errore'] }, suggerimento: T }) }, domanda_guida: T });
-const DEMO_CONTROLLO = { riepilogo: 'Esempio: in modalità demo Scio non legge la tua foto. Con la chiave AI controlla davvero i tuoi passaggi, senza mai darti la soluzione.', passi: [{ cosa_hai_fatto: 'Passaggio 1 (esempio)', esito: 'ok', suggerimento: '' }, { cosa_hai_fatto: 'Passaggio 2 (esempio)', esito: 'errore', suggerimento: 'Guarda il segno: che cosa succede quando cambi lato?' }], domanda_guida: 'Che operazione devi fare su entrambi i lati per mantenere l\'uguaglianza?' };
+const DEMO_CONTROLLO = { riepilogo: 'Esempio: in modalità demo AI.st.ain non legge la tua foto. Con la chiave AI controlla davvero i tuoi passaggi, senza mai darti la soluzione.', passi: [{ cosa_hai_fatto: 'Passaggio 1 (esempio)', esito: 'ok', suggerimento: '' }, { cosa_hai_fatto: 'Passaggio 2 (esempio)', esito: 'errore', suggerimento: 'Guarda il segno: che cosa succede quando cambi lato?' }], domanda_guida: 'Che operazione devi fare su entrambi i lati per mantenere l\'uguaglianza?' };
 async function controllaSvolgimento() {
   V.cosa = ((document.getElementById('cosa') || {}).value || '').trim();
   const demo = FAM.ai.provider === 'demo';
@@ -1507,7 +1768,7 @@ async function spiegaGen() {
   V.busy = true; render();
   try {
     const nome = LINGUE_NOME_IT[FAM.lingua] || 'italiano';
-    const txt = await chiamaAI('Sei Scio. Scrivi in ' + nome + ' un testo di 8-10 righe per un genitore che non conosce bene l\'italiano: di cosa parla il capitolo, i 5 concetti principali (con il termine italiano tra parentesi) e come aiutare il figlio a ripassare. Linguaggio semplice, solo testo, nessun titolo, nessun elenco numerato.', 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.map(plain).join('\n- ') + '\n\nRiassunto completo:\n' + plain(c.riassunto_completo).slice(0, 7000), []);
+    const txt = await chiamaAI('Sei AI.st.ain. Scrivi in ' + nome + ' un testo di 8-10 righe per un genitore che non conosce bene l\'italiano: di cosa parla il capitolo, i 5 concetti principali (con il termine italiano tra parentesi) e come aiutare il figlio a ripassare. Linguaggio semplice, solo testo, nessun titolo, nessun elenco numerato.', 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.map(plain).join('\n- ') + '\n\nRiassunto completo:\n' + plain(c.riassunto_completo).slice(0, 7000), []);
     V.genRiass = { id: c.id, testo: txt };
   } catch (e) { toast(e.message === 'NODEMO' ? t('serve_ai') : e.message); }
   V.busy = false; render();
@@ -1519,6 +1780,7 @@ document.addEventListener('input', e => {
   if (el.type === 'radio' && !el.checked) return;
   if (V.vista === 'aspetto' && S.profilo) {
     const k = el.dataset.pref; S.profilo[k] = (k === 'font' || k === 'tema' || k === 'voce') ? el.value : parseFloat(el.value);
+    if (['font', 'fs', 'lh', 'ls', 'ws'].includes(k)) S.profilo.auto = false;
     salva(); applicaTema();
   }
   anteprima();
@@ -1549,7 +1811,7 @@ var promptInstalla = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstalla = e; const b = document.getElementById('installa'); if (b) b.hidden = false; });
 if ('serviceWorker' in navigator && location.protocol === 'https:' || location.hostname === 'localhost') {
   navigator.serviceWorker && navigator.serviceWorker.register('sw.js').then(r => {
-    r.addEventListener('updatefound', () => { const w = r.installing; if (w) w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) toast('Nuova versione di Scio pronta: chiudi e riapri l\'app.'); }); });
+    r.addEventListener('updatefound', () => { const w = r.installing; if (w) w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) toast('Nuova versione di AI.st.ain pronta: chiudi e riapri l\'app.'); }); });
   }).catch(() => {});
 }
 render();
