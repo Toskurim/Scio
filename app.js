@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.19';
+const VERSIONE = '0.20';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1201,7 +1201,8 @@ function cardEs(e) {
   return '<div class="card"><b>' + esc(e.materia) + '</b><div class="muted">' + esc(e.richiesta).slice(0, 90) + '</div><p></p><span class="chip ' + (e.finito ? 'ok' : '') + '">' + (e.finito ? t('completato') : t('passo_di', { i: e.i + 1, n: e.passi.length })) + '</span> <button class="btn sec small" data-act="apri-es" data-id="' + e.id + '">' + t('apri') + '</button></div>';
 }
 function boxSposta(item, tipo) {
-  const altre = S.materie.filter(m => !sameM(m, item.materia));
+  /* tutte le materie del profilo + quelle standard non ancora create (si creano scegliendole) */
+  const altre = S.materie.concat(MATERIE.filter(m => !S.materie.some(x => sameM(x, m)))).filter(m => !sameM(m, item.materia));
   return '<div class="card"><h3>' + t('sposta_titolo') + '</h3>' + (altre.length ? '<div class="row"><select id="spostaM" aria-label="' + esc(t('materia_lbl')) + '">' + altre.map(m => '<option>' + esc(m) + '</option>').join('') + '</select><button class="btn sec small" data-act="sposta" data-k="' + tipo + '" data-id="' + item.id + '">' + t('sposta_btn') + '</button></div>' : '') +
     '<p></p><button class="btn sec small" data-act="elimina-' + tipo + '" data-id="' + item.id + '">' + t('elimina_lavoro') + '</button></div>';
 }
@@ -1616,6 +1617,7 @@ const AZ = {
   'sposta': el => {
     const sel = document.getElementById('spostaM'); if (!sel || !sel.value) return 'async';
     const lista = el.dataset.k === 'es' ? S.esercizi : S.capitoli; const it = lista.find(x => x.id === el.dataset.id); if (!it) return 'async';
+    if (!S.materie.some(m => sameM(m, sel.value))) S.materie.push(sel.value);
     it.materia = sel.value; V.materia = sel.value; salva(); toast(t('spostato', { n: sel.value }));
   },
   'elimina-cap': el => { const it = S.capitoli.find(x => x.id === el.dataset.id); if (!it || !confirm(t('conferma', { n: it.titolo }))) return 'async'; S.capitoli = S.capitoli.filter(x => x.id !== it.id); pulisciRip(); salva(); V.materia = it.materia; V.vista = 'materia'; },
