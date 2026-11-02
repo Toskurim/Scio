@@ -181,3 +181,12 @@ progress{width:100%;height:14px;accent-color:var(--accent)}
   #stampa .rispo{height:26mm;border-bottom:1px dotted #888}
   #stampa section{break-inside:auto}
 }
+
+/* v0.16 */
+.bolla{padding:10px 12px;border-radius:14px;margin:8px 0;max-width:92%;line-height:1.5}
+.bolla.ai{background:var(--soft)}
+.bolla.io{background:var(--card);border:1px solid var(--border);margin-left:auto}
+.mic-grande{font-size:1.15rem;padding:14px 22px;min-height:52px}
+.btn.rec{background:var(--warn);color:var(--warn-ink);border-color:var(--warn-ink)}
+.rec-dot{color:var(--warn-ink)}
+#or-live{min-height:3em;margin:6px 0}

@@ -1,4 +1,4 @@
-# AI.st.ain v0.15 — app di studio installabile (PWA)
+# AI.st.ain v0.16 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,10 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.16
+- **Interrogazione orale a turni**: nuova scheda "Interrogazione". Il ragazzo sceglie il capitolo o un paragrafo, l'AI fa da insegnante ("Raccontami…"), il ragazzo parla e preme **"Ho finito"** quando ha terminato (la registrazione non si chiude da sola alle pause). Vede la trascrizione e può correggerla o scrivere al posto di parlare. L'AI valuta solo i contenuti (non la pronuncia): cosa è detto bene, cosa è sbagliato con la correzione, cosa manca (come domande guida), poi fa una domanda di approfondimento e risponde anche a voce. Fino a 5 risposte; a fine interrogazione c'è il risultato, un elenco di cosa ripassare, i punti e la medaglia "Oratore".
+- Il riconoscimento vocale è quello del browser: ascolta in italiano e può inviare l'audio al produttore del browser (Google o Microsoft). Il genitore può nascondere la scheda dal profilo.
 
 ## Novità della v0.15
 - **Il mio riassunto**: nuova sezione in ogni capitolo dove il ragazzo costruisce il riassunto da solo, un paragrafo alla volta (metodo in 4 passi: leggo, sottolineo le parole chiave, scrivo con parole mie, controllo). L'AI dice cosa è stato colto e fa domande guida su ciò che manca, senza mai scrivere il riassunto al posto suo. Il riassunto automatico resta com'è: se il genitore lo nasconde, il ragazzo vede solo questo strumento. A fine capitolo il riassunto si stampa e si guadagna la medaglia "Autore del riassunto".
@@ -65,7 +69,7 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.14 a v0.15)
+## Aggiornare il sito su GitHub (da v0.15 a v0.16)
 1. Dalla v0.14 cambiano solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
 2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.

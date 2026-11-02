@@ -419,6 +419,45 @@ DE('co_stampa', 'Stampa o salva PDF', 'Print or save as PDF');
 DE('co_nota_sez', 'Se nascondi il riassunto, il ragazzo può comunque costruirlo da solo in «Il mio riassunto», con l’aiuto dell’AI ma senza vedere quello già pronto.', 'If you hide the summary, the student can still build it alone in “My summary”, helped by the AI but without seeing the ready-made one.');
 DE('badge_autore', 'Autore del riassunto', 'Summary author'); DE('badge_autore_d', 'Hai costruito da solo il riassunto di un capitolo.', 'You built a chapter summary on your own.');
 
+
+/* ===== v0.16 — Interrogazione orale ===== */
+DE('orale', 'Interrogazione', 'Oral practice');
+DE('or_intro', 'Ripeti a voce quello che hai studiato, come a scuola: ti ascolto, ti dico cosa hai detto bene, cosa correggere e cosa ti sei dimenticato, e ti faccio qualche domanda. Valuto solo i contenuti, non come parli.', 'Say out loud what you have studied, as at school: I listen, tell you what you said well, what to correct and what you forgot, and ask you a few questions. I only judge the content, not how you speak.');
+DE('or_parte', 'Su cosa vuoi essere interrogato?', 'What do you want to be tested on?');
+DE('or_tutto', 'Tutto il capitolo', 'The whole chapter');
+DE('or_inizia', 'Inizia l’interrogazione', 'Start the oral practice');
+DE('or_nota_it', 'Il riconoscimento vocale ascolta in italiano.', 'Speech recognition listens in Italian.');
+DE('or_privacy', 'Attenzione: per trascrivere la voce il browser può inviare l’audio al suo produttore (per esempio Google o Microsoft); il testo trascritto va al servizio AI scelto dal genitore. In alternativa puoi scrivere la risposta.', 'Note: to transcribe your voice the browser may send the audio to its maker (for example Google or Microsoft); the transcribed text goes to the AI service chosen by the parent. You can type your answer instead.');
+DE('or_nomic', 'Il riconoscimento vocale non è disponibile su questo dispositivo o browser: puoi scrivere la risposta.', 'Speech recognition is not available on this device or browser: you can type your answer.');
+DE('or_mic_negato', 'Il microfono non è permesso: attivalo nelle impostazioni del browser oppure scrivi la risposta.', 'The microphone is not allowed: enable it in the browser settings or type your answer.');
+DE('or_prima', 'Raccontami: {t}. Quando sei pronto premi «Parla».', 'Tell me about: {t}. When you are ready press “Speak”.');
+DE('or_parla', 'Parla', 'Speak');
+DE('or_ho_finito', 'Ho finito', 'I am done');
+DE('or_annulla', 'Annulla', 'Cancel');
+DE('or_scrivi', 'Scrivi invece di parlare', 'Type instead of speaking');
+DE('or_riascolta', 'Riascolta', 'Listen again');
+DE('or_ascolto_t', 'Ti sto ascoltando… quando hai finito premi «Ho finito».', 'I am listening… when you are done press “I am done”.');
+DE('or_rivedi_t', 'Ecco cosa ho capito. Puoi correggere il testo prima di inviarlo.', 'Here is what I understood. You can fix the text before sending it.');
+DE('or_invia', 'Invia la risposta', 'Send the answer');
+DE('or_aggiungi', 'Aggiungi altro a voce', 'Add more by voice');
+DE('or_cancella', 'Cancella e riprova', 'Delete and try again');
+DE('or_attesa', 'Sto valutando la tua risposta…', 'I am evaluating your answer…');
+DE('or_poco', 'Dì o scrivi qualcosa di più.', 'Say or write a little more.');
+DE('or_turno', 'Risposta {n} di {m}', 'Answer {n} of {m}');
+DE('or_giusto', 'Detto bene:', 'Well said:');
+DE('or_correggi', 'Da correggere:', 'To correct:');
+DE('or_manca', 'Pensa anche a:', 'Also think about:');
+DE('or_esito_ottimo', 'Ottimo!', 'Excellent!');
+DE('or_esito_bene', 'Bene, ma si può completare.', 'Good, but it can be completed.');
+DE('or_esito_da_rivedere', 'Da rivedere: rileggi e riprova.', 'Needs review: read again and retry.');
+DE('or_concludi', 'Concludi l’interrogazione', 'Finish the oral practice');
+DE('or_voce_ai', 'Voce dell’AI', 'AI voice');
+DE('or_fine_t', 'Interrogazione conclusa', 'Oral practice finished');
+DE('or_risultato', 'Risultato: {p}%', 'Result: {p}%');
+DE('or_da_ripassare', 'Da ripassare:', 'To review:');
+DE('or_ancora', 'Nuova interrogazione', 'New oral practice');
+DE('badge_oratore', 'Oratore', 'Speaker'); DE('badge_oratore_d', 'Interrogazione orale con almeno l’80%.', 'Oral practice with at least 80%.');
+
 /* ricerca testo: lingua corrente */
 let LINGUA_CORRENTE = 'it';
 function t(k, v) {

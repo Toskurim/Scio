@@ -2,8 +2,8 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.15';
-const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica'];
+const VERSIONE = '0.16';
+const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -103,7 +103,7 @@ function vistaIniziale() {
 let V = { vista: vistaIniziale(), tab: 'riassunto', foto: [], busy: false, errore: '', test: null, es: null, bozza: '', cap: null, genitoriOk: false, edit: null, voce: false, lettura: null };
 function attiva(id) {
   const f = DB.figli.find(x => x.id === id); if (!f) return false;
-  fermaVoce(); S = f; V.vista = 'home'; V.materia = ''; V.cap = null; V.es = null; V.test = null; V.voce = false; V.pinFiglio = null; V.genitoriOk = false; V.controllo = null; V.genRiass = null; V.genVede = false; return true;
+  fermaVoce(); V.or = null; S = f; V.vista = 'home'; V.materia = ''; V.cap = null; V.es = null; V.test = null; V.voce = false; V.pinFiglio = null; V.genitoriOk = false; V.controllo = null; V.genRiass = null; V.genVede = false; return true;
 }
 function salva() {
   try { localStorage.setItem(LS, JSON.stringify(DB)); return true; }
@@ -150,7 +150,7 @@ function pulisciDati(o) {
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
       riassunto_breve: L(x.riassunto_breve, 1500), riassunto_completo: Tx(x.riassunto_completo),
       schema: { radice: Tx(x.schema && x.schema.radice, 300), rami: A(x.schema && x.schema.rami).filter(r => r && typeof r === 'object').map(r => ({ titolo: Tx(r.titolo, 300), punti: L(r.punti, 800) })) },
-      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica), mio: normMio(x.mio),
+      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica), mio: normMio(x.mio), orali: arr(x.orali).filter(o => o && typeof o === 'object').slice(-100).map(o => ({ data: Tx(o.data, 40), pct: Math.max(0, Math.min(100, Math.floor(N(o.pct)))) })),
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
       test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000), d: Math.max(1, Math.min(5, Math.floor(N(q.d)) || 1)) })),
@@ -646,7 +646,7 @@ async function preparaCapitolo() {
     else {
       c = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + ' Genera il materiale di studio.', V.foto, SCHEMA_CAPITOLO);
     }
-    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null };
+    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null, orali: [] };
     S.capitoli.unshift(cap); salva();
     V.foto = []; V.cap = cap.id; V.genVede = false; V.tab = primoTab(); V.vista = 'capitolo'; V.busy = false; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
@@ -684,7 +684,7 @@ async function controllaIdea() {
 /* ===== v0.14: domande, difficoltà, esercizi di allenamento, premi ===== */
 const LIV_TEST = 5;
 const RANGHI = [0, 60, 200, 450, 900];
-const BADGE = ['primo', 'dieci', 'perfetto', 'liv3', 'liv5', 'allenato', 'autore'];
+const BADGE = ['primo', 'dieci', 'perfetto', 'liv3', 'liv5', 'allenato', 'autore', 'oratore'];
 function premiVuoti() { return { xp: 0, test: 0, perfetti: 0, maxLiv: 1, pratica: 0, badge: [] }; }
 function pulisciPremi(p) {
   const n = x => { x = Math.floor(Number(x)); return isFinite(x) && x > 0 ? Math.min(x, 1000000) : 0; };
@@ -865,6 +865,114 @@ function vCostruisci(c) {
     }).join('') +
     (fatte === m.sez.length ? '<div class="card"><h2>' + t('co_finale') + '</h2>' + m.sez.map(s => '<h3>' + esc(s.t) + '</h3><p>' + esc(s.testo).replace(/\n/g, '<br>') + '</p>').join('') + '<div class="row"><button class="btn" data-act="co-stampa">' + t('co_stampa') + '</button></div></div>' : '');
 }
+/* ===== v0.16: interrogazione orale a turni ===== */
+const SYS_ORALE = `Sei AI.st.ain, un tutor che fa da insegnante in un'interrogazione orale di prova. Ricevi il testo di riferimento (RISERVATO), la conversazione finora e l'ultima risposta dello studente, trascritta dal riconoscimento vocale.
+Regole:
+- La trascrizione può avere errori di parole, punteggiatura mancante o termini difficili storpiati: sii tollerante e valuta il CONTENUTO, mai la pronuncia, la fluidità o la grammatica.
+- "giusto": cosa ha detto correttamente (al massimo 4 voci brevi, tono positivo).
+- "da_correggere": affermazioni sbagliate o imprecise, ciascuna con la correzione in una frase (al massimo 3). Lista vuota se non ce ne sono.
+- "manca": ciò che l'insegnante si aspetterebbe e non è stato detto, scritto come DOMANDE GUIDA e non come risposte (al massimo 3).
+- "esito": "ottimo" (idee principali giuste e abbastanza complete), "bene" (giusto ma con lacune), "da_rivedere" (errori importanti o molto incompleto).
+- "parlato": 2-4 frasi che verranno lette ad alta voce: si parte dal positivo, poi un'osservazione sulle correzioni o sulle lacune. Niente elenchi né simboli.
+- "domanda": UNA sola domanda di approfondimento per il turno successivo, su qualcosa che manca o su un altro punto del testo; vuota se l'interrogazione è conclusa.
+- "fine": true solo se l'argomento è stato coperto bene o lo studente non ha altro da dire.
+- Tono incoraggiante, mai giudicante. Non leggere il testo di riferimento: parafrasa.`;
+const SCHEMA_ORALE = OBJ({ esito: { type: 'string', enum: ['ottimo', 'bene', 'da_rivedere'] }, giusto: LS_, da_correggere: LS_, manca: LS_, parlato: T, domanda: T, fine: { type: 'boolean' } });
+function normOrale(r) {
+  const T0 = (x, n) => (typeof x === 'string' ? x : '').slice(0, n), L0 = (x, k, n) => arr(x).map(y => T0(String(y), n)).filter(Boolean).slice(0, k);
+  r = r && typeof r === 'object' ? r : {};
+  return { esito: ['ottimo', 'bene', 'da_rivedere'].includes(r.esito) ? r.esito : 'bene', giusto: L0(r.giusto, 4, 300), da_correggere: L0(r.da_correggere, 3, 400), manca: L0(r.manca, 3, 300), parlato: T0(r.parlato, 900), domanda: T0(r.domanda, 400), fine: r.fine === true };
+}
+function oralDemo(rif, testo, n) {
+  const w = [...new Set((String(rif).toLowerCase().match(/[a-zàèéìòù]{6,}/g) || []))], mio = testo.toLowerCase(), hit = w.filter(x => mio.includes(x));
+  const esito = hit.length >= 4 ? 'ottimo' : hit.length >= 2 ? 'bene' : 'da_rivedere';
+  return { esito: esito, giusto: hit.length ? ['Hai nominato: ' + hit.slice(0, 4).join(', ') + '.'] : [], da_correggere: [], manca: esito === 'ottimo' ? [] : ['Rileggi il testo: quale idea importante non hai ancora raccontato?'],
+    parlato: (hit.length ? 'Bene, hai ricordato alcune parole importanti. ' : 'Proviamo a ricordare di più. ') + '(In modalità demo la valutazione è semplificata.)', domanda: n >= 2 ? '' : 'Cosa altro ricordi di questo argomento?', fine: n >= 2 };
+}
+function orPronto(c, parte) {
+  const tit = parte >= 0 ? titoliSezioni(c)[parte] : c.titolo;
+  V.or = { cap: c.id, parte: parte, turni: [{ ruolo: 'ai', testo: t('or_prima', { t: tit }) }], fase: 'pronto', trascr: '', base: '', n: 0, max: 5, esiti: [], voce: true, fermo: true, riavvii: 0, t0: 0, errore: '', chiuso: null };
+  if (V.or.voce) parlaCb(plain(V.or.turni[0].testo));
+}
+function orChiudiAscolto() {
+  const o = V.or; if (!o || o.fase !== 'ascolto') return;
+  if (o.errore === 'perm') toast(t('or_mic_negato')); o.errore = '';
+  o.fase = 'rivedi'; render();
+}
+function orAvviaRec() {
+  const o = V.or, SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast(t('or_nomic')); o.fase = 'rivedi'; render(); return; }
+  fermaVoce();
+  o.fase = 'ascolto'; o.base = o.trascr ? o.trascr.trim() + ' ' : ''; o.fermo = false; o.riavvii = 0; o.t0 = Date.now(); o.errore = ''; render();
+  const nuovo = () => {
+    const r = new SR(); V.rec = r; r.lang = LINGUE_VOCE.it; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
+    r.onresult = ev => { if (V.or !== o) return; const tx = [...ev.results].map(x => x[0].transcript).join(' '); o.trascr = (o.base + tx).replace(/\s+/g, ' ').trim(); const el = document.getElementById('or-live'); if (el) el.textContent = o.trascr; };
+    r.onerror = ev => { if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') { o.fermo = true; o.errore = 'perm'; } else if (ev.error === 'network' || ev.error === 'audio-capture') { o.fermo = true; o.errore = ev.error; } };
+    r.onend = () => {
+      if (V.rec === r) V.rec = null;
+      if (V.or !== o || o.fase !== 'ascolto') return;
+      if (!o.fermo && o.riavvii < 12 && Date.now() - o.t0 < 180000) { o.riavvii++; o.base = o.trascr ? o.trascr + ' ' : ''; try { nuovo(); return; } catch (e) { /* si chiude qui sotto */ } }
+      orChiudiAscolto();
+    };
+    try { r.start(); } catch (e) { orChiudiAscolto(); }
+  };
+  nuovo();
+}
+function orFinisci(c) {
+  const o = V.or; if (!o || !o.n) { if (o) o.fase = 'pronto'; return; }
+  const pt = { ottimo: 2, bene: 1, da_rivedere: 0 }, pct = o.esiti.reduce((a, e) => a + pt[e], 0) / (2 * o.n), P = premi(), nuovi = [];
+  const xp = o.esiti.reduce((a, e) => a + pt[e] * 2 + 1, 0) + (pct >= 0.8 ? 10 : 0);
+  P.xp += xp; if (pct >= 0.8 && o.n >= 3 && !P.badge.includes('oratore')) { P.badge.push('oratore'); nuovi.push('oratore'); }
+  const ripassare = []; o.turni.forEach(x => { if (x.fb) { x.fb.da_correggere.concat(x.fb.manca).forEach(y => { if (!ripassare.includes(y)) ripassare.push(y); }); } });
+  c.orali = arr(c.orali).concat([{ data: new Date().toISOString(), pct: Math.round(pct * 100) }]).slice(-100);
+  o.chiuso = { pct: Math.round(pct * 100), xp: xp, nuovi: nuovi, ripassare: ripassare.slice(0, 8) }; o.fase = 'fine'; fermaVoce(); salva();
+}
+async function orInvia(c) {
+  const o = V.or, tx = ((document.getElementById('or-testo') || {}).value || '').trim();
+  if (tx.length < 8) { toast(t('or_poco')); return; }
+  o.trascr = tx; o.fase = 'invio'; render();
+  try {
+    const rif = (o.parte >= 0 ? testoSezione(c, o.parte) : '') || c.riassunto_completo;
+    let r;
+    if (FAM.ai.provider === 'demo') { await new Promise(x => setTimeout(x, 400)); r = oralDemo(rif, tx, o.n); }
+    else r = await chiediJSON(SYS_ORALE + '\n\n' + profiloTesto(), 'Materia: ' + c.materia + '\nArgomento: ' + (o.parte >= 0 ? titoliSezioni(c)[o.parte] : c.titolo) + '\n\nTesto di riferimento (RISERVATO):\n' + String(rif).slice(0, 20000) + '\n\nConversazione finora:\n' + o.turni.map(x => (x.ruolo === 'ai' ? 'Insegnante: ' : 'Studente: ') + x.testo).join('\n') + '\n\nUltima risposta dello studente (trascrizione):\n' + tx, [], SCHEMA_ORALE);
+    const fb = normOrale(r);
+    o.turni.push({ ruolo: 'io', testo: tx }); o.n++; o.esiti.push(fb.esito);
+    o.turni.push({ ruolo: 'ai', testo: (fb.parlato + ' ' + fb.domanda).trim(), fb: fb });
+    o.trascr = '';
+    if (o.n >= o.max || fb.fine || !fb.domanda) orFinisci(c);
+    else { o.fase = 'pronto'; if (o.voce) parlaCb(plain(fb.parlato + ' ' + fb.domanda)); }
+  } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); o.fase = 'rivedi'; }
+  render();
+}
+function vOrale(c) {
+  const o = V.or && V.or.cap === c.id ? V.or : null, SRok = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  if (!o) {
+    const tt = titoliSezioni(c);
+    return '<div class="card"><h2>' + t('orale') + '</h2><p>' + t('or_intro') + '</p>' +
+      '<label class="f">' + t('or_parte') + '<select id="or-parte"><option value="-1">' + esc(t('or_tutto')) + '</option>' + tt.map((x, i) => '<option value="' + i + '">' + esc(x) + '</option>').join('') + '</select></label>' +
+      '<button class="btn" data-act="or-inizia">' + t('or_inizia') + '</button>' +
+      '<p class="muted">' + t('or_nota_it') + ' ' + t('or_privacy') + '</p>' + (SRok ? '' : '<div class="fb warn">' + t('or_nomic') + '</div>') + '</div>';
+  }
+  const ult = o.turni[o.turni.length - 1];
+  const bolle = o.turni.map(x => '<div class="bolla ' + x.ruolo + '"><b>' + (x.ruolo === 'ai' ? '🎓 ' : '🙂 ') + '</b>' + esc(x.testo) + '</div>').join('');
+  const fbh = ult && ult.fb && o.fase !== 'fine' ? '<div class="fb ' + (ult.fb.esito === 'ottimo' ? 'ok' : 'warn') + '" role="status"><b>' + t('or_esito_' + ult.fb.esito) + '</b>' +
+    (ult.fb.giusto.length ? '<p><b>' + t('or_giusto') + '</b></p><ul>' + ult.fb.giusto.map(x => '<li>✔ ' + esc(x) + '</li>').join('') + '</ul>' : '') +
+    (ult.fb.da_correggere.length ? '<p><b>' + t('or_correggi') + '</b></p><ul>' + ult.fb.da_correggere.map(x => '<li>✏️ ' + esc(x) + '</li>').join('') + '</ul>' : '') +
+    (ult.fb.manca.length ? '<p><b>' + t('or_manca') + '</b></p><ul>' + ult.fb.manca.map(x => '<li>❓ ' + esc(x) + '</li>').join('') + '</ul>' : '') + '</div>' : '';
+  let ctrl = '';
+  if (o.fase === 'fine') {
+    const f = o.chiuso || { pct: 0, xp: 0, nuovi: [], ripassare: [] };
+    return '<div class="card"><h2>' + t('or_fine_t') + '</h2><p><b>' + t('or_risultato', { p: f.pct }) + '</b> · ⭐ ' + t('punti_guadagnati', { n: f.xp }) + '</p>' + f.nuovi.map(b => '<p>🏅 ' + esc(t('nuovo_badge', { b: t('badge_' + b) })) + '</p>').join('') +
+      (f.ripassare.length ? '<div class="fb warn"><b>' + t('or_da_ripassare') + '</b><ul>' + f.ripassare.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '<div class="fb ok">' + t('tutto_chiaro') + '</div>') + '<div class="row"><button class="btn" data-act="or-ancora">' + t('or_ancora') + '</button></div></div>';
+  }
+  if (o.fase === 'pronto') ctrl = '<div class="row">' + (SRok ? '<button class="btn mic-grande" data-act="or-parla">🎤 ' + t('or_parla') + '</button>' : '') + '<button class="btn sec" data-act="or-scrivi">✏️ ' + t('or_scrivi') + '</button>' + '<button class="btn sec" data-act="or-riascolta">🔊 ' + t('or_riascolta') + '</button></div>';
+  else if (o.fase === 'ascolto') ctrl = '<div class="fb" aria-live="polite"><b class="rec-dot">● ' + t('or_ascolto_t') + '</b><p id="or-live">' + esc(o.trascr) + '</p></div><div class="row"><button class="btn mic-grande rec" data-act="or-fine">✋ ' + t('or_ho_finito') + '</button><button class="btn sec" data-act="or-annulla">' + t('or_annulla') + '</button></div>';
+  else if (o.fase === 'rivedi') ctrl = '<p class="muted">' + t('or_rivedi_t') + '</p><label class="f"><textarea id="or-testo" rows="5" maxlength="4000">' + esc(o.trascr) + '</textarea></label><div class="row"><button class="btn" data-act="or-invia">' + t('or_invia') + '</button>' + (SRok ? '<button class="btn sec" data-act="or-parla">🎤 ' + t('or_aggiungi') + '</button>' : '') + '<button class="btn sec" data-act="or-cancella">' + t('or_cancella') + '</button></div>';
+  else if (o.fase === 'invio') ctrl = '<p><span class="spin"></span> ' + t('or_attesa') + '</p>';
+  return '<div class="card"><h2>' + t('orale') + '</h2><p class="muted">' + t('or_turno', { n: Math.min(o.n + 1, o.max), m: o.max }) + '</p>' + bolle + fbh + ctrl +
+    '<div class="row" style="margin-top:12px">' + (o.n ? '<button class="btn sec small" data-act="or-concludi">' + t('or_concludi') + '</button>' : '') + '<label class="chk"><input type="checkbox" id="or-voce"' + (o.voce ? ' checked' : '') + ' data-act="or-voce">' + t('or_voce_ai') + '</label></div></div>';
+}
 function salvaBozzePratica(c) { V.prBozza = V.prBozza || {}; arr(c.pratica).forEach((_, i) => { const el = document.getElementById('pr' + i); if (el) V.prBozza[i] = el.value; }); }
 /* ===== v0.14: aspetto automatico per livello e DSA ===== */
 function temiPer(livello) { return livello === 'elementari' ? ['gioco'] : ['calmo', 'notte']; }
@@ -961,7 +1069,7 @@ function vociLingua(lang) {
   try { return speechSynthesis.getVoices().map(v => [punteggioVoce(v, lang), v]).filter(x => x[0] > -1000).sort((a, b) => b[0] - a[0]).map(x => x[1]); } catch (e) { return []; }
 }
 function scegliVoce(lang, nome) { const vs = vociLingua(lang); return vs.length ? ((nome && vs.find(v => v.name === nome)) || vs[0]) : null; }
-function fermaVoce() { TOKEN++; try { speechSynthesis.cancel(); } catch (e) { /* non disponibile */ } try { if (V && V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } if (V) V.rec = null; }
+function fermaVoce() { if (V && V.or) V.or.fermo = true; TOKEN++; try { speechSynthesis.cancel(); } catch (e) { /* non disponibile */ } try { if (V && V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } if (V) V.rec = null; }
 function parlaCb(testo, cb, bnd, opz) {
   if (!('speechSynthesis' in window)) { toast(t('voce_non')); if (cb) cb(); return null; }
   opz = opz || {};
@@ -1207,7 +1315,7 @@ function vControllo() {
     (r ? '<div class="card"><h2>' + md(r.riepilogo || '') + '</h2>' + arr(r.passi).map(x => '<div class="step"><span class="num ' + (x.esito === 'ok' ? 'done' : '') + '">' + (x.esito === 'ok' ? '✓' : x.esito === 'errore' ? '!' : '?') + '</span><div style="flex:1"><b>' + md(x.cosa_hai_fatto || '') + '</b> <span class="chip ' + cl(x.esito) + '">' + t(x.esito === 'ok' ? 'esito_ok' : x.esito === 'errore' ? 'esito_err' : 'esito_dub') + '</span>' + (x.suggerimento ? '<div class="fb ' + (x.esito === 'errore' ? 'warn' : '') + '">' + md(x.suggerimento) + '</div>' : '') + '</div></div>').join('') + (r.domanda_guida ? '<div class="fb"><b>?</b> ' + md(r.domanda_guida) + '</div>' : '') + (arr(r.passi).some(x => x.esito !== 'ok') ? '<p class="muted">' + t('prova_correggere') + '</p>' : '') + '</div>' : '');
 }
 function sezOk(k) { return k === 'test' || !!V.genVede || !S.profilo || !S.profilo.sezioni || S.profilo.sezioni[k] !== false; }
-function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'test'].filter(sezOk); }
+function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'test'].filter(sezOk); }
 function primoTab() { return tabsAttive()[0]; }
 function mancano(c) {
   const m = [];
@@ -1227,6 +1335,7 @@ function vCapitolo() {
   else if (V.tab === 'mappa') corpo = vMappa(c);
   else if (V.tab === 'pratica') corpo = vPratica(c);
   else if (V.tab === 'costruisci') corpo = vCostruisci(c);
+  else if (V.tab === 'orale') corpo = vOrale(c);
   else if (V.tab === 'spiegazioni') corpo = c.spiegazioni.map((s, i) => '<div class="card"><h3>' + md(s.concetto) + '</h3><p>' + md(s.spiegazione) + '</p><div class="fb"><b>' + t('esempio') + ':</b> ' + md(s.esempio) + '</div><button class="btn sec small" data-act="meglio" data-i="' + i + '">' + t('spiega_meglio') + '</button><div id="m' + i + '"></div></div>').join('') || '<div class="card muted">–</div>';
   else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
   else corpo = vTestPartenza(c);
@@ -1381,6 +1490,7 @@ function vGenitori() {
     '<div class="card"><h2>' + t('dati_sic') + '</h2><p class="muted">' + t('dati_info') + '</p><p class="muted">' + bk + '</p><div class="row"><button class="btn sec" data-act="esporta">' + t('salva_copia') + '</button><label class="btn sec">' + t('ripristina') + '<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" id="installa" data-act="installa"' + (promptInstalla ? '' : ' hidden') + '>' + t('installa') + '</button><button class="btn sec" data-act="azzera">' + t('cancella_tutto') + '</button></div></div>';
 }
 function render() {
+  if (V.or && V.or.fase === 'ascolto' && !(V.vista === 'capitolo' && V.tab === 'orale' && V.cap === V.or.cap)) { V.or.fermo = true; V.or.fase = 'pronto'; try { if (V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } V.rec = null; }
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
   if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
@@ -1502,13 +1612,14 @@ const AZ = {
   'prepara-es': () => { preparaEsercizio(); return 'async'; },
   'apri-cap': el => { V.coAiuto = {}; V.mzFit = true; V.prFb = {}; V.prBozza = {}; V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
   'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
-  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0 && V.tab === 'pratica') salvaBozzePratica(c0); if (c0 && V.tab === 'costruisci') salvaBozzeCo(c0); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },
+  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0 && V.tab === 'pratica') salvaBozzePratica(c0); if (c0 && V.tab === 'costruisci') salvaBozzeCo(c0); if (V.or && V.or.fase === 'rivedi') V.or.trascr = ((document.getElementById('or-testo') || {}).value || V.or.trascr || ''); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },
   'ascolta': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async';
     const tx = V.tab === 'riassunto' ? c.riassunto_breve.join('. ') + '. ' + c.riassunto_completo
       : V.tab === 'glossario' ? c.glossario.map(g => g.termine + ': ' + g.definizione).join('. ')
       : V.tab === 'spiegazioni' ? c.spiegazioni.map(x => x.concetto + '. ' + x.spiegazione + ' ' + x.esempio).join(' ')
       : V.tab === 'mappa' ? (haMappa(c) ? mappaElenco(c.mappa).join('. ') : c.titolo)
+      : V.tab === 'orale' ? (V.or && V.or.cap === c.id && V.or.turni.length ? V.or.turni[V.or.turni.length - 1].testo : c.titolo)
       : V.tab === 'costruisci' ? mioDi(c).sez.filter(s => s.testo.trim()).map(s => s.t + '. ' + s.testo).join(' ') || c.titolo
       : V.tab === 'pratica' ? arr(c.pratica).map((e, i) => t('pr_n', { n: i + 1 }) + '. ' + e.testo).join(' ')
       : V.tab === 'schema' ? (c.schema.radice || c.titolo) + '. ' + arr(c.schema.rami).map(r => r.titolo + ': ' + arr(r.punti).join('. ')).join('. ')
@@ -1667,6 +1778,17 @@ const AZ = {
     } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); }
     V.busy = false; render(); return 'async';
   },
+  'or-inizia': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; orPronto(c, parseInt(vv('or-parte'), 10) >= 0 ? parseInt(vv('or-parte'), 10) : -1); },
+  'or-parla': () => { if (V.or) { V.or.trascr = ((document.getElementById('or-testo') || {}).value || V.or.trascr || '').trim(); orAvviaRec(); } return 'async'; },
+  'or-fine': () => { const o = V.or; if (!o) return 'async'; o.fermo = true; try { if (V.rec) V.rec.stop(); } catch (e) { /* già fermo */ } setTimeout(orChiudiAscolto, 1500); return 'async'; },
+  'or-annulla': () => { const o = V.or; if (!o) return; o.fermo = true; try { if (V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } V.rec = null; o.trascr = ''; o.fase = 'pronto'; },
+  'or-scrivi': () => { if (V.or) { fermaVoce(); V.or.fase = 'rivedi'; } },
+  'or-cancella': () => { if (V.or) { V.or.trascr = ''; V.or.fase = 'pronto'; } },
+  'or-invia': () => { const c = S.capitoli.find(x => x.id === V.cap); if (c && V.or) orInvia(c); return 'async'; },
+  'or-riascolta': () => { const o = V.or; if (!o) return 'async'; const u = o.turni[o.turni.length - 1]; if (u) parlaCb(plain(u.testo)); return 'async'; },
+  'or-concludi': () => { const c = S.capitoli.find(x => x.id === V.cap); if (c && V.or) { fermaVoce(); orFinisci(c); } },
+  'or-ancora': () => { V.or = null; },
+  'or-voce': () => { if (V.or) { V.or.voce = !V.or.voce; if (!V.or.voce) fermaVoce(); } return 'async'; },
   'co-controlla': async el => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async';
     salvaBozzeCo(c); const i = +el.dataset.i, s = mioDi(c).sez[i]; if (!s) return 'async';
