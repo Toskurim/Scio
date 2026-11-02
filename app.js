@@ -2,8 +2,8 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.14';
-const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'pratica'];
+const VERSIONE = '0.15';
+const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
@@ -150,7 +150,7 @@ function pulisciDati(o) {
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
       riassunto_breve: L(x.riassunto_breve, 1500), riassunto_completo: Tx(x.riassunto_completo),
       schema: { radice: Tx(x.schema && x.schema.radice, 300), rami: A(x.schema && x.schema.rami).filter(r => r && typeof r === 'object').map(r => ({ titolo: Tx(r.titolo, 300), punti: L(r.punti, 800) })) },
-      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica),
+      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica), mio: normMio(x.mio),
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
       test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000), d: Math.max(1, Math.min(5, Math.floor(N(q.d)) || 1)) })),
@@ -646,7 +646,7 @@ async function preparaCapitolo() {
     else {
       c = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + ' Genera il materiale di studio.', V.foto, SCHEMA_CAPITOLO);
     }
-    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica) };
+    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null };
     S.capitoli.unshift(cap); salva();
     V.foto = []; V.cap = cap.id; V.genVede = false; V.tab = primoTab(); V.vista = 'capitolo'; V.busy = false; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
@@ -684,7 +684,7 @@ async function controllaIdea() {
 /* ===== v0.14: domande, difficoltà, esercizi di allenamento, premi ===== */
 const LIV_TEST = 5;
 const RANGHI = [0, 60, 200, 450, 900];
-const BADGE = ['primo', 'dieci', 'perfetto', 'liv3', 'liv5', 'allenato'];
+const BADGE = ['primo', 'dieci', 'perfetto', 'liv3', 'liv5', 'allenato', 'autore'];
 function premiVuoti() { return { xp: 0, test: 0, perfetti: 0, maxLiv: 1, pratica: 0, badge: [] }; }
 function pulisciPremi(p) {
   const n = x => { x = Math.floor(Number(x)); return isFinite(x) && x > 0 ? Math.min(x, 1000000) : 0; };
@@ -805,6 +805,65 @@ function vPratica(c) {
       '<label class="f">' + t('pr_tua') + '<textarea id="pr' + i + '" rows="3" maxlength="3000">' + esc(V.prBozza[i] || '') + '</textarea></label>' +
       '<div class="row"><button class="btn small" data-act="pratica-controlla" data-i="' + i + '"' + (V.busy ? ' disabled' : '') + '>' + t('pr_controlla') + '</button>' + (e.ind < e.indizi.length ? '<button class="btn sec small" data-act="pratica-indizio" data-i="' + i + '">' + t('pr_dammi_indizio') + '</button>' : '') + '</div>' +
       (fb ? '<div class="fb ' + fb.tipo + '" role="status">' + md(fb.testo) + '</div>' : '') + '</div>'; }).join('');
+}
+/* ===== v0.15: costruisci il tuo riassunto ===== */
+function titoliSezioni(c) {
+  let tt = []; String(c.riassunto_completo || '').replace(/^### (.+)$/gm, (m, x) => { tt.push(senzaMarc(x).trim()); return m; });
+  if (tt.length < 2) tt = arr(c.schema && c.schema.rami).map(r => senzaMarc(r.titolo).trim());
+  if (tt.length < 2) tt = [c.titolo];
+  return tt.filter(Boolean).slice(0, 20);
+}
+function testoSezione(c, i) { const p = String(c.riassunto_completo || '').split(/^### .+$/gm).slice(1); return p[i] ? p[i].trim() : ''; }
+function normMio(m) {
+  const T = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
+  if (!m || typeof m !== 'object') return null;
+  const sez = arr(m.sez).filter(s => s && typeof s === 'object').slice(0, 20).map(s => {
+    const f = s.fb && typeof s.fb === 'object' ? s.fb : {};
+    return { t: T(s.t, 300), k: T(s.k, 300), testo: T(s.testo, 4000), ok: s.ok === true, n: Math.max(0, Math.min(1000, Math.floor(Number(s.n)) || 0)), fb: { esito: ['completo', 'quasi', 'da_rivedere'].includes(f.esito) ? f.esito : '', colto: arr(f.colto).map(x => T(String(x), 300)).slice(0, 8), mancano: arr(f.mancano).map(x => T(String(x), 300)).slice(0, 5), consigli: T(f.consigli, 600) } };
+  }).filter(s => s.t);
+  return sez.length ? { sez: sez } : null;
+}
+function mioDi(c) {
+  if (!c.mio || !arr(c.mio.sez).length) c.mio = { sez: titoliSezioni(c).map(x => ({ t: x, k: '', testo: '', ok: false, n: 0, fb: { esito: '', colto: [], mancano: [], consigli: '' } })) };
+  return c.mio;
+}
+function salvaBozzeCo(c) {
+  const m = mioDi(c); let cambiato = false;
+  m.sez.forEach((s, i) => { const k = document.getElementById('cok' + i), x = document.getElementById('cot' + i); if (k && k.value !== s.k) { s.k = k.value.slice(0, 300); cambiato = true; } if (x && x.value !== s.testo) { s.testo = x.value.slice(0, 4000); cambiato = true; } });
+  if (cambiato) salva();
+}
+const SYS_CO = `Sei AI.st.ain, un tutor che INSEGNA A RIASSUMERE. Ricevi un paragrafo di riferimento (RISERVATO), le parole chiave scelte dallo studente e il riassunto che ha scritto con parole sue.
+Valuta se ha colto le idee principali del paragrafo.
+Regole ASSOLUTE:
+- Non scrivere MAI il riassunto al posto suo, né frasi del riassunto corretto, né copiare il testo di riferimento. Non rivelare le informazioni che mancano: trasformale in DOMANDE GUIDA ("Cosa succede dopo...?", "Perché...?"), al massimo 3.
+- "colto": le idee principali che ha già colto, frasi brevissime, tono positivo (al massimo 5).
+- "esito": "completo" se ci sono le idee principali (non servono tutti i dettagli); "quasi" se ne manca una importante; "da_rivedere" se ne mancano diverse, se ha solo copiato o è fuori tema.
+- "consigli": UN solo consiglio sulla tecnica del riassumere (troppo lungo o copiato dal libro: riscrivi con parole tue; troppo corto; parole chiave poco utili; frasi non collegate), al massimo 2 frasi, incoraggiante.
+- Se il testo è quasi uguale a quello del libro, dillo con gentilezza.`;
+const SCHEMA_CO = OBJ({ esito: { type: 'string', enum: ['completo', 'quasi', 'da_rivedere'] }, colto: LS_, mancano: LS_, consigli: T });
+function coDemo(c, i, s) {
+  const rif = (testoSezione(c, i) || c.riassunto_completo).toLowerCase().match(/[a-zàèéìòù]{6,}/g) || [], mio = s.testo.toLowerCase();
+  const uniq = [...new Set(rif)], hit = uniq.filter(w => mio.includes(w)), r = uniq.length ? hit.length / uniq.length : 0;
+  const ec = hit.length >= 3 || r >= 0.25;
+  return { esito: ec ? 'completo' : hit.length >= 1 ? 'quasi' : 'da_rivedere', colto: hit.length ? ['Hai usato parole importanti: ' + hit.slice(0, 3).join(', ') + '.'] : [], mancano: ec ? [] : ['Rileggi il paragrafo: quale idea importante non hai ancora scritto?'], consigli: 'Scrivi con parole tue e in poche frasi. (In modalità demo il controllo è semplificato.)' };
+}
+function vCostruisci(c) {
+  const m = mioDi(c), fatte = m.sez.filter(s => s.ok).length; V.coAiuto = V.coAiuto || {};
+  return '<div class="card"><h2>' + t('costruisci') + '</h2><p>' + t('co_intro') + '</p><div class="fb"><b>' + t('co_metodo_t') + '</b><ol><li>' + t('co_m1') + '</li><li>' + t('co_m2') + '</li><li>' + t('co_m3') + '</li><li>' + t('co_m4') + '</li></ol></div>' +
+    '<p class="muted">' + t('co_avanz', { a: fatte, n: m.sez.length }) + '</p><progress max="' + m.sez.length + '" value="' + fatte + '" aria-label="' + esc(t('co_avanz', { a: fatte, n: m.sez.length })) + '"></progress></div>' +
+    m.sez.map((s, i) => {
+      const f = s.fb;
+      return '<div class="card"><h3>' + (i + 1) + '. ' + esc(s.t) + (s.ok ? ' ✓' : '') + '</h3>' +
+        '<label class="f">' + t('co_chiave') + '<input type="text" id="cok' + i + '" maxlength="300" value="' + esc(s.k) + '" autocomplete="off"></label>' +
+        '<label class="f">' + t('co_tuo') + '<textarea id="cot' + i + '" rows="4" maxlength="4000">' + esc(s.testo) + '</textarea></label>' +
+        '<div class="row"><button class="btn small" data-act="co-controlla" data-i="' + i + '"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('co_controlla')) + '</button><button class="btn sec small" data-act="co-aiuto" data-i="' + i + '">' + t('co_aiuto') + '</button>' + (!s.ok && s.n >= 3 && f.esito ? '<button class="btn sec small" data-act="co-ok" data-i="' + i + '">' + t('co_va_bene') + '</button>' : '') + '</div>' +
+        (V.coAiuto[i] ? '<div class="fb"><b>' + t('co_aiuto_t') + '</b><p>' + t('co_aiuto_txt', { t: esc(s.t) }) + '</p></div>' : '') +
+        (f.esito ? '<div class="fb ' + (f.esito === 'completo' ? 'ok' : 'warn') + '" role="status"><b>' + t('co_esito_' + f.esito) + '</b>' +
+          (f.colto.length ? '<ul>' + f.colto.map(x => '<li>✔ ' + esc(x) + '</li>').join('') + '</ul>' : '') +
+          (f.mancano.length ? '<p><b>' + t('co_pensa') + '</b></p><ul>' + f.mancano.map(x => '<li>❓ ' + esc(x) + '</li>').join('') + '</ul>' : '') +
+          (f.consigli ? '<p>💡 ' + esc(f.consigli) + '</p>' : '') + '</div>' : '') + '</div>';
+    }).join('') +
+    (fatte === m.sez.length ? '<div class="card"><h2>' + t('co_finale') + '</h2>' + m.sez.map(s => '<h3>' + esc(s.t) + '</h3><p>' + esc(s.testo).replace(/\n/g, '<br>') + '</p>').join('') + '<div class="row"><button class="btn" data-act="co-stampa">' + t('co_stampa') + '</button></div></div>' : '');
 }
 function salvaBozzePratica(c) { V.prBozza = V.prBozza || {}; arr(c.pratica).forEach((_, i) => { const el = document.getElementById('pr' + i); if (el) V.prBozza[i] = el.value; }); }
 /* ===== v0.14: aspetto automatico per livello e DSA ===== */
@@ -1102,7 +1161,7 @@ function vSetup() {
     Object.keys(DSA).map(k => '<label class="chk"><input type="checkbox" data-dsa="' + k + '"' + (p.dsa && p.dsa[k] ? ' checked' : '') + '>' + t(k) + '</label><div class="dsainfo" id="info-' + k + '"' + (p.dsa && p.dsa[k] ? '' : ' hidden') + '>' + infoDsa(k) + '</div>').join('') +
     '<p class="muted">' + t('nota_dsa') + '</p>' +
     '<label class="chk"><input type="checkbox" id="colori"' + (p.colori === undefined ? ' checked' : (p.colori ? ' checked' : '')) + '>' + t('colori_lbl') + '</label><p class="muted">' + t('colori_nota') + '</p></div>' +
-    '<div class="card"><h2>' + t('sez_titolo') + '</h2><p class="muted">' + t('sez_nota') + '</p>' + SEZ.map(k => '<label class="chk"><input type="checkbox" data-sez="' + k + '"' + (p.sezioni && p.sezioni[k] === false ? '' : ' checked') + '>' + t(k) + '</label>').join('') + '<label class="chk"><input type="checkbox" checked disabled>' + t('test') + ' — ' + t('sez_sempre') + '</label></div>' +
+    '<div class="card"><h2>' + t('sez_titolo') + '</h2><p class="muted">' + t('sez_nota') + '</p><p class="muted">' + t('co_nota_sez') + '</p>' + SEZ.map(k => '<label class="chk"><input type="checkbox" data-sez="' + k + '"' + (p.sezioni && p.sezioni[k] === false ? '' : ' checked') + '>' + t(k) + '</label>').join('') + '<label class="chk"><input type="checkbox" checked disabled>' + t('test') + ' — ' + t('sez_sempre') + '</label></div>' +
     '<div class="card"><h2>' + t('aspetto') + '</h2><div id="cons">' + bloccoTema(p) + '</div>' + bloccoAspetto(p) + '</div>' +
     '<div class="card"><h2>' + t('pin_figlio', { n: esc(p.nome || '…') }) + '</h2><label class="f"><input type="password" id="pinf" inputmode="numeric" maxlength="8" value="" autocomplete="off" placeholder="' + esc(p.pin ? t('pin_figlio_tieni') : '') + '"></label>' + (p.pin ? '<label class="chk"><input type="checkbox" id="rmpin">' + t('rimuovi_pin_figlio') + '</label>' : '') + '<p class="muted">' + t('pin_figlio_nota') + '</p></div>' +
     '<button class="btn full" data-act="salva-figlio">' + t('salva') + '</button>' + (DB.figli.length ? '<p></p><button class="btn sec full" data-act="genitori">' + t('annulla') + '</button>' : '');
@@ -1148,7 +1207,7 @@ function vControllo() {
     (r ? '<div class="card"><h2>' + md(r.riepilogo || '') + '</h2>' + arr(r.passi).map(x => '<div class="step"><span class="num ' + (x.esito === 'ok' ? 'done' : '') + '">' + (x.esito === 'ok' ? '✓' : x.esito === 'errore' ? '!' : '?') + '</span><div style="flex:1"><b>' + md(x.cosa_hai_fatto || '') + '</b> <span class="chip ' + cl(x.esito) + '">' + t(x.esito === 'ok' ? 'esito_ok' : x.esito === 'errore' ? 'esito_err' : 'esito_dub') + '</span>' + (x.suggerimento ? '<div class="fb ' + (x.esito === 'errore' ? 'warn' : '') + '">' + md(x.suggerimento) + '</div>' : '') + '</div></div>').join('') + (r.domanda_guida ? '<div class="fb"><b>?</b> ' + md(r.domanda_guida) + '</div>' : '') + (arr(r.passi).some(x => x.esito !== 'ok') ? '<p class="muted">' + t('prova_correggere') + '</p>' : '') + '</div>' : '');
 }
 function sezOk(k) { return k === 'test' || !!V.genVede || !S.profilo || !S.profilo.sezioni || S.profilo.sezioni[k] !== false; }
-function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'pratica', 'test'].filter(sezOk); }
+function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'test'].filter(sezOk); }
 function primoTab() { return tabsAttive()[0]; }
 function mancano(c) {
   const m = [];
@@ -1167,6 +1226,7 @@ function vCapitolo() {
   else if (V.tab === 'schema') corpo = '<div class="card"><h2>' + esc(c.schema.radice || c.titolo) + '</h2>' + arr(c.schema.rami).map(r => '<div class="tree"><h3>' + md(r.titolo) + '</h3><ul>' + arr(r.punti).map(p => '<li>' + md(p) + '</li>').join('') + '</ul></div>').join('') + '</div>';
   else if (V.tab === 'mappa') corpo = vMappa(c);
   else if (V.tab === 'pratica') corpo = vPratica(c);
+  else if (V.tab === 'costruisci') corpo = vCostruisci(c);
   else if (V.tab === 'spiegazioni') corpo = c.spiegazioni.map((s, i) => '<div class="card"><h3>' + md(s.concetto) + '</h3><p>' + md(s.spiegazione) + '</p><div class="fb"><b>' + t('esempio') + ':</b> ' + md(s.esempio) + '</div><button class="btn sec small" data-act="meglio" data-i="' + i + '">' + t('spiega_meglio') + '</button><div id="m' + i + '"></div></div>').join('') || '<div class="card muted">–</div>';
   else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
   else corpo = vTestPartenza(c);
@@ -1440,15 +1500,16 @@ const AZ = {
   'del': el => { V.foto.splice(+el.dataset.i, 1); },
   'prepara-cap': () => { preparaCapitolo(); return 'async'; },
   'prepara-es': () => { preparaEsercizio(); return 'async'; },
-  'apri-cap': el => { V.mzFit = true; V.prFb = {}; V.prBozza = {}; V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
+  'apri-cap': el => { V.coAiuto = {}; V.mzFit = true; V.prFb = {}; V.prBozza = {}; V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
   'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
-  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; if (V.tab === 'pratica') { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0) salvaBozzePratica(c0); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },
+  'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0 && V.tab === 'pratica') salvaBozzePratica(c0); if (c0 && V.tab === 'costruisci') salvaBozzeCo(c0); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },
   'ascolta': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async';
     const tx = V.tab === 'riassunto' ? c.riassunto_breve.join('. ') + '. ' + c.riassunto_completo
       : V.tab === 'glossario' ? c.glossario.map(g => g.termine + ': ' + g.definizione).join('. ')
       : V.tab === 'spiegazioni' ? c.spiegazioni.map(x => x.concetto + '. ' + x.spiegazione + ' ' + x.esempio).join(' ')
       : V.tab === 'mappa' ? (haMappa(c) ? mappaElenco(c.mappa).join('. ') : c.titolo)
+      : V.tab === 'costruisci' ? mioDi(c).sez.filter(s => s.testo.trim()).map(s => s.t + '. ' + s.testo).join(' ') || c.titolo
       : V.tab === 'pratica' ? arr(c.pratica).map((e, i) => t('pr_n', { n: i + 1 }) + '. ' + e.testo).join(' ')
       : V.tab === 'schema' ? (c.schema.radice || c.titolo) + '. ' + arr(c.schema.rami).map(r => r.titolo + ': ' + arr(r.punti).join('. ')).join('. ')
       : c.titolo;
@@ -1605,6 +1666,28 @@ const AZ = {
       c.pratica = arr(c.pratica).concat(nuovi).slice(-30); salva();
     } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); }
     V.busy = false; render(); return 'async';
+  },
+  'co-controlla': async el => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return 'async';
+    salvaBozzeCo(c); const i = +el.dataset.i, s = mioDi(c).sez[i]; if (!s) return 'async';
+    if (s.testo.trim().length < 12) { toast(t('co_scrivi')); return 'async'; }
+    V.busy = true; render();
+    try {
+      let r;
+      if (FAM.ai.provider === 'demo') r = coDemo(c, i, s);
+      else r = await chiediJSON(SYS_CO + '\n\n' + profiloTesto(), 'Materia: ' + c.materia + '\nParagrafo: ' + s.t + '\n\nTesto di riferimento (RISERVATO):\n' + (testoSezione(c, i) || c.riassunto_completo) + '\n\nParole chiave dello studente: ' + (s.k || '(nessuna)') + '\n\nRiassunto dello studente:\n' + s.testo, [], SCHEMA_CO);
+      s.n++; s.fb = normMio({ sez: [{ t: s.t, fb: r }] }).sez[0].fb;
+      if (s.fb.esito === 'completo' && !s.ok) { s.ok = true; premi().xp += 5; const m = mioDi(c); if (m.sez.every(x => x.ok) && !premi().badge.includes('autore')) { premi().badge.push('autore'); toast('🏅 ' + t('nuovo_badge', { b: t('badge_autore') })); } }
+      salva();
+    } catch (e) { toast(e.message === 'NODEMO' ? t('serve_chiave_ai') : e.message); }
+    V.busy = false; render(); return 'async';
+  },
+  'co-aiuto': el => { const c = S.capitoli.find(x => x.id === V.cap); if (c) salvaBozzeCo(c); V.coAiuto = V.coAiuto || {}; V.coAiuto[+el.dataset.i] = true; },
+  'co-ok': el => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; salvaBozzeCo(c); const s = mioDi(c).sez[+el.dataset.i]; if (s) { s.ok = true; const m = mioDi(c); if (m.sez.every(x => x.ok) && !premi().badge.includes('autore')) { premi().badge.push('autore'); toast('🏅 ' + t('nuovo_badge', { b: t('badge_autore') })); } salva(); } },
+  'co-stampa': () => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; salvaBozzeCo(c);
+    document.getElementById('stampa').innerHTML = '<section><h1>' + esc(c.titolo) + '</h1><p class="meta">' + esc(c.materia) + ' · ' + t('co_finale') + '</p>' + mioDi(c).sez.filter(s => s.testo.trim()).map(s => '<h3>' + esc(s.t) + '</h3><p>' + esc(s.testo).replace(/\n/g, '<br>') + '</p>').join('') + '</section>';
+    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
   },
   'pratica-indizio': el => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; salvaBozzePratica(c); const e = arr(c.pratica)[+el.dataset.i]; if (e && e.ind < e.indizi.length) { e.ind++; salva(); } },
   'pratica-controlla': async el => {

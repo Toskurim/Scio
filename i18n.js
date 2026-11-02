@@ -392,6 +392,33 @@ DE('badge_liv5', 'Maestro', 'Master'); DE('badge_liv5_d', 'Almeno l’80% al liv
 DE('badge_allenato', 'Ben allenato', 'Well trained'); DE('badge_allenato_d', '5 esercizi di allenamento risolti.', '5 practice exercises solved.');
 DE('acronimo', 'Aiuto Intelligente per lo STudio, l’Autonomia e l’INclusione', 'Artificial Intelligence for STudy, Autonomy and INclusion');
 
+
+/* ===== v0.15 — Il mio riassunto ===== */
+DE('costruisci', 'Il mio riassunto', 'My summary');
+DE('co_intro', 'Costruisci il riassunto da solo, un paragrafo alla volta. Leggi il paragrafo sul libro e scrivi con parole tue: ti dirò cosa hai già colto e cosa ti conviene rivedere, senza scriverlo al posto tuo.', 'Build the summary yourself, one paragraph at a time. Read the paragraph in the book and write in your own words: I will tell you what you have already caught and what to look at again, without writing it for you.');
+DE('co_metodo_t', 'Il metodo in 4 passi', 'The 4-step method');
+DE('co_m1', 'Leggi il paragrafo per intero.', 'Read the whole paragraph.');
+DE('co_m2', 'Sottolinea 3-5 parole chiave: nomi, date, concetti.', 'Underline 3-5 key words: names, dates, concepts.');
+DE('co_m3', 'Chiuditi il libro e scrivi 1-3 frasi con parole tue.', 'Close the book and write 1-3 sentences in your own words.');
+DE('co_m4', 'Controlla e correggi.', 'Check and fix it.');
+DE('co_avanz', 'Paragrafi completati: {a} su {n}', 'Paragraphs completed: {a} of {n}');
+DE('co_chiave', 'Le mie parole chiave', 'My key words');
+DE('co_tuo', 'Il mio riassunto del paragrafo', 'My summary of the paragraph');
+DE('co_controlla', 'Controlla', 'Check');
+DE('co_aiuto', 'Non so da dove partire', 'I do not know where to start');
+DE('co_aiuto_t', 'Prova a rispondere a voce, poi scrivilo:', 'Try answering out loud, then write it down:');
+DE('co_aiuto_txt', 'Di cosa parla «{t}»? Qual è la cosa più importante da ricordare? Come lo spiegheresti a un amico in due frasi?', 'What is «{t}» about? What is the most important thing to remember? How would you explain it to a friend in two sentences?');
+DE('co_scrivi', 'Scrivi prima almeno una frase con parole tue.', 'First write at least one sentence in your own words.');
+DE('co_va_bene', 'Va bene così', 'This is fine');
+DE('co_esito_completo', 'Ottimo: hai colto le idee principali!', 'Great: you caught the main ideas!');
+DE('co_esito_quasi', 'Ci sei quasi.', 'Almost there.');
+DE('co_esito_da_rivedere', 'Rileggi il paragrafo e riprova.', 'Read the paragraph again and try once more.');
+DE('co_pensa', 'Pensa a queste domande:', 'Think about these questions:');
+DE('co_finale', 'Il mio riassunto', 'My summary');
+DE('co_stampa', 'Stampa o salva PDF', 'Print or save as PDF');
+DE('co_nota_sez', 'Se nascondi il riassunto, il ragazzo può comunque costruirlo da solo in «Il mio riassunto», con l’aiuto dell’AI ma senza vedere quello già pronto.', 'If you hide the summary, the student can still build it alone in “My summary”, helped by the AI but without seeing the ready-made one.');
+DE('badge_autore', 'Autore del riassunto', 'Summary author'); DE('badge_autore_d', 'Hai costruito da solo il riassunto di un capitolo.', 'You built a chapter summary on your own.');
+
 /* ricerca testo: lingua corrente */
 let LINGUA_CORRENTE = 'it';
 function t(k, v) {

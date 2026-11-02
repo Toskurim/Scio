@@ -1,4 +1,4 @@
-# AI.st.ain v0.14 — app di studio installabile (PWA)
+# AI.st.ain v0.15 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,9 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.15
+- **Il mio riassunto**: nuova sezione in ogni capitolo dove il ragazzo costruisce il riassunto da solo, un paragrafo alla volta (metodo in 4 passi: leggo, sottolineo le parole chiave, scrivo con parole mie, controllo). L'AI dice cosa è stato colto e fa domande guida su ciò che manca, senza mai scrivere il riassunto al posto suo. Il riassunto automatico resta com'è: se il genitore lo nasconde, il ragazzo vede solo questo strumento. A fine capitolo il riassunto si stampa e si guadagna la medaglia "Autore del riassunto".
 
 ## Novità della v0.14
 - **Nuovo nome e nuova icona**: AI.st.ain, con un omino dai capelli bianchi scarmigliati.
@@ -62,9 +65,9 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.13 a v0.14)
-1. Cambiano tutti i file tranne i font: `index.html`, `app.js`, `i18n.js`, `style.css`, `sw.js`, `manifest.webmanifest`, `README.md` e la cartella `icons`.
-2. Nel repository su github.com: **Add file › Upload files**, trascina i file (stessi nomi: vengono sostituiti) e la cartella `icons`.
+## Aggiornare il sito su GitHub (da v0.14 a v0.15)
+1. Dalla v0.14 cambiano solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
+2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.
 4. Sui dispositivi, chiudi e riapri l'app: compare "Nuova versione pronta".
 
