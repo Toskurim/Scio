@@ -572,3 +572,7 @@ DE("dq_discalculia_3", "Confonde i segni (+ − × ÷), incolonna male i numeri 
 DE("dq_discalculia_4", "Ha difficoltà con orologio, calendario, misure o soldi.", "Has trouble with clocks, calendars, measures or money.");
 DE("dq_discalculia_5", "Nei problemi con più passaggi perde il filo.", "Loses the thread in problems with several steps.");
 DE("dq_discalculia_6", "Sbaglia i calcoli anche dopo aver capito il ragionamento.", "Makes calculation mistakes even after understanding the reasoning.");
+
+/* v0.25 mappa a tutto schermo */
+DE("mappa_full", "Schermo intero", "Full screen");
+DE("mappa_chiudi", "Chiudi", "Close");

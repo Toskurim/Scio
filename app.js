@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.24';
+const VERSIONE = '0.25';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -390,7 +390,7 @@ function rinfresca() {
 function fitMappa() {
   const w = document.querySelector('.mappa-wrap'), sv = w && w.querySelector('svg'); if (!sv) return;
   const dw = +sv.dataset.w, dh = +sv.dataset.h;
-  V.mz = Math.max(0.3, Math.min(1, (w.clientWidth - 8) / dw, (Math.max(240, window.innerHeight * 0.66) - 8) / dh));
+  V.mz = Math.max(0.3, Math.min(1, (w.clientWidth - 8) / dw, ((V.mFull ? w.clientHeight : Math.max(240, window.innerHeight * 0.66)) - 8) / dh));
   sv.setAttribute('width', Math.round(dw * V.mz)); sv.setAttribute('height', Math.round(dh * V.mz));
 }
 function ripitturaMappa(c) {
@@ -460,12 +460,24 @@ function vMappa(c) {
   if (!haMappa(c)) return '<div class="card"><h2>' + t('mappa') + '</h2><p>' + t('mappa_vuota') + '</p><button class="btn" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_crea')) + '</button> ' + (V.busy ? '<span class="spin"></span>' : '') + '</div>';
   const ed = !!V.mEdit;
   if (ed && !c.mappa.nodi.some(n => n.id === V.mSel)) V.mSel = c.mappa.nodi[0].id;
-  return '<div class="card"><div class="row"><button class="btn sec small" data-act="mappa-zoom" data-d="0.8" aria-label="' + t('mappa_meno') + '">−</button><button class="btn sec small" data-act="mappa-zoom" data-d="1.25" aria-label="' + t('mappa_piu') + '">+</button>' +
-    '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button>' +
-    (ed ? '<button class="btn sec small" data-act="mappa-annulla"' + (V.mundo && V.mundo.length ? '' : ' disabled') + '>↶ ' + t('mappa_annulla') + '</button>' : '<button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button>') +
-    '<button class="btn sec small" data-act="stampa-mappa">' + t('mappa_stampa') + '</button><button class="btn small" data-act="mappa-modifica">' + (ed ? t('mappa_fine') : t('mappa_modifica')) + '</button></div>' + (ed ? '<p class="muted">' + t('mappa_trascina') + '</p>' : '') +
+  return '<div class="card">' + barraMappa(c, ed) + (ed ? '<p class="muted">' + t('mappa_trascina') + '</p>' : '') +
     '<div class="mappa-wrap' + (ed ? ' edit' : '') + '" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo, ed, V.mSel) + '</div></div>' +
     (ed ? vPannelloMappa(c) : '<details class="card"><summary>' + t('mappa_elenco') + '</summary><ul>' + mappaElenco(c.mappa).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></details>');
+}
+function barraMappa(c, ed) {
+  return '<div class="row"><button class="btn sec small" data-act="mappa-zoom" data-d="0.8" aria-label="' + t('mappa_meno') + '">−</button><button class="btn sec small" data-act="mappa-zoom" data-d="1.25" aria-label="' + t('mappa_piu') + '">+</button>' +
+    '<button class="btn sec small" data-act="mappa-adatta">' + t('mappa_adatta') + '</button>' +
+    (ed ? '<button class="btn sec small" data-act="mappa-annulla"' + (V.mundo && V.mundo.length ? '' : ' disabled') + '>↶ ' + t('mappa_annulla') + '</button>' : '<button class="btn sec small" data-act="crea-mappa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('mappa_rifai')) + '</button>') +
+    '<button class="btn sec small" data-act="stampa-mappa">' + t('mappa_stampa') + '</button>' + (V.mFull ? '' : '<button class="btn sec small" data-act="mappa-full">⛶ ' + t('mappa_full') + '</button>') + '<button class="btn small" data-act="mappa-modifica">' + (ed ? t('mappa_fine') : t('mappa_modifica')) + '</button></div>';
+}
+/* v0.25: la mappa a tutto schermo, con tutte le funzioni di spostamento e modifica */
+function vMappaFull(c) {
+  const ed = !!V.mEdit;
+  if (ed && !c.mappa.nodi.some(n => n.id === V.mSel)) V.mSel = c.mappa.nodi[0].id;
+  return '<div class="mp-full' + (ed ? ' ed' : '') + '"><div class="mp-full-bar"><button class="btn sec small" data-act="mappa-chiudi-full">✕ ' + t('mappa_chiudi') + '</button><b class="mp-full-t">' + esc(c.titolo) + '</b></div>' +
+    '<div class="mp-full-map">' + barraMappa(c, ed) + (ed ? '<p class="muted">' + t('mappa_trascina') + '</p>' : '') +
+    '<div class="mappa-wrap' + (ed ? ' edit' : '') + '" tabindex="0">' + mappaSVG(c.mappa, V.mz || 1, c.titolo, ed, V.mSel) + '</div></div>' +
+    (ed ? '<div class="mp-full-pan">' + vPannelloMappa(c) + '</div>' : '') + '</div>';
 }
 const SCHEMA_MAPPA = OBJ({ nodi: { type: 'array', items: OBJ({ id: T, testo: T }) }, relazioni: { type: 'array', items: OBJ({ da: T, a: T, etichetta: T }) } });
 const SYS_MAPPA = `Sei AI.st.ain, un tutor di studio. Ti viene dato il riassunto di un capitolo. Costruisci una MAPPA CONCETTUALE: nodi (concetti) collegati da relazioni con una breve etichetta (un verbo o una breve espressione).
@@ -1410,6 +1422,7 @@ function mancano(c) {
 function vCapitolo() {
   const c = S.capitoli.find(x => x.id === V.cap); if (!c) return vHome();
   const TB = tabsAttive(); if (!TB.includes(V.tab)) V.tab = TB[0];
+  if (V.mFull && V.tab === 'mappa' && haMappa(c)) return vMappaFull(c);
   const stampabile = TB.length > 1;
   let corpo = '';
   if (V.tab === 'riassunto') corpo = legendaColori() + '<div class="card"><h2>' + t('in_breve') + '</h2><ul>' + c.riassunto_breve.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></div><div class="card"><h2>' + t('riass_compl') + '</h2>' + md(c.riassunto_completo) + '</div>' + (arr(c.inventario).length ? '<details class="card"><summary><b>' + t('inventario') + '</b> (' + c.inventario.length + ')</summary><ul>' + c.inventario.map(x => '<li>' + md(x) + '</li>').join('') + '</ul></details>' : '');
@@ -1573,6 +1586,7 @@ function vGenitori() {
     '<div class="card"><h2>' + t('dati_sic') + '</h2><p class="muted">' + t('dati_info') + '</p><p class="muted">' + bk + '</p><div class="row"><button class="btn sec" data-act="esporta">' + t('salva_copia') + '</button><label class="btn sec">' + t('ripristina') + '<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" id="installa" data-act="installa"' + (promptInstalla ? '' : ' hidden') + '>' + t('installa') + '</button><button class="btn sec" data-act="azzera">' + t('cancella_tutto') + '</button></div></div>';
 }
 function render() {
+  if (V.mFull && !(V.vista === 'capitolo' && V.tab === 'mappa')) { V.mFull = false; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) { /* già fuori */ } }
   if (V.or && V.or.fase === 'ascolto' && !(V.vista === 'capitolo' && V.tab === 'orale' && V.cap === V.or.cap)) { V.or.fermo = true; V.or.fase = 'pronto'; try { if (V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } V.rec = null; }
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
@@ -1583,7 +1597,7 @@ function render() {
   const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
   document.getElementById('app').oninput = null;
   document.getElementById('app').innerHTML = (M[v] || vHome)();
-  if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit) fitMappa(); }
+  if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit || V.mFull) fitMappa(); }
   const f1 = document.getElementById('f1'), f2 = document.getElementById('f2');
   if (f1) f1.onchange = e => aggiungiFoto([...e.target.files]);
   if (f2) f2.onchange = e => aggiungiFoto([...e.target.files]);
@@ -1719,6 +1733,8 @@ const AZ = {
     document.getElementById('stampa').innerHTML = '<section><h1>' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1><p class="meta">' + esc(new Date().toLocaleDateString(LINGUE_VOCE[LINGUA_CORRENTE])) + ' · AI.st.ain</p>' + statisticheCorpo(f, statisticheFiglio(f)) + '</section>';
     const tt = document.title; document.title = t('stat_di', { n: f.profilo.nome }); try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
   },
+  'mappa-full': () => { V.mFull = true; V.mzFit = true; try { const e = document.documentElement; if (e.requestFullscreen && !document.fullscreenElement) e.requestFullscreen().catch(() => {}); } catch (e) { /* senza schermo intero del dispositivo la pagina riempie comunque lo schermo */ } window.scrollTo(0, 0); },
+  'mappa-chiudi-full': () => { V.mFull = false; V.mzFit = true; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) { /* già fuori */ } },
   'mappa-modifica': () => {
     const c = mappaCorr(); if (!c) return 'async';
     V.mEdit = !V.mEdit; V.mundo = [];
@@ -2101,7 +2117,7 @@ function tourLetti() { try { return JSON.parse(localStorage.getItem('scio.tour')
 function tourSegna(k) { try { const o = tourLetti(); o[tourChiave(k)] = 1; localStorage.setItem('scio.tour', JSON.stringify(o)); } catch (e) { /* senza memoria locale la guida si ripropone: nessun danno */ } }
 function tourVistaCorrente() { return V.vista === 'home' ? 'home' : V.vista === 'materia' ? 'materia' : V.vista === 'capitolo' ? 'capitolo' : (V.vista === 'genitori' && V.genitoriOk && FAM.pin) ? 'genitori' : null; }
 function tourAuto() {
-  if (navigator.webdriver || document.getElementById('tour') || document.getElementById('dsaq') || V.busy) return;
+  if (navigator.webdriver || V.mFull || document.getElementById('tour') || document.getElementById('dsaq') || V.busy) return;
   const k = tourVistaCorrente(); if (!k || tourLetti()[tourChiave(k)]) return;
   const vista = V.vista;
   setTimeout(() => { if (V.vista === vista && !V.busy && !document.getElementById('tour') && !document.getElementById('dsaq')) tourAvvia(k); }, 800);
@@ -2225,6 +2241,9 @@ function iconaMateria(m) {
   };
 })();
 
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && V.mFull) { V.mFull = false; V.mzFit = true; render(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && V.mFull && !document.getElementById('tour') && !document.getElementById('dsaq')) { V.mFull = false; V.mzFit = true; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (x) { /* nulla */ } render(); } });
+window.addEventListener('resize', () => { if (V.mFull && document.querySelector('.mappa-wrap')) { fitMappa(); } });
 /* Migrazione: chiave e PIN di versioni precedenti */
 (async () => {
   try {
