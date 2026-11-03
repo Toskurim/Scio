@@ -1,4 +1,4 @@
-# AI.st.ain v0.21 — app di studio installabile (PWA)
+# AI.st.ain v0.22 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,9 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.22
+- **Test meno prevedibili**: la risposta giusta non è più quasi sempre la A o la B. Le opzioni vengono mescolate dall'app in modo uniforme (anche nei test già salvati, una sola volta) e all'AI è chiesto di fare opzioni di lunghezza simile, con sbagliate plausibili, e circa metà di affermazioni false nei vero/falso.
 
 ## Novità della v0.21
 - **Capitoli lunghi (anche 100 pagine)**: se carichi più di 8 foto, AI.st.ain le legge a blocchi di 8, mostra l'avanzamento ("16 pagine su 40") e unisce tutto in un solo capitolo (riassunto, schema, spiegazioni, glossario, esercizi e test; il test iniziale è limitato a 30 domande, poi si possono chiederne altre). Se un blocco è ancora troppo lungo viene dimezzato da solo; se un blocco fallisce, il capitolo viene creato con il resto e un avviso indica quali foto ricaricare.
@@ -86,7 +89,7 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.20 a v0.21)
+## Aggiornare il sito su GitHub (da v0.21 a v0.22)
 1. Dalla v0.18 cambiano `style.css`, solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
 2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.

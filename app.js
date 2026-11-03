@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.21';
+const VERSIONE = '0.22';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -150,7 +150,7 @@ function pulisciDati(o) {
       id: ID(x.id), data: Tx(x.data, 40), materia: Tx(x.materia, 60), focus: Tx(x.focus, 300), titolo: Tx(x.titolo, 300), inventario: L(x.inventario, 500), avvisi: L(x.avvisi, 800),
       riassunto_breve: L(x.riassunto_breve, 1500), riassunto_completo: Tx(x.riassunto_completo),
       schema: { radice: Tx(x.schema && x.schema.radice, 300), rami: A(x.schema && x.schema.rami).filter(r => r && typeof r === 'object').map(r => ({ titolo: Tx(r.titolo, 300), punti: L(r.punti, 800) })) },
-      mappa: pulisciMappa(x.mappa), lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica), mio: normMio(x.mio), orali: arr(x.orali).filter(o => o && typeof o === 'object').slice(-100).map(o => ({ data: Tx(o.data, 40), pct: Math.max(0, Math.min(100, Math.floor(N(o.pct)))) })),
+      mappa: pulisciMappa(x.mappa), mesc: !!x.mesc, lvl: Math.max(1, Math.min(5, Math.floor(N(x.lvl)) || 1)), pratica: normPratica(x.pratica), mio: normMio(x.mio), orali: arr(x.orali).filter(o => o && typeof o === 'object').slice(-100).map(o => ({ data: Tx(o.data, 40), pct: Math.max(0, Math.min(100, Math.floor(N(o.pct)))) })),
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
       test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000), d: Math.max(1, Math.min(5, Math.floor(N(q.d)) || 1)) })),
@@ -278,7 +278,7 @@ const SCHEMA_CAPITOLO = OBJ({
   spiegazioni: { type: 'array', description: 'Almeno 5 concetti spiegati in modo semplice, ciascuno con un esempio pratico', items: OBJ({ concetto: T, spiegazione: T, esempio: T }) },
   pratica: { type: 'array', description: 'Da 4 a 8 esercizi di allenamento ispirati agli esercizi del libro (dati diversi), con soluzione riservata e 3 indizi', items: OBJ({ testo: T, soluzione: T, indizi: LS_ }) },
   glossario: { type: 'array', description: 'Almeno 8 termini chiave', items: OBJ({ termine: T, definizione: T }) },
-  test: { type: 'array', description: 'NON fare domande sugli esercizi del libro (cosa chiedono): solo sui concetti. Da 20 a 30 domande (più il capitolo è lungo, più domande): circa 7 su 10 con tipo "scelta" (4 opzioni) e le altre con tipo "vf"', items: OBJ({ tipo: { type: 'string', enum: ['scelta', 'vf'] }, argomento: T, domanda: T, opzioni: Object.assign({ description: 'Solo per tipo scelta: 4 opzioni' }, LS_), corretta: { description: 'Per scelta: indice 0-3 dell\'opzione giusta. Per vf: true o false' }, spiegazione: T }, ['tipo', 'argomento', 'domanda', 'corretta', 'spiegazione']) }
+  test: { type: 'array', description: 'NON fare domande sugli esercizi del libro (cosa chiedono): solo sui concetti. Da 20 a 30 domande (più il capitolo è lungo, più domande): circa 7 su 10 con tipo "scelta" (4 opzioni) e le altre con tipo "vf"', items: OBJ({ tipo: { type: 'string', enum: ['scelta', 'vf'] }, argomento: T, domanda: T, opzioni: Object.assign({ description: 'Solo per tipo scelta: 4 opzioni di lunghezza e dettaglio simili; la giusta non è la più lunga; le sbagliate sono plausibili' }, LS_), corretta: { description: 'Per scelta: indice 0-3 dell\'opzione giusta. Per vf: true o false' }, spiegazione: T }, ['tipo', 'argomento', 'domanda', 'corretta', 'spiegazione']) }
 });
 SCHEMA_CAPITOLO.required = SCHEMA_CAPITOLO.required.filter(k => k !== 'pratica');
 const SCHEMA_ESERCIZIO = OBJ({
@@ -525,6 +525,8 @@ async function chiediJSON(system, testo, immagini, schema) {
   throw new Error('L\'AI ha risposto in un formato non valido anche al secondo tentativo (' + ultimo.message + '). Riprova, magari con meno foto.');
 }
 (function () { let m = false; DB.figli.forEach(f => (f.capitoli || []).forEach(c => { if (riparaCapitolo(c)) m = true; })); if (m) salva(); })();
+/* v0.22: i test già salvati vengono rimescolati una sola volta */
+(function () { let m = false; DB.figli.forEach(f => (f.capitoli || []).forEach(c => { if (!c.mesc) { mescolaOpzioni(c.test); c.mesc = true; m = true; } })); if (m) salva(); })();
 /* ===== Materie ===== */
 function pl(n, uno, molti) { return n + ' ' + (n === 1 ? uno : molti); }
 function sameM(a, b) { return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase(); }
@@ -552,7 +554,7 @@ Regole:
 {"inventario":["..."],"titolo":"...","avvisi":["..."],"riassunto_breve":["5 frasi brevi al massimo"],"riassunto_completo":"testo con paragrafi separati da \\n\\n","schema":{"radice":"concetto centrale","rami":[{"titolo":"...","punti":["...","..."]}]},"spiegazioni":[{"concetto":"...","spiegazione":"...","esempio":"..."}],"glossario":[{"termine":"...","definizione":"..."}],"pratica":[{"testo":"esercizio completo di tutti i dati","soluzione":"breve, riservata","indizi":["leggero","medio","chiaro ma senza soluzione"]}],"test":[{"tipo":"scelta","argomento":"...","domanda":"...","opzioni":["a","b","c","d"],"corretta":0,"spiegazione":"..."},{"tipo":"vf","argomento":"...","domanda":"...","corretta":true,"spiegazione":"..."}]}
 - Spiegazioni: almeno 5; glossario: almeno 8 termini; il test copre argomenti diversi dell'inventario.
 - Pratica: da 4 a 8 esercizi di allenamento sugli stessi argomenti del capitolo (ispirati agli esercizi del libro se ci sono), ciascuno con testo completo, soluzione breve (riservata) e 3 indizi graduali che non rivelano la soluzione.
-- Il test ha da 20 a 30 domande (20 per un capitolo breve, fino a 30 per uno lungo), distribuite su TUTTI gli argomenti dell'inventario: circa 7 su 10 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e le altre vero/falso. Non ripetere due volte la stessa domanda. Le domande verificano la comprensione, non la memoria di dettagli. Le spiegazioni sono gentili e spiegano il perché.`;
+- Il test ha da 20 a 30 domande (20 per un capitolo breve, fino a 30 per uno lungo), distribuite su TUTTI gli argomenti dell'inventario: circa 7 su 10 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e le altre vero/falso. REGOLE PER LE OPZIONI: tutte e 4 le opzioni hanno lunghezza e livello di dettaglio simili (la risposta giusta NON deve essere la più lunga né la più completa); le sbagliate sono plausibili, specifiche e costruite con errori tipici, non banali né assurde; niente "tutte le precedenti" o "nessuna delle precedenti". Nei vero/falso circa la metà delle affermazioni è falsa. Non ripetere due volte la stessa domanda. Le domande verificano la comprensione, non la memoria di dettagli. Le spiegazioni sono gentili e spiegano il perché.`;
 
 const SYS_ESERCIZIO = `Sei AI.st.ain, un tutor che GUIDA IL RAGIONAMENTO. Ricevi la foto di un esercizio (matematica, fisica, latino, greco o altro).
 REGOLA ASSOLUTA: non dare MAI la soluzione, né il risultato finale, né la traduzione completa. Lo studente deve arrivarci da solo.
@@ -694,7 +696,7 @@ async function preparaCapitolo() {
     else {
       c = await elaboraCapitolo(materia, focus, V.foto);
     }
-    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null, orali: [] };
+    const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: mescolaOpzioni(normDomande(arr(c.test), 1)), mesc: true, risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null, orali: [] };
     S.capitoli.unshift(cap); salva();
     V.foto = []; V.cap = cap.id; V.genVede = false; V.tab = primoTab(); V.vista = 'capitolo'; V.busy = false; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
@@ -758,6 +760,19 @@ function normDomande(lista, d) {
   const buone = out.filter(domandaOk);
   return buone.length >= Math.min(8, out.length) ? buone : out;
 }
+/* Posizione della risposta giusta: distribuita in modo uniforme e casuale (l'AI tende a metterla in A o B e a farla più lunga). */
+function mescolaOpzioni(lista) {
+  const sc = arr(lista).filter(q => q && q.tipo !== 'vf' && arr(q.opzioni).length === 4 && q.corretta >= 0 && q.corretta < 4 && !arr(q.opzioni).some(o => /\b(tutte|nessuna|entrambe)\b|le precedenti|\b[a-d]\s*(e|e\/o|,)\s*[a-d]\b/i.test(o)));
+  const rnd = () => (crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296);
+  const mesc = l => { for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; };
+  let pos = [];
+  sc.forEach(q => {
+    if (!pos.length) pos = mesc([0, 1, 2, 3]);
+    const dove = pos.pop(), giusta = q.opzioni[q.corretta], altre = mesc(q.opzioni.filter((x, i) => i !== q.corretta));
+    altre.splice(dove, 0, giusta); q.opzioni = altre; q.corretta = dove;
+  });
+  return lista;
+}
 function normPratica(lista) {
   const T = (x, n) => (typeof x === 'string' ? x : '').slice(0, n);
   return arr(lista).filter(e => e && typeof e === 'object').slice(0, 30).map(e => {
@@ -787,6 +802,7 @@ Regole:
 - Ogni domanda verifica la comprensione di un concetto, di una causa, di un collegamento o di un'applicazione e si capisce senza avere il libro davanti.
 - Non fare MAI domande sugli esercizi o sulle attività del libro (cosa chiede un esercizio, cosa si deve fare, come è scritta una consegna, "è vero che nell'esercizio..."): gli esercizi sono solo uno spunto per gli argomenti.
 - Circa 7 domande su 10 a scelta multipla (4 opzioni, "corretta" è l'indice 0-3, varia la posizione) e le altre vero/falso.
+- REGOLE PER LE OPZIONI: tutte e 4 le opzioni hanno lunghezza e livello di dettaglio simili (la risposta giusta NON deve essere la più lunga né la più completa); le sbagliate sono plausibili, specifiche e costruite con errori tipici, non banali né assurde; niente "tutte le precedenti" o "nessuna delle precedenti". Nei vero/falso circa la metà delle affermazioni è falsa.
 - Spiegazione gentile che dice perché la risposta è quella giusta.
 Difficoltà richiesta: `;
 async function generaDomande(c, liv, n) {
@@ -794,7 +810,7 @@ async function generaDomande(c, liv, n) {
   const gia = arr(c.test).map(q => '- ' + q.domanda).slice(-80).join('\n');
   const sch = OBJ({ test: Object.assign({}, SCHEMA_CAPITOLO.properties.test, { description: 'Esattamente ' + n + ' domande nuove' }) });
   const r = await chiediJSON(SYS_NUOVE + DIFF[liv] + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nQuante domande: ' + n + '\n\nRiassunto completo:\n' + c.riassunto_completo + '\n\nArgomenti:\n' + arr(c.inventario).join('; ') + '\n\nDomande già fatte (da non ripetere):\n' + gia, [], sch);
-  const nuove = normDomande(r.test, liv).map(q => Object.assign(q, { d: liv }));
+  const nuove = mescolaOpzioni(normDomande(r.test, liv)).map(q => Object.assign(q, { d: liv }));
   if (nuove.length < 4) throw new Error('Non sono riuscito a preparare nuove domande valide: riprova.');
   return nuove;
 }
@@ -1802,7 +1818,7 @@ const AZ = {
       if (!arr(c.schema && c.schema.rami).length && n.schema) c.schema = n.schema;
       if (!arr(c.spiegazioni).length) c.spiegazioni = arr(n.spiegazioni);
       if (!arr(c.glossario).length) c.glossario = arr(n.glossario);
-      if (!arr(c.test).length) c.test = normDomande(arr(n.test), 1);
+      if (!arr(c.test).length) { c.test = mescolaOpzioni(normDomande(arr(n.test), 1)); c.mesc = true; }
       if (!arr(c.pratica).length) c.pratica = normPratica(n.pratica);
       if (!arr(c.inventario).length) c.inventario = arr(n.inventario);
       salva(); toast(mancano(c) ? 'Alcune parti mancano ancora: riprova.' : 'Fatto: ora c\'è tutto.');
