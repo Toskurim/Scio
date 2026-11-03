@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.33';
+const VERSIONE = '0.34';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1421,7 +1421,7 @@ function vNuovo(tipo) {
     '<p><span class="muted">' + t('materia_lbl') + ':</span> <b>' + esc(V.materia) + '</b> <button class="btn sec small" data-act="home">' + t('cambia_materia') + '</button></p>' +
     (tipo === 'cap' ? '<label class="f">' + t('focus') + '<input type="text" id="focus"></label>' : '') +
     fotoBox() +
-    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog && V.prog.tot > fotoPerBlocco() ? ' (' + t('prog_pagine', { i: V.prog.fatte, n: V.prog.tot }) + ')' : '') + '</p>' : (tipo === 'cap' && V.foto.length > FOTO_PER_BLOCCO ? '<p class="muted">' + t('blocchi_nota', { b: FOTO_PER_BLOCCO, n: Math.ceil(V.foto.length / FOTO_PER_BLOCCO) }) + '</p>' : '') + '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
+    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog && V.prog.tot > fotoPerBlocco() ? ' (' + t('prog_pagine', { i: V.prog.fatte, n: V.prog.tot }) + ')' : '') + '</p><p class="muted">' + t('lavora_nota') + '</p>' : (tipo === 'cap' && V.foto.length > FOTO_PER_BLOCCO ? '<p class="muted">' + t('blocchi_nota', { b: FOTO_PER_BLOCCO, n: Math.ceil(V.foto.length / FOTO_PER_BLOCCO) }) + '</p>' : '') + '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
     '<p class="muted">' + t('foto_privacy') + '</p></div>';
 }
 function vControllo() {
