@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.30';
+const VERSIONE = '0.31';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -15,6 +15,7 @@ const PRESET = {
   gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-3.8-flash', chiave: true },
   groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true }
 };
+let GEM_NORID = false;
 const GEMINI_ALT = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 const METODI = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'ascolto', 'libro', 'insieme'];
 const DSA = {
@@ -263,7 +264,8 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
   try {
     for (let i = 0; i < catena.length; i++) {
       r = await fetch(url, { method: 'POST', headers: head,
-        body: JSON.stringify({ model: catena[i], temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }) });
+        body: JSON.stringify(Object.assign({ model: catena[i], temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }, gem && !GEM_NORID ? { reasoning_effort: 'low' } : {})) });
+      if (r.status === 400 && gem && !GEM_NORID) { GEM_NORID = true; i--; continue; }   /* il modello non accetta l'impostazione: da ora senza */
       if (r.ok || !gem || ![429, 500, 503, 404].includes(r.status) || i === catena.length - 1) break;
       if (typeof toast === 'function') toast('Il servizio è occupato: provo con un altro modello…');
       await new Promise(x => setTimeout(x, 2500));
@@ -1847,6 +1849,10 @@ const AZ = {
       let m;
       if (FAM.ai.provider === 'demo') m = mappaDaSchema(c);
       else m = pulisciMappa(await chiediJSON(SYS_MAPPA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_MAPPA));
+      if ((m.nodi.length < 4 || m.relazioni.length < 3) && FAM.ai.provider !== 'anthropic') {
+        const r = mappaDaSchema(c);
+        if (r.nodi.length >= 4 && r.relazioni.length >= 3) { m = r; toast('La mappa dell\'AI era troppo piccola: ho costruito quella dallo schema.'); }
+      }
       if (m.nodi.length < 4 || m.relazioni.length < 3) throw new Error('la mappa è venuta troppo piccola: riprova');
       c.mappa = m; V.mz = 1; V.mzFit = true; salva();
     } catch (e) { toast(e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni.' : 'Non sono riuscito: ' + e.message); }
