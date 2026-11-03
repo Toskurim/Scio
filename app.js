@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.31';
+const VERSIONE = '0.32';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -13,7 +13,7 @@ const PRESET = {
   ollama:   { nome: 'Ollama sul mio PC (gratis, privato)', url: 'http://localhost:11434/v1', modello: 'gemma4:26b', chiave: false },
   lmstudio: { nome: 'LM Studio sul mio PC (gratis, privato)', url: 'http://localhost:1234/v1', modello: '', chiave: false },
   gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-3.8-flash', chiave: true },
-  groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true }
+  groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: 'qwen/qwen3.8-27b', chiave: true }
 };
 let GEM_NORID = false;
 const GEMINI_ALT = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
@@ -260,7 +260,8 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
   let r;
   /* Gemini: se il servizio è sovraccarico (503, 429) o il modello non c'è più (404), riprova con un modello vicino */
   const gem = compat && /generativelanguage\.googleapis\.com/.test(a.url);
-  const catena = gem ? [a.model || PRESET.gemini.modello].concat(GEMINI_ALT).filter((m, i, v) => m && v.indexOf(m) === i).slice(0, 3) : [a.model || (compat ? undefined : 'google/gemini-2.5-flash')];
+  const groq = compat && /api\.groq\.com/.test(a.url);
+  const catena = gem ? [a.model || PRESET.gemini.modello].concat(GEMINI_ALT).filter((m, i, v) => m && v.indexOf(m) === i).slice(0, 3) : [a.model || (groq ? PRESET.groq.modello : compat ? undefined : 'google/gemini-2.5-flash')];
   try {
     for (let i = 0; i < catena.length; i++) {
       r = await fetch(url, { method: 'POST', headers: head,
@@ -668,6 +669,8 @@ async function aggiungiFoto(files) {
 /* ===== Elaborazione ===== */
 /* ===== v0.21: capitoli lunghi a blocchi ===== */
 const FOTO_PER_BLOCCO = 8;
+/* Groq accetta al massimo 3 immagini per richiesta: con Groq i capitoli si dividono in blocchi da 3 foto */
+function fotoPerBlocco() { const a = FAM.ai || {}; return a.provider === 'compat' && /api\.groq\.com/.test(a.url || '') ? 3 : FOTO_PER_BLOCCO; }
 async function bloccoCap(materia, focus, foto, da, tot) {
   const aiuto = tot > foto.length ? ' Hai ricevuto le pagine da ' + (da + 1) + ' a ' + (da + foto.length) + ' di un capitolo di ' + tot + ' pagine: elabora SOLO queste pagine, come parte del capitolo.' : '';
   try {
@@ -703,7 +706,8 @@ function unisciParti(parti) {
 async function elaboraCapitolo(materia, focus, foto) {
   V.prog = { fatte: 0, tot: foto.length };
   const blocchi = [];
-  for (let i = 0; i < foto.length; i += FOTO_PER_BLOCCO) blocchi.push([i, foto.slice(i, i + FOTO_PER_BLOCCO)]);
+  const n = fotoPerBlocco();
+  for (let i = 0; i < foto.length; i += n) blocchi.push([i, foto.slice(i, i + n)]);
   let esiti = [];
   for (const [da, fl] of blocchi) esiti = esiti.concat(await bloccoCap(materia, focus, fl, da, foto.length));
   V.prog = null;
@@ -1359,7 +1363,7 @@ function vFam() {
     '<label class="f">' + t('indirizzo_servizio') + '<input type="text" id="url" value="' + esc(a.url || PRESET.ollama.url) + '" autocomplete="off"></label></div>' +
     '<label class="f">' + t('chiave_api') + '<input type="password" id="chiave" value="' + esc(b.ai && b.ai.key ? b.ai.key : '') + '" placeholder="' + esc(haChiave(FAM.ai) ? t('chiave_salvata') : '') + '" autocomplete="off"></label>' + (haChiave(FAM.ai) ? '<button class="btn sec small" type="button" data-act="rimuovi-chiave">' + t('rimuovi_chiave') + '</button>' : '') +
     '<label class="f">' + t('modello') + '<input type="text" id="modello" list="mod-sugg" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
-    '<datalist id="mod-sugg">' + ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'claude-haiku-5-5', 'claude-sonnet-5-5'].map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
+    '<datalist id="mod-sugg">' + ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'qwen/qwen3.8-27b', 'claude-haiku-5-5', 'claude-sonnet-5-5'].map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
     '<button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
     '<details><summary>Guida / Guide: Ollama, LM Studio</summary><p class="muted"><b>Ollama</b>: <code>ollama pull gemma4:26b</code> (GPU ~16 GB). <code>OLLAMA_ORIGINS=' + esc(location.origin.startsWith('http') ? location.origin : 'https://toskurim.github.io') + '</code>. <b>LM Studio</b>: Developer › server + CORS.<br>Funziona solo sul PC dove girano / works only on the PC where they run.</p></details></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" type="button" data-act="priv-apri">' + t('priv_btn') + '</button>' +
@@ -1414,7 +1418,7 @@ function vNuovo(tipo) {
     '<p><span class="muted">' + t('materia_lbl') + ':</span> <b>' + esc(V.materia) + '</b> <button class="btn sec small" data-act="home">' + t('cambia_materia') + '</button></p>' +
     (tipo === 'cap' ? '<label class="f">' + t('focus') + '<input type="text" id="focus"></label>' : '') +
     fotoBox() +
-    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog && V.prog.tot > FOTO_PER_BLOCCO ? ' (' + t('prog_pagine', { i: V.prog.fatte, n: V.prog.tot }) + ')' : '') + '</p>' : (tipo === 'cap' && V.foto.length > FOTO_PER_BLOCCO ? '<p class="muted">' + t('blocchi_nota', { b: FOTO_PER_BLOCCO, n: Math.ceil(V.foto.length / FOTO_PER_BLOCCO) }) + '</p>' : '') + '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
+    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog && V.prog.tot > fotoPerBlocco() ? ' (' + t('prog_pagine', { i: V.prog.fatte, n: V.prog.tot }) + ')' : '') + '</p>' : (tipo === 'cap' && V.foto.length > FOTO_PER_BLOCCO ? '<p class="muted">' + t('blocchi_nota', { b: FOTO_PER_BLOCCO, n: Math.ceil(V.foto.length / FOTO_PER_BLOCCO) }) + '</p>' : '') + '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
     '<p class="muted">' + t('foto_privacy') + '</p></div>';
 }
 function vControllo() {
