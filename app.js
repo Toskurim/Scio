@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.25';
+const VERSIONE = '0.26';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -15,6 +15,7 @@ const PRESET = {
   gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-2.5-flash', chiave: true },
   groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true }
 };
+const METODI = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'ascolto', 'libro', 'insieme'];
 const DSA = {
   discalculia: 'Discalculia: spiegazioni di numeri e calcoli passo passo, un passaggio per volta, con esempi concreti e visivi prima delle formule; numeri piccoli negli esempi; nei test valuta il ragionamento e non la velocità o il calcolo mentale.',
   dislessia: 'Dislessia: frasi brevi (al massimo 15 parole), una sola idea per frase, parole semplici, elenchi puntati, parole chiave evidenziate con **doppio asterisco**; evita incisi e periodi lunghi.',
@@ -74,7 +75,7 @@ function urlConsentito(u) {
 }
 /* ===== Dati: una famiglia, più figli ===== */
 function aiVuoto() { return { provider: 'demo', key: '', kc: '', model: '', preset: 'ollama', url: '' }; }
-function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti() }; }
+function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti(), esp: null }; }
 function famVuota() { const l = String(navigator.language || 'it').slice(0, 2).toLowerCase(); return { pin: '', ai: aiVuoto(), lingua: LINGUE[l] ? l : 'it', ultimoBackup: '', dsaAI: true }; }
 function caricaDB() {
   try {
@@ -142,7 +143,7 @@ function pulisciDati(o) {
   if (!grezzi) throw new Error('non valido');
   const figli = grezzi.filter(f => f && typeof f === 'object' && f.profilo && typeof f.profilo === 'object').slice(0, 12).map(c => {
     const pr = c.profilo;
-    const profilo = { nome: Tx(pr.nome, 60), livello: LIVELLI.includes(pr.livello) ? pr.livello : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '', sezioni: {} };
+    const profilo = { nome: Tx(pr.nome, 60), livello: LIVELLI.includes(pr.livello) ? pr.livello : 'superiori', dsa: {}, tema: TEMI[pr.tema] ? pr.tema : 'calmo', fs: R(pr.fs, 0.8, 2, 1), colori: !!pr.colori, metodo: { chiedi: !(pr.metodo && pr.metodo.chiedi === false), confronto: !(pr.metodo && pr.metodo.confronto === false), esperimento: !(pr.metodo && pr.metodo.esperimento === false) }, lingua: LINGUE[pr.lingua] ? pr.lingua : 'it', font: ['tema', 'lexend', 'andika', 'atkinson', 'sistema'].includes(pr.font) ? pr.font : 'tema', lh: R(pr.lh, 1.3, 2.4, 0), ls: R(pr.ls, 0, 0.2, 0), ws: R(pr.ws, 0, 0.4, 0), vel: R(pr.vel, 0.5, 1.5, 0.9), voce: Tx(pr.voce, 160), pin: '', sezioni: {} };
     SEZ.forEach(k => { profilo.sezioni[k] = !(pr.sezioni && pr.sezioni[k] === false); });
     Object.keys(DSA).forEach(k => { if (pr.dsa && pr.dsa[k] === true) profilo.dsa[k] = true; });
     profilo.tema = temaValido(profilo); profilo.auto = pr.auto !== false;
@@ -154,7 +155,8 @@ function pulisciDati(o) {
       spiegazioni: A(x.spiegazioni).filter(s => s && typeof s === 'object').map(s => ({ concetto: Tx(s.concetto, 300), spiegazione: Tx(s.spiegazione), esempio: Tx(s.esempio) })),
       glossario: A(x.glossario).filter(g => g && typeof g === 'object').map(g => ({ termine: Tx(g.termine, 300), definizione: Tx(g.definizione, 3000) })),
       test: A(x.test).filter(q => q && typeof q === 'object').map(q => ({ tipo: q.tipo === 'vf' ? 'vf' : 'scelta', argomento: Tx(q.argomento, 300), domanda: Tx(q.domanda, 2000), opzioni: L(q.opzioni, 800), corretta: typeof q.corretta === 'boolean' ? q.corretta : N(q.corretta), spiegazione: Tx(q.spiegazione, 3000), d: Math.max(1, Math.min(5, Math.floor(N(q.d)) || 1)) })),
-      risultati: A(x.risultati).filter(r => r && typeof r === 'object').map(r => ({ data: Tx(r.data, 40), punti: N(r.punti), totale: N(r.totale) || 1, errati: L(r.errati, 300) }))
+      risultati: A(x.risultati).filter(r => r && typeof r === 'object').map(r => ({ data: Tx(r.data, 40), punti: N(r.punti), totale: N(r.totale) || 1, errati: L(r.errati, 300), come: Array.isArray(r.come) ? L(r.come, 20).filter(k => METODI.includes(k)) : null })),
+      uso: (() => { const u = {}; METODI.forEach(k => { if (x.uso && x.uso[k] === 1) u[k] = 1; }); return u; })()
     }));
     const esercizi = A(c.esercizi).filter(e => e && typeof e === 'object').slice(0, 500).map(e => ({
       id: ID(e.id), data: Tx(e.data, 40), materia: Tx(e.materia, 60), richiesta: Tx(e.richiesta, 5000),
@@ -164,7 +166,7 @@ function pulisciDati(o) {
     const ripetizioni = {};
     if (c.rip && typeof c.rip === 'object') Object.keys(c.rip).slice(0, 3000).forEach(k => { const r = c.rip[k]; if (/^[A-Za-z0-9_-]{1,40}\|\d{1,4}$/.test(k) && r && typeof r === 'object' && DATA(r.next)) ripetizioni[k] = { b: Math.max(0, Math.min(6, Math.floor(N(r.b)))), next: DATA(r.next) }; });
     const verifiche = A(c.verifiche).filter(v => v && typeof v === 'object' && DATA(v.data)).slice(0, 200).map(v => ({ id: ID(v.id), materia: Tx(v.materia, 60), data: DATA(v.data), argomento: Tx(v.argomento, 120) }));
-    return { id: ID(c.id), profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))), premi: pulisciPremi(c.premi) };
+    return { id: ID(c.id), profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))), premi: pulisciPremi(c.premi), esp: (c.esp && METODI.includes(c.esp.m)) ? { m: c.esp.m, dal: Tx(c.esp.dal, 40), base: Math.max(0, Math.min(100, N(c.esp.base))) } : null };
   });
   const fam = famVuota();
   if (p.fam && typeof p.fam === 'object' && LINGUE[p.fam.lingua]) fam.lingua = p.fam.lingua;
@@ -193,6 +195,7 @@ function applicaTema() {
   let tema = 'calmo';
   try { if (p) { tema = temaValido(p); localStorage.setItem('scio.tema', tema); } else { const u = localStorage.getItem('scio.tema'); if (TEMI[u]) tema = u; } } catch (e) { if (p) tema = temaValido(p); }
   b.setAttribute('data-tema', tema);
+  if (p && p.livello) b.setAttribute('data-liv', p.livello); else b.removeAttribute('data-liv');
   r.style.setProperty('--fs', p && p.fs ? p.fs : 1);
   const set = (k, v) => { if (v) b.style.setProperty(k, v); else b.style.removeProperty(k); };
   set('--font', p && FONT_STACK[p.font]); set('--lh', p && p.lh); set('--ls', p && p.ls ? p.ls + 'em' : ''); set('--ws', p && p.ws ? p.ws + 'em' : '');
@@ -1364,6 +1367,8 @@ function vSetup() {
     '<p class="muted">' + t('nota_dsa') + '</p>' +
     '<label class="chk"><input type="checkbox" id="colori"' + (p.colori === undefined ? ' checked' : (p.colori ? ' checked' : '')) + '>' + t('colori_lbl') + '</label><p class="muted">' + t('colori_nota') + '</p></div>' +
     '<div class="card"><h2>' + t('sez_titolo') + '</h2><p class="muted">' + t('sez_nota') + '</p><p class="muted">' + t('co_nota_sez') + '</p>' + SEZ.map(k => '<label class="chk"><input type="checkbox" data-sez="' + k + '"' + (p.sezioni && p.sezioni[k] === false ? '' : ' checked') + '>' + t(k) + '</label>').join('') + '<label class="chk"><input type="checkbox" checked disabled>' + t('test') + ' — ' + t('sez_sempre') + '</label></div>' +
+    '<div class="card"><h2>' + t('met_set_t') + '</h2><p class="muted">' + t('met_set_nota') + '</p>' +
+    [['chiedi', 'met_set_chiedi'], ['confronto', 'met_set_confronto'], ['esperimento', 'met_set_esp']].map(o => '<label class="chk"><input type="checkbox" id="met-' + o[0] + '"' + (!p.metodo || p.metodo[o[0]] !== false ? ' checked' : '') + '>' + t(o[1]) + '</label>').join('') + '</div>' +
     '<div class="card"><h2>' + t('aspetto') + '</h2><div id="cons">' + bloccoTema(p) + '</div>' + bloccoAspetto(p) + '</div>' +
     '<div class="card"><h2>' + t('pin_figlio', { n: esc(p.nome || '…') }) + '</h2><label class="f"><input type="password" id="pinf" inputmode="numeric" maxlength="8" value="" autocomplete="off" placeholder="' + esc(p.pin ? t('pin_figlio_tieni') : '') + '"></label>' + (p.pin ? '<label class="chk"><input type="checkbox" id="rmpin">' + t('rimuovi_pin_figlio') + '</label>' : '') + '<p class="muted">' + t('pin_figlio_nota') + '</p></div>' +
     '<button class="btn full" data-act="salva-figlio">' + t('salva') + '</button>' + (DB.figli.length ? '<p></p><button class="btn sec full" data-act="genitori">' + t('annulla') + '</button>' : '');
@@ -1381,7 +1386,7 @@ function vHome() {
     (S.capitoli.some(c => arr(c.test).length) ? '<div class="card"><h2>' + t('ripasso_oggi') + '</h2>' + (due ? '<p>' + (due === 1 ? t('una_rip') : t('n_domande_rip', { n: due })) + '</p><button class="btn" data-act="inizia-ripasso">' + t('inizia_ripasso') + '</button>' : '<p class="muted">' + t('nessun_ripasso') + '</p>') + '<p class="muted">' + t('rip_spiega') + '</p></div>' : '') +
     (ver.length ? '<h2>' + t('verifiche') + '</h2>' + ver.map(x => { const pr = pianoRipasso(x.v); const oggi = pr.giorni && pr.giorni[0] ? pr.giorni[0].righe.join(' · ') : ''; return '<div class="card"><div class="row" style="justify-content:space-between"><div><b>' + esc(x.v.materia) + '</b>' + (x.v.argomento ? ' · ' + esc(x.v.argomento) : '') + '</div><span class="chip ' + (x.d <= 3 ? 'warn' : '') + '">' + esc(quando(x.d)) + '</span></div>' + (oggi ? '<p class="muted"><b>' + t('compito_oggi') + ':</b> ' + oggi + '</p>' : '') + '<button class="btn sec small" data-act="apri-materia" data-m="' + esc(x.v.materia) + '">' + t('piano') + '</button></div>'; }).join('') : '') +
     (ultimi.length ? '<h2>' + t('continua') + '</h2>' + ultimi.map(cardCap).join('') : '') +
-    vTraguardi() + '<p class="muted" style="text-align:center;margin-top:18px"><b>AI.st.ain</b> = ' + esc(t('acronimo')) + '</p>';
+    cardMetodo() + vTraguardi() + '<p class="muted" style="text-align:center;margin-top:18px"><b>AI.st.ain</b> = ' + esc(t('acronimo')) + '</p>';
 }
 function fotoBox() {
   return '<div class="row"><label class="btn sec">' + t('scatta') + '<input type="file" accept="image/*" capture="environment" id="f1" hidden></label><label class="btn sec">' + t('scegli_foto') + '<input type="file" accept="image/*" multiple id="f2" hidden></label></div>' +
@@ -1441,6 +1446,7 @@ function vCapitolo() {
     '<div class="tabs" role="tablist">' + TB.map(x => '<button class="tab' + (V.tab === x ? ' on' : '') + '" role="tab" data-act="tab" data-t="' + x + '">' + t(x) + '</button>').join('') + '</div>' + corpo + boxSposta(c, 'cap');
 }
 function vTestPartenza(c) {
+  if (V.come && V.come.cap === c.id) return cardCome();
   if (V.test && V.test.cap === c.id) return vTest(c);
   const liv = c.lvl || 1, n = idxLivello(c, liv).length, ult = c.risultati[c.risultati.length - 1];
   return '<div class="card"><h2>' + t('test_finale') + '</h2><p><b>' + t('livello_test', { n: liv, nome: t('liv_' + liv) }) + '</b></p><p>' + t('test_intro', { n: Math.min(n, 30) }) + '</p>' + (ult ? '<p class="muted">' + t('ultimo_ris', { p: ult.punti, n: ult.totale }) + '</p>' : '') +
@@ -1456,7 +1462,7 @@ function vTest(c) {
       (errati.length ? '<div class="fb warn"><b>' + t('da_ripassare') + ':</b> ' + errati.map(esc).join(', ') + '</div>' : '<div class="fb ok">' + t('tutto_chiaro') + '</div>') +
       (ts.xp != null ? '<div class="fb ok" role="status"><b>⭐ ' + t('punti_guadagnati', { n: ts.xp }) + '</b>' + (ts.rangoNuovo >= 0 ? '<br>' + t('nuovo_rango', { r: t('rango_' + ts.rangoNuovo) }) : '') + arr(ts.nuovi).map(b => '<br>🏅 ' + t('nuovo_badge', { b: t('badge_' + b) })).join('') + '</div>' : '') +
       (ts.liv && !ts.ripasso && c.id !== '__rip' ? '<div class="row">' + (ts.pct >= 0.8 && ts.liv < LIV_TEST ? '<button class="btn" data-act="test-livello" data-d="1"' + (V.busy ? ' disabled' : '') + '>' + t('test_sali', { n: ts.liv + 1, nome: t('liv_' + (ts.liv + 1)) }) + '</button>' : '') + '<button class="btn sec" data-act="test-nuovi"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('test_altre')) + '</button>' + (ts.pct < 0.5 && ts.liv > 1 ? '<button class="btn sec" data-act="test-livello" data-d="-1"' + (V.busy ? ' disabled' : '') + '>' + t('test_piu_facile') + '</button>' : '') + '</div>' + (V.busy ? '<p><span class="spin"></span> ' + t('preparo_domande') + '</p>' : '') : '') +
-      '<div class="row">' + (ts.errati.length ? '<button class="btn" data-act="solo-errori">' + t('ripeti_errori') + '</button>' : '') + '<button class="btn sec" data-act="chiudi-test">' + t('chiudi') + '</button></div></div>';
+      '<div class="row">' + (ts.errati.length ? '<button class="btn" data-act="solo-errori">' + t('ripeti_errori') + '</button>' : '') + '<button class="btn sec" data-act="chiudi-test">' + t('chiudi') + '</button></div></div>' + (ts.espMsg ? '<div class="card"><div class="fb ok">' + esc(t('esp_esito', { m: t('met_' + ts.espMsg.m), p: ts.espMsg.pct, b: ts.espMsg.base })) + ' <b>' + t(ts.espMsg.pct >= ts.espMsg.base + 5 ? 'esp_v_su' : ts.espMsg.pct <= ts.espMsg.base - 5 ? 'esp_v_giu' : 'esp_v_pari') + '</b></div></div>' : '') + (ts.ripasso || c.id === '__rip' ? '' : cardMetodo());
   }
   const q = c.test[ts.dom[ts.i]]; const opz = q.tipo === 'vf' ? [t('vero'), t('falso')] : arr(q.opzioni);
   const corr = q.tipo === 'vf' ? (q.corretta ? 0 : 1) : q.corretta;
@@ -1939,7 +1945,7 @@ const AZ = {
   },
   'avanti': () => {
     const ts = V.test; if (!ts) return; const c = capCorrente(); ts.scelta = null; ts.i++;
-    if (ts.i >= ts.dom.length) { ts.fine = true; assegnaPremi(c, ts); if (!ts.ripasso && c.id !== '__rip') { c.risultati.push({ data: new Date().toISOString(), punti: ts.punti, totale: ts.dom.length, errati: [...new Set(ts.errati.map(i => c.test[i].argomento).filter(Boolean))] }); salva(); } }
+    if (ts.i >= ts.dom.length) { ts.fine = true; assegnaPremi(c, ts); if (!ts.ripasso && c.id !== '__rip') { c.risultati.push({ data: new Date().toISOString(), punti: ts.punti, totale: ts.dom.length, errati: [...new Set(ts.errati.map(i => c.test[i].argomento).filter(Boolean))], come: Array.isArray(ts.come) ? ts.come.slice() : null }); salva(); } }
   },
   'solo-errori': () => { const ts = V.test; V.test = { cap: ts.cap, dom: [...new Set(ts.errati)], i: 0, punti: 0, errati: [], scelta: null, fine: false, ripasso: true }; V.voce = false; fermaVoce(); },
   'chiudi-test': () => { V.test = null; V.voce = false; fermaVoce(); if (V.vista === 'ripasso') V.vista = 'home'; },
@@ -2020,7 +2026,8 @@ const AZ = {
     const lg2 = document.getElementById('lingua-fig').value;
     const rm = document.getElementById('rmpin');
     const sezioni = {}; SEZ.forEach(k => { const e = document.querySelector('[data-sez="' + k + '"]'); sezioni[k] = e ? e.checked : true; });
-    const prof = { nome: nome, sezioni: sezioni, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: temaValido({ livello: livello, tema: (document.querySelector('input[name=tema]:checked') || {}).value }), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
+    const metodo = {}; ['chiedi', 'confronto', 'esperimento'].forEach(k => { const e = document.getElementById('met-' + k); metodo[k] = e ? e.checked : true; });
+    const prof = { nome: nome, sezioni: sezioni, metodo: metodo, livello: livello, lingua: LINGUE[lg2] ? lg2 : 'it', dsa: dsa, tema: temaValido({ livello: livello, tema: (document.querySelector('input[name=tema]:checked') || {}).value }), colori: document.getElementById('colori').checked, fs: num('fs', 1), font: g('font') || 'tema', lh: num('lh', 0), ls: num('ls', 0), ws: num('ws', 0), vel: num('vel', 0.9), voce: g('voce'), pin: pinf ? await hashPin(pinf) : (rm && rm.checked ? '' : (old.pin || '')) };
     { const rec = aspettoConsigliato(livello, dsa); prof.auto = prof.font === rec.font && Math.abs(prof.fs - rec.fs) < 0.01 && Math.abs(prof.lh - rec.lh) < 0.01 && Math.abs(prof.ls - rec.ls) < 0.005 && Math.abs(prof.ws - rec.ws) < 0.005; }
     if (f) f.profilo = prof; else { const n = statoVuoto(); n.profilo = prof; DB.figli.push(n); }
     salva(); V.edit = null;
@@ -2125,7 +2132,7 @@ function tourAuto() {
 function tourChiudi() {
   const o = document.getElementById('tour'); if (!o) return;
   window.removeEventListener('resize', o._ri); document.removeEventListener('keydown', o._kd, true);
-  const f = o._focus; o.remove(); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ }
+  const f = o._focus; o.remove(); if (!document.getElementById('dsaq')) bloccaScroll(false); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ }
 }
 function tourAvvia(k) {
   const passi = (TOUR_PASSI[k] || []).filter(p => document.querySelector(p[0]));
@@ -2135,7 +2142,8 @@ function tourAvvia(k) {
   ov._focus = document.activeElement;
   ov.innerHTML = '<div class="tour-spot"></div><svg class="tour-arrow" aria-hidden="true"><defs><marker id="tour-p" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker></defs><path d="" marker-end="url(#tour-p)"/></svg>' +
     '<div class="tour-box" tabindex="-1" aria-live="polite"><div class="tour-n muted"></div><p class="tour-t"></p><div class="row tour-btns"><button class="btn sec small" data-tour="salta"></button><button class="btn sec small" data-tour="indietro"></button><button class="btn small" data-tour="avanti"></button></div></div>';
-  document.body.appendChild(ov);
+  document.body.appendChild(ov); bloccaScroll(true);
+  ov.addEventListener('wheel', e => e.preventDefault(), { passive: false }); ov.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   let i = 0;
   const box = ov.querySelector('.tour-box'), spot = ov.querySelector('.tour-spot'), path = ov.querySelector('svg > path');
   const pos = (scroll) => {
@@ -2161,7 +2169,8 @@ function tourAvvia(k) {
   };
   ov._ri = () => pos(false); window.addEventListener('resize', ov._ri);
   const avanti = () => { if (i < passi.length - 1) { i++; pos(true); } else tourChiudi(); };
-  ov._kd = e => { if (e.key === 'Escape') { e.stopPropagation(); tourChiudi(); } else if (e.key === 'ArrowRight' || (e.key === 'Enter' && !(e.target.dataset && e.target.dataset.tour))) { e.preventDefault(); avanti(); } else if (e.key === 'ArrowLeft' && i > 0) { i--; pos(true); } };
+  ov._kd = e => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.key) || (e.key === ' ' && !(e.target && e.target.closest && e.target.closest('button')))) e.preventDefault();
+    if (e.key === 'Escape') { e.stopPropagation(); tourChiudi(); } else if (e.key === 'ArrowRight' || (e.key === 'Enter' && !(e.target.dataset && e.target.dataset.tour))) { e.preventDefault(); avanti(); } else if (e.key === 'ArrowLeft' && i > 0) { i--; pos(true); } };
   document.addEventListener('keydown', ov._kd, true);
   ov.addEventListener('click', e => { const b = e.target.closest('[data-tour]'); if (!b) return; if (b.dataset.tour === 'salta') tourChiudi(); else if (b.dataset.tour === 'indietro') { if (i > 0) { i--; pos(true); } } else avanti(); });
   pos(true); const ab = ov.querySelector('[data-tour=avanti]'); if (ab) ab.focus({ preventScroll: true });
@@ -2170,14 +2179,14 @@ AZ['tour'] = () => { const k = tourVistaCorrente(); if (!k) { toast(t('tour_altr
 
 /* ===== Questionario sui segnali di DSA (NON è una diagnosi; le risposte non vengono salvate né inviate) ===== */
 const DSA_Q = [['dislessia', 6], ['disortografia', 6], ['disgrafia', 6], ['discalculia', 6]];
-function dsaqChiudi() { const o = document.getElementById('dsaq'); if (!o) return; document.removeEventListener('keydown', o._kd, true); const f = o._focus; o.remove(); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ } }
+function dsaqChiudi() { const o = document.getElementById('dsaq'); if (!o) return; document.removeEventListener('keydown', o._kd, true); const f = o._focus; o.remove(); if (!document.getElementById('tour')) bloccaScroll(false); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ } }
 function dsaq() {
   dsaqChiudi(); tourChiudi();
   const ov = document.createElement('div'); ov.id = 'dsaq'; ov.className = 'dsaq'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', t('dsaq_titolo'));
   ov._focus = document.activeElement;
   const liv = (document.getElementById('livello') || {}).value || (S.profilo && S.profilo.livello) || '';
   const ris = {}; let p = -1;   /* -1 introduzione, 0..3 aree, 4 risultato */
-  const box = document.createElement('div'); box.className = 'dsaq-box'; ov.appendChild(box); document.body.appendChild(ov);
+  const box = document.createElement('div'); box.className = 'dsaq-box'; ov.appendChild(box); document.body.appendChild(ov); bloccaScroll(true);
   const punti = a => { let s = 0; for (let n = 1; n <= 6; n++) s += ris[a + n] || 0; return s; };
   const livello = s => s >= 8 ? 2 : s >= 5 ? 1 : 0;
   const disegna = () => {
@@ -2237,6 +2246,8 @@ function iconaMateria(m) {
     const chiave = V.vista + '|' + (V.cap || '') + '|' + (V.materia || '') + '|' + (S.id || '');
     const app = document.getElementById('app');
     if (chiave !== ultima && app) { ultima = chiave; app.classList.remove('entra'); void app.offsetWidth; app.classList.add('entra'); setTimeout(() => app.classList.remove('entra'), 700); }
+    if (V.vista === 'capitolo' && !V.mFull && METODI_TAB.includes(V.tab)) segnaUso(S.capitoli.find(x => x.id === V.cap), V.tab);
+    if (V.come && (V.vista !== 'capitolo' || V.tab !== 'test')) V.come = null;
     tourAuto();
   };
 })();
@@ -2244,6 +2255,75 @@ function iconaMateria(m) {
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && V.mFull) { V.mFull = false; V.mzFit = true; render(); } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && V.mFull && !document.getElementById('tour') && !document.getElementById('dsaq')) { V.mFull = false; V.mzFit = true; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (x) { /* nulla */ } render(); } });
 window.addEventListener('resize', () => { if (V.mFull && document.querySelector('.mappa-wrap')) { fitMappa(); } });
+/* ===== v0.26: aiuto (facoltativo) per trovare il proprio metodo di studio ===== */
+const METODI_TAB = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
+const ucf = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+function metodoOn(k) { const m = S.profilo && S.profilo.metodo; return !m || m[k] !== false; }   /* k: chiedi | confronto | esperimento */
+function metodoDispo(k) { return !METODI_TAB.includes(k) || tabsAttive().includes(k); }
+function segnaUso(c, k) { if (!c) return; if (!c.uso) c.uso = {}; if (!c.uso[k]) { c.uso[k] = 1; salva(); } }
+function cardCome() {
+  const c = S.capitoli.find(x => x.id === V.come.cap) || { uso: {} };
+  return '<div class="card promo"><h2>' + t('come_t') + '</h2><p class="muted">' + t('come_nota') + '</p>' +
+    METODI.filter(metodoDispo).map(k => '<label class="chk"><input type="checkbox" data-come="' + k + '"' + (V.come.sel.includes(k) ? ' checked' : '') + '>' + esc(ucf(t('met_' + k))) + '</label>').join('') +
+    '<div class="row"><button class="btn" data-act="come-ok">' + t('come_ok') + '</button><button class="btn sec" data-act="come-salta">' + t('come_salta') + '</button></div></div>';
+}
+function analisiMetodo() {
+  const R = [];
+  S.capitoli.forEach(c => arr(c.risultati).forEach(r => { if (Array.isArray(r.come)) R.push({ data: r.data, pct: r.punti / Math.max(1, r.totale), come: r.come }); }));
+  R.sort((a, b) => String(a.data).localeCompare(String(b.data)));
+  const media = l => l.length ? Math.round(100 * l.reduce((s, x) => s + x.pct, 0) / l.length) : null;
+  const per = METODI.map(k => { const con = R.filter(r => r.come.includes(k)), senza = R.filter(r => !r.come.includes(k)); return { k, nc: con.length, ns: senza.length, mc: media(con), ms: media(senza) }; })
+    .filter(x => x.nc >= 2 && x.ns >= 2).map(x => Object.assign(x, { d: x.mc - x.ms })).sort((a, b) => b.d - a.d);
+  return { R, n: R.length, tot: media(R), per };
+}
+function proponiEsperimento(A) {
+  const ultimi = A.R.slice(-2), ultimo = A.R.slice(-1);
+  const usatoUltimo = k => ultimo.some(r => r.come.includes(k)), usatoDue = k => ultimi.some(r => r.come.includes(k));
+  const buono = A.per.filter(x => x.d >= 8 && metodoDispo(x.k) && !usatoUltimo(x.k))[0];
+  if (buono) return buono.k;
+  return ['pratica', 'orale', 'costruisci', 'mappa', 'spiegazioni'].filter(k => metodoDispo(k) && !usatoDue(k))[0] || null;
+}
+function cardMetodo() {
+  if (!metodoOn('confronto') && !metodoOn('esperimento')) return '';
+  const A = analisiMetodo(); if (!A.n) return '';
+  let h = '<div class="card"><h2>🧭 ' + t('met_titolo') + '</h2>';
+  if (metodoOn('confronto')) {
+    if (!A.per.length) h += '<p class="muted">' + t('met_pochi', { n: A.n }) + '</p>';
+    else {
+      const top = A.per.filter(x => x.d >= 8).slice(0, 3);
+      h += top.length ? '<ul>' + top.map(x => '<li>' + esc(t('met_riga', { m: t('met_' + x.k), a: x.mc, na: x.nc, b: x.ms, nb: x.ns })) + '</li>').join('') + '</ul>' : '<p>' + t('met_nessuno') + '</p>';
+      h += '<p class="muted">' + t('met_cautela') + '</p>';
+    }
+  }
+  if (metodoOn('esperimento')) {
+    if (S.esp) h += '<div class="fb">' + esc(t('esp_corso', { m: t('met_' + S.esp.m) })) + ' <button class="btn sec small" data-act="esp-annulla">' + t('esp_annulla') + '</button></div>';
+    else if (A.n >= 2) { const m = proponiEsperimento(A); if (m) h += '<div class="fb"><b>' + t('esp_t') + '</b> ' + esc(t('esp_prop', { m: t('met_' + m) })) + '<p></p><button class="btn small" data-act="esp-accetta" data-m="' + m + '">' + t('esp_accetta') + '</button></div>'; }
+  }
+  return h + '</div>';
+}
+function espEsito(ts) {
+  if (!S.esp || ts.espMsg) return;
+  if (arr(ts.come).includes(S.esp.m)) { ts.espMsg = { m: S.esp.m, pct: Math.round(100 * ts.punti / Math.max(1, ts.dom.length)), base: S.esp.base }; S.esp = null; salva(); }
+}
+['inizia-test', 'inizia-voce'].forEach(a => {
+  const orig = AZ[a];
+  AZ[a] = el => {
+    const c = S.capitoli.find(x => x.id === V.cap); if (!c) return orig(el);
+    if (metodoOn('chiedi') && !V.comeOk) { V.come = { cap: c.id, az: a, sel: METODI.filter(k => c.uso && c.uso[k] && metodoDispo(k)) }; return; }
+    const sel = V.comeOk ? V.comeSel : null; V.comeOk = false; V.comeSel = null; V.come = null;
+    const r = orig(el); if (V.test && V.test.cap === c.id) V.test.come = sel; return r;
+  };
+});
+{ const orig = AZ['test-livello']; AZ['test-livello'] = async el => { const prima = V.test && V.test.come; const r = await orig(el); if (V.test && !V.test.come) V.test.come = prima; return r; }; }
+{ const orig = AZ.avanti; AZ.avanti = el => { const r = orig(el); const ts = V.test; if (ts && ts.fine && !ts.ripasso && ts.cap !== '__rip') { espEsito(ts); const c = S.capitoli.find(x => x.id === ts.cap); if (c && c.uso && Object.keys(c.uso).length && !ts.usoAzzerato) { ts.usoAzzerato = true; c.uso = {}; salva(); } } return r; }; }
+{ const orig = AZ.ascolta; AZ.ascolta = el => { segnaUso(S.capitoli.find(x => x.id === V.cap), 'ascolto'); return orig(el); }; }
+AZ['come-ok'] = () => { V.comeSel = [...document.querySelectorAll('[data-come]:checked')].map(x => x.dataset.come).filter(k => METODI.includes(k)); V.comeOk = true; return AZ[V.come.az](); };
+AZ['come-salta'] = () => { V.comeSel = null; V.comeOk = true; return AZ[V.come.az](); };
+AZ['esp-accetta'] = el => { const m = el.dataset.m; if (!METODI.includes(m)) return; const A = analisiMetodo(); S.esp = { m, dal: new Date().toISOString(), base: A.tot == null ? 0 : A.tot }; salva(); };
+AZ['esp-annulla'] = () => { S.esp = null; salva(); };
+
+/* Blocco dello scorrimento mentre la guida o il questionario sono aperti */
+function bloccaScroll(on) { const r = document.documentElement; if (on) { r.style.scrollbarGutter = 'stable'; r.style.overflow = 'hidden'; } else { r.style.overflow = ''; r.style.scrollbarGutter = ''; } }
 /* Migrazione: chiave e PIN di versioni precedenti */
 (async () => {
   try {

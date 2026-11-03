@@ -1,4 +1,4 @@
-# AI.st.ain v0.25 — app di studio installabile (PWA)
+# AI.st.ain v0.26 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,14 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.26
+- **Aiuto per trovare il proprio metodo di studio (facoltativo)**, in tre parti che il genitore può spegnere separatamente per ogni profilo (modifica profilo › "Aiuto per trovare il proprio metodo di studio"):
+  1. prima di un test chiede «Come hai studiato?» (le schede usate sono già spuntate; si può saltare);
+  2. mostra quali modi di studiare danno risultati migliori, con avviso che i dati sono pochi;
+  3. propone piccoli esperimenti ("prima del prossimo test prova l'allenamento") e a fine test confronta il risultato.
+  Tutto resta sul dispositivo.
+- **Tutorial**: mentre la guida (o il questionario DSA) è aperta la pagina non scorre più, così l'area evidenziata non si perde.
 
 ## Novità della v0.25
 - **Mappa a tutto schermo**: nella scheda Mappa il pulsante "Schermo intero" apre la mappa in una pagina che occupa tutto lo schermo (e, dove il dispositivo lo permette, nasconde anche la barra del browser). Restano tutte le funzioni: zoom, adatta, rifai, stampa, modifica con trascinamento dei riquadri e delle etichette, pannello per aggiungere, collegare ed eliminare, annulla. Si esce con "Chiudi" o con il tasto Esc.
@@ -100,7 +108,7 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.24 a v0.25)
+## Aggiornare il sito su GitHub (da v0.25 a v0.26)
 1. Dalla v0.18 cambiano `style.css`, solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
 2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.

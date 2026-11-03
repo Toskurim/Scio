@@ -576,3 +576,39 @@ DE("dq_discalculia_6", "Sbaglia i calcoli anche dopo aver capito il ragionamento
 /* v0.25 mappa a tutto schermo */
 DE("mappa_full", "Schermo intero", "Full screen");
 DE("mappa_chiudi", "Chiudi", "Close");
+
+/* v0.26 metodo di studio */
+DE("met_titolo", "Il mio metodo di studio", "My study method");
+DE("met_pochi", "Ho segnato come hai studiato in {n} test. Dopo qualche test in più ti mostrerò quali modi funzionano meglio per te.", "I have noted how you studied for {n} tests. After a few more tests I will show you which ways work best for you.");
+DE("met_riga", "Con {m}: {a}% in media ({na} test), senza: {b}% ({nb} test)", "With {m}: {a}% on average ({na} tests), without: {b}% ({nb} tests)");
+DE("met_nessuno", "Per ora nessun modo di studiare si distingue dagli altri: continua così e prova cose diverse.", "For now no way of studying stands out from the others: keep going and try different things.");
+DE("met_cautela", "Sono pochi dati e conta anche quanto è difficile l’argomento: prendili come un indizio, non come una regola.", "This is little data and the difficulty of the topic matters too: take it as a hint, not a rule.");
+DE("esp_t", "Piccolo esperimento:", "Little experiment:");
+DE("esp_prop", "prima del prossimo test prova a usare {m}, poi confrontiamo il risultato.", "before the next test try using {m}, then we compare the result.");
+DE("esp_accetta", "Accetto la sfida", "I accept the challenge");
+DE("esp_corso", "Esperimento in corso: prima del prossimo test usa {m}.", "Experiment in progress: before the next test use {m}.");
+DE("esp_annulla", "Lascia stare", "Drop it");
+DE("esp_esito", "Esperimento: studiando con {m} hai preso il {p}% (prima, in media, il {b}%).", "Experiment: studying with {m} you scored {p}% (before, on average, {b}%).");
+DE("esp_v_su", "Sembra che ti aiuti!", "It seems to help you!");
+DE("esp_v_giu", "Stavolta non ha aiutato: puoi provare altro.", "It did not help this time: you can try something else.");
+DE("esp_v_pari", "Quasi uguale: servono altre prove.", "About the same: more tries are needed.");
+DE("come_t", "Come hai studiato?", "How did you study?");
+DE("come_nota", "Spunta cosa hai usato per prepararti a questo test (se l’app l’ha già visto, è già segnato). Serve a capire quali modi funzionano meglio per te.", "Tick what you used to prepare for this test (if the app already saw it, it is ticked). It helps find which ways work best for you.");
+DE("come_ok", "Inizia il test", "Start the test");
+DE("come_salta", "Salta", "Skip");
+DE("met_riassunto", "il riassunto", "the summary");
+DE("met_schema", "lo schema", "the outline");
+DE("met_mappa", "la mappa", "the map");
+DE("met_spiegazioni", "le spiegazioni", "the explanations");
+DE("met_glossario", "il glossario", "the glossary");
+DE("met_costruisci", "scrivere il mio riassunto", "writing my own summary");
+DE("met_pratica", "l’allenamento", "the practice exercises");
+DE("met_orale", "l’interrogazione a voce", "oral practice");
+DE("met_ascolto", "l’ascolto del capitolo", "listening to the chapter");
+DE("met_libro", "il libro o i miei appunti", "the book or my notes");
+DE("met_insieme", "studiare con qualcuno", "studying with someone");
+DE("met_set_t", "Aiuto per trovare il proprio metodo di studio (facoltativo)", "Help finding your own study method (optional)");
+DE("met_set_nota", "Puoi togliere ciò che trovi troppo invadente. Le informazioni restano sul dispositivo.", "You can turn off anything you find too intrusive. The information stays on the device.");
+DE("met_set_chiedi", "Prima di un test chiedi «Come hai studiato?»", "Before a test ask “How did you study?”");
+DE("met_set_confronto", "Mostra quali modi di studiare funzionano meglio (confronto con i risultati dei test)", "Show which ways of studying work best (compared with test results)");
+DE("met_set_esp", "Proponi piccoli esperimenti (provare un modo di studiare nuovo)", "Suggest little experiments (trying a new way of studying)");

@@ -273,3 +273,14 @@ h2{letter-spacing:.005em}
 .mp-full.ed{grid-template-columns:minmax(0,1fr) 360px}
 .mp-full-pan{min-width:0;padding-right:2px}
 .mp-full-pan .card{margin:0 0 10px}
+
+/* v0.26: profilo universitario, grafica più sobria e adulta */
+body[data-liv=universita]{--r:8px;--bw:1px}
+body[data-liv=universita][data-tema=calmo]{background:var(--bg);--bg:#F3F4F6;--accent:#26466F;--soft:#E4E9F0;--border:#D5D9E0;--shadow:0 1px 2px rgba(20,30,50,.08)}
+body[data-liv=universita][data-tema=notte]{background:var(--bg);--accent:#8FB4E3;--acc-ink:#0F1722;--shadow:0 1px 2px rgba(0,0,0,.4)}
+body[data-liv=universita] .card{box-shadow:var(--shadow);border-width:1px}
+body[data-liv=universita] .btn:not(.sec){box-shadow:none;border-radius:6px}
+body[data-liv=universita] .btn,body[data-liv=universita] .tab,body[data-liv=universita] input,body[data-liv=universita] select,body[data-liv=universita] textarea{border-radius:6px}
+body[data-liv=universita] h1,body[data-liv=universita] h2{font-weight:600;letter-spacing:0}
+body[data-liv=universita] .mat-ico{display:none}
+body[data-liv=universita] *{animation:none!important}
