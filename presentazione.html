@@ -187,7 +187,8 @@ footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color
   <section id="video" hidden>
     <p class="eb">In 30 secondi</p>
     <h2>Guarda come funziona</h2>
-    <video id="vid" controls playsinline preload="metadata" style="width:100%;max-width:960px;display:block;margin-top:18px;border-radius:20px;border:1px solid var(--line);background:#13203B" aria-label="Animazione di 30 secondi che mostra come funziona AI.st.ain"></video>
+    <video id="vid" controls playsinline muted preload="metadata" style="width:100%;max-width:960px;display:block;margin-top:18px;border-radius:20px;border:1px solid var(--line);background:#13203B" aria-label="Animazione di 30 secondi che mostra come funziona AI.st.ain"></video>
+    <p class="lead" style="margin-top:10px;font-size:.9rem">Parte da sola senza audio: tocca l'altoparlante nel lettore per sentire la musica.</p>
   </section>
 
   <section>
@@ -363,7 +364,9 @@ footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color
 <script>
 (function(){var v=document.getElementById('vid'),s=document.getElementById('video');if(!v||!s)return;
 v.addEventListener('loadedmetadata',function(){s.hidden=false;});
-v.src='video/ai-st-ain.mp4';})();
+v.muted=true;v.src='video/ai-st-ain.mp4';
+var done=false,calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!calm&&'IntersectionObserver' in window){new IntersectionObserver(function(es,o){es.forEach(function(e){if(e.isIntersecting&&!done){done=true;var p=v.play();if(p&&p.catch)p.catch(function(){});o.disconnect();}});},{threshold:0.6}).observe(v);}})();
 </script>
 </body>
 </html>
