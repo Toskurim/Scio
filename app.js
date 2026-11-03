@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.20';
+const VERSIONE = '0.21';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -635,6 +635,53 @@ async function aggiungiFoto(files) {
 }
 
 /* ===== Elaborazione ===== */
+/* ===== v0.21: capitoli lunghi a blocchi ===== */
+const FOTO_PER_BLOCCO = 8;
+async function bloccoCap(materia, focus, foto, da, tot) {
+  const aiuto = tot > foto.length ? ' Hai ricevuto le pagine da ' + (da + 1) + ' a ' + (da + foto.length) + ' di un capitolo di ' + tot + ' pagine: elabora SOLO queste pagine, come parte del capitolo.' : '';
+  try {
+    const r = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + aiuto + ' Genera il materiale di studio.', foto, SCHEMA_CAPITOLO);
+    V.prog.fatte += foto.length; render();
+    return [{ r, da, n: foto.length }];
+  } catch (e) {
+    if (foto.length > 1 && /troppo lunga|formato non valido|formato atteso|vuota/.test(e.message)) {   /* troppo per una volta sola: dimezza e riprova */
+      const m = Math.ceil(foto.length / 2);
+      return (await bloccoCap(materia, focus, foto.slice(0, m), da, tot)).concat(await bloccoCap(materia, focus, foto.slice(m), da + m, tot));
+    }
+    if (/Errore 40[13]|chiave|Manca|Rete non raggiungibile|Non riesco/i.test(e.message)) throw e;   /* problemi che riguardano tutto: inutile continuare */
+    return [{ errore: e.message, da, n: foto.length }];
+  }
+}
+function unisciParti(parti) {
+  if (parti.length === 1) return parti[0];
+  const uniq = (l, k) => { const v = new Set(); return l.filter(x => { const s = String(k ? x[k] : x).trim().toLowerCase(); if (!s || v.has(s)) return false; v.add(s); return true; }); };
+  const giro = (liste, max) => { const out = []; for (let i = 0; out.length < max && liste.some(l => i < l.length); i++) liste.forEach(l => { if (i < l.length && out.length < max) out.push(l[i]); }); return out; };
+  return {
+    titolo: parti[0].titolo,
+    inventario: uniq(parti.flatMap(p => arr(p.inventario))),
+    avvisi: uniq(parti.flatMap(p => arr(p.avvisi))),
+    riassunto_breve: giro(parti.map(p => arr(p.riassunto_breve)), 12),
+    riassunto_completo: parti.map(p => p.riassunto_completo || '').filter(Boolean).join('\n\n'),
+    schema: { radice: (parti[0].schema && parti[0].schema.radice) || parti[0].titolo, rami: parti.flatMap(p => arr(p.schema && p.schema.rami)) },
+    spiegazioni: parti.flatMap(p => arr(p.spiegazioni)),
+    glossario: uniq(parti.flatMap(p => arr(p.glossario)), 'termine'),
+    pratica: giro(parti.map(p => arr(p.pratica)), 12),
+    test: giro(parti.map(p => arr(p.test)), 30)
+  };
+}
+async function elaboraCapitolo(materia, focus, foto) {
+  V.prog = { fatte: 0, tot: foto.length };
+  const blocchi = [];
+  for (let i = 0; i < foto.length; i += FOTO_PER_BLOCCO) blocchi.push([i, foto.slice(i, i + FOTO_PER_BLOCCO)]);
+  let esiti = [];
+  for (const [da, fl] of blocchi) esiti = esiti.concat(await bloccoCap(materia, focus, fl, da, foto.length));
+  V.prog = null;
+  const ok = esiti.filter(x => x.r), ko = esiti.filter(x => x.errore);
+  if (!ok.length) throw new Error(ko[0].errore);
+  const c = unisciParti(ok.map(x => x.r));
+  ko.forEach(x => c.avvisi = arr(c.avvisi).concat(t('avv_parte_mancante', { a: x.da + 1, b: x.da + x.n })));
+  return c;
+}
 async function preparaCapitolo() {
   const materia = V.materia;
   const focus = document.getElementById('focus').value.trim();
@@ -645,7 +692,7 @@ async function preparaCapitolo() {
     let c;
     if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 900)); c = JSON.parse(JSON.stringify(DEMO_CAP)); c.pratica = JSON.parse(JSON.stringify(DEMO_PRATICA)); }
     else {
-      c = await chiediJSON(SYS_CAPITOLO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. ' + (focus ? 'Concentrati SOLO su: ' + focus + '.' : 'Usa tutto il capitolo.') + ' Genera il materiale di studio.', V.foto, SCHEMA_CAPITOLO);
+      c = await elaboraCapitolo(materia, focus, V.foto);
     }
     const cap = { id: uid(), data: new Date().toISOString(), materia, focus, titolo: c.titolo || 'Capitolo', inventario: arr(c.inventario), avvisi: arr(c.avvisi), riassunto_breve: arr(c.riassunto_breve), riassunto_completo: c.riassunto_completo || '', schema: c.schema || { radice: '', rami: [] }, spiegazioni: arr(c.spiegazioni), glossario: arr(c.glossario), test: normDomande(arr(c.test), 1), risultati: [], lvl: 1, pratica: normPratica(c.pratica), mio: null, orali: [] };
     S.capitoli.unshift(cap); salva();
@@ -1317,7 +1364,7 @@ function vNuovo(tipo) {
     '<p><span class="muted">' + t('materia_lbl') + ':</span> <b>' + esc(V.materia) + '</b> <button class="btn sec small" data-act="home">' + t('cambia_materia') + '</button></p>' +
     (tipo === 'cap' ? '<label class="f">' + t('focus') + '<input type="text" id="focus"></label>' : '') +
     fotoBox() +
-    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + '</p>' : '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
+    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog && V.prog.tot > FOTO_PER_BLOCCO ? ' (' + t('prog_pagine', { i: V.prog.fatte, n: V.prog.tot }) + ')' : '') + '</p>' : (tipo === 'cap' && V.foto.length > FOTO_PER_BLOCCO ? '<p class="muted">' + t('blocchi_nota', { b: FOTO_PER_BLOCCO, n: Math.ceil(V.foto.length / FOTO_PER_BLOCCO) }) + '</p>' : '') + '<button class="btn full" data-act="' + (tipo === 'cap' ? 'prepara-cap' : 'prepara-es') + '">' + (tipo === 'cap' ? t('prepara_studio') : t('guidami')) + '</button>') +
     '<p class="muted">' + t('foto_privacy') + '</p></div>';
 }
 function vControllo() {
