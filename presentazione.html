@@ -135,6 +135,12 @@ details ol{margin:10px 0 0;padding-left:1.3em;color:var(--muted)}
 .lk:hover{transform:translateY(-3px)}
 .lk b{font:600 1.05rem var(--f-d)}
 .lk span{font-size:.93rem;opacity:.92}
+.gem{margin-top:26px;background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,32px)}
+.gem h3{font-size:1.35rem;font-weight:800;margin-bottom:8px}
+.gem ol{margin:14px 0 0;padding-left:1.4em;display:grid;gap:8px}
+.gem ol li::marker{font:600 1rem var(--f-d);color:var(--accent)}
+.avv{margin-top:20px;background:var(--soft);border-radius:16px;padding:16px 20px}
+.avv ul{margin:8px 0 0;padding-left:1.2em;display:grid;gap:6px;color:var(--ink);font-size:.97rem}
 .nota{margin-top:18px;color:var(--muted);font-size:.95rem;max-width:70ch}
 .mascot{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:clamp(20px,4vw,36px)}
 .mascot img{border-radius:32px;border:3px solid var(--ink);box-shadow:0 8px 0 -2px var(--ink);animation:dondola 5s ease-in-out infinite}
@@ -295,6 +301,24 @@ footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color
       <a class="lk" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener"><b>Claude (Anthropic)</b><span>Crea l'account, ricarica il credito e genera la chiave</span></a>
       <a class="lk" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"><b>Google Gemini</b><span>Chiave da Google AI Studio, con un livello gratuito a limiti giornalieri</span></a>
       <a class="lk" href="https://console.groq.com/keys" target="_blank" rel="noopener"><b>Groq</b><span>Alternativa veloce, con chiave dalla console</span></a>
+    </div>
+    <div class="gem">
+      <p class="eb">Per provare senza spendere</p>
+      <h3>La chiave gratuita di Google Gemini</h3>
+      <p>Per iniziare puoi usare il livello gratuito di Google. Di norma non serve la carta di credito, basta un account Google.</p>
+      <ol>
+        <li>Apri <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> e accedi con il tuo account Google.</li>
+        <li>Premi il pulsante per creare una chiave API (in inglese "Create API key") e accetta le condizioni.</li>
+        <li>Copia il codice che compare. È una lunga serie di lettere e numeri.</li>
+        <li>In AI.st.ain apri <b>Area genitori › Impostazioni › Collegamento all'AI</b>, scegli <b>Google Gemini</b>, incolla la chiave e salva.</li>
+        <li>Torna alla home, aggiungi le foto di un capitolo e premi per prepararlo.</li>
+      </ol>
+      <div class="avv"><b>Da sapere</b><ul>
+        <li>Il livello gratuito ha dei limiti giornalieri. Se un capitolo molto lungo non parte, riprova più tardi o il giorno dopo.</li>
+        <li>Google può cambiare limiti e condizioni quando vuole: controllali sul sito.</li>
+        <li>Nel livello gratuito Google può usare i testi inviati per migliorare i suoi modelli, salvo eccezioni come lo Spazio Economico Europeo. Sono pagine di libro, mai il nome del ragazzo. Se non vuoi, usa una chiave a pagamento.</li>
+        <li>La chiave è personale: non condividerla e tienila solo sui tuoi dispositivi.</li>
+      </ul></div>
     </div>
     <p class="nota">Le condizioni, i limiti gratuiti e il trattamento dei dati cambiano da servizio a servizio: leggile sul sito scelto prima di attivare la chiave. Per chi preferisce non usare internet esiste anche l'opzione di un modello installato sul proprio computer.</p>
   </section>
