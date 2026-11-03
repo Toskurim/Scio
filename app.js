@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.27';
+const VERSIONE = '0.28';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1339,11 +1339,12 @@ function vPrivacy() {
 function vFam() {
   const b = V.bozzaFam || {}; const a = Object.assign({}, FAM.ai, b.ai || {});
   const lingua = b.lingua || FAM.lingua;
-  const srv = [['demo', 'srv_demo'], ['compat', 'srv_compat'], ['openrouter', 'srv_or'], ['anthropic', 'srv_anth']];
+  const srv = [['demo', 'srv_demo'], ['gemini', 'srv_gemini'], ['groq', 'srv_groq'], ['compat', 'srv_compat'], ['openrouter', 'srv_or'], ['anthropic', 'srv_anth']];
+  const sel = a.provider === 'compat' && (a.preset === 'gemini' || a.preset === 'groq') ? a.preset : a.provider;
   return barra() + '<div class="card"><h1>' + t('imp_famiglia') + '</h1>' + (!FAM.pin ? '<p class="muted">' + t('passo_fam') + '</p>' : '') + '</div>' +
     '<div class="card"><label class="f">' + t('lingua_gen') + '<select id="lingua-gen">' + LINGUE_ORD.map(l => '<option value="' + l + '"' + (lingua === l ? ' selected' : '') + '>' + LINGUE[l] + '</option>').join('') + '</select></label><p class="muted">' + t('lingua_nota') + '</p></div>' +
-    '<div class="card"><h2>' + t('ai_titolo') + '</h2><label class="f">' + t('servizio') + '<select id="prov">' + srv.map(o => '<option value="' + o[0] + '"' + (a.provider === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>').join('') + '</select></label>' +
-    '<div id="boxcompat"' + (a.provider === 'compat' ? '' : ' hidden') + '><label class="f">' + t('quale') + '<select id="preset">' + Object.keys(PRESET).map(k => '<option value="' + k + '"' + ((a.preset || 'ollama') === k ? ' selected' : '') + '>' + PRESET[k].nome + '</option>').join('') + '</select></label>' +
+    '<div class="card"><h2>' + t('ai_titolo') + '</h2><label class="f">' + t('servizio') + '<select id="prov">' + srv.map(o => '<option value="' + o[0] + '"' + (sel === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>').join('') + '</select></label>' +
+    '<div id="boxcompat"' + (sel === 'compat' ? '' : ' hidden') + '><label class="f">' + t('quale') + '<select id="preset">' + Object.keys(PRESET).filter(k => !PRESET[k].chiave).map(k => '<option value="' + k + '"' + ((a.preset === 'lmstudio' ? 'lmstudio' : 'ollama') === k ? ' selected' : '') + '>' + PRESET[k].nome + '</option>').join('') + '</select></label>' +
     '<label class="f">' + t('indirizzo_servizio') + '<input type="text" id="url" value="' + esc(a.url || PRESET.ollama.url) + '" autocomplete="off"></label></div>' +
     '<label class="f">' + t('chiave_api') + '<input type="password" id="chiave" value="' + esc(b.ai && b.ai.key ? b.ai.key : '') + '" placeholder="' + esc(haChiave(FAM.ai) ? t('chiave_salvata') : '') + '" autocomplete="off"></label>' + (haChiave(FAM.ai) ? '<button class="btn sec small" type="button" data-act="rimuovi-chiave">' + t('rimuovi_chiave') + '</button>' : '') +
     '<label class="f">' + t('modello') + '<input type="text" id="modello" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
@@ -1587,7 +1588,7 @@ function vGenitori() {
   const bk = FAM.ultimoBackup ? t('ultima_copia', { d: esc(new Date(FAM.ultimoBackup).toLocaleDateString(lang)) }) + (Date.now() - new Date(FAM.ultimoBackup).getTime() > 30 * 86400000 ? ' ' + t('copia_vecchia') : '') : '<b>' + t('no_copia') + '</b>';
   return barra() + '<div class="card"><h1>' + t('area_gen') + '</h1></div><h2>' + t('figli') + '</h2>' + (figli || '<div class="card muted">' + t('nessun_profilo') + '</div>') +
     '<div class="card"><button class="btn" data-act="aggiungi-figlio">+ ' + t('aggiungi_figlio') + '</button></div>' +
-    '<div class="card"><h2>' + t('imp_famiglia') + '</h2><p class="muted">' + t('lingua_gen') + ': <b>' + LINGUE[FAM.lingua] + '</b> · ' + t('ai_titolo') + ': <b>' + esc(FAM.ai.provider) + '</b></p><button class="btn sec" data-act="modifica-fam">' + t('modifica') + '</button></div>' +
+    '<div class="card"><h2>' + t('imp_famiglia') + '</h2><p class="muted">' + t('lingua_gen') + ': <b>' + LINGUE[FAM.lingua] + '</b> · ' + t('ai_titolo') + ': <b>' + esc(FAM.ai.provider === 'compat' && (FAM.ai.preset === 'gemini' || FAM.ai.preset === 'groq') ? FAM.ai.preset : FAM.ai.provider) + '</b></p><button class="btn sec" data-act="modifica-fam">' + t('modifica') + '</button></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" data-act="priv-apri">' + t('priv_btn') + '</button></div>' +
     '<div class="card"><h2>' + t('dati_sic') + '</h2><p class="muted">' + t('dati_info') + '</p><p class="muted">' + bk + '</p><div class="row"><button class="btn sec" data-act="esporta">' + t('salva_copia') + '</button><label class="btn sec">' + t('ripristina') + '<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" id="installa" data-act="installa"' + (promptInstalla ? '' : ' hidden') + '>' + t('installa') + '</button><button class="btn sec" data-act="azzera">' + t('cancella_tutto') + '</button></div></div>';
 }
@@ -1620,8 +1621,8 @@ function render() {
   };
   if (v === 'fam') {
     const prov = document.getElementById('prov'), preset = document.getElementById('preset');
-    document.getElementById('chiave').oninput = () => { const a = leggiAi(); if (a.provider !== prov.value) { prov.value = a.provider; prov.onchange(); } };
-    prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat'; };
+    document.getElementById('chiave').oninput = () => { if (prov.value !== 'demo') return; const a = leggiAi(); if (a.provider !== 'demo') { prov.value = a.provider; prov.onchange(); } };
+    prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat'; const x = PRESET[prov.value === 'compat' ? preset.value : prov.value]; if (x && prov.value !== 'anthropic' && prov.value !== 'openrouter' && prov.value !== 'demo') { document.getElementById('url').value = x.url; document.getElementById('modello').value = x.modello || ''; } };
     preset.onchange = () => { const x = PRESET[preset.value]; document.getElementById('url').value = x.url; if (x.modello) document.getElementById('modello').value = x.modello; };
     document.getElementById('lingua-gen').onchange = e => { V.bozzaFam = { ai: leggiAi(), lingua: e.target.value }; FAM.lingua = e.target.value; render(); };
   }
@@ -1671,7 +1672,9 @@ function indovinaServizio(a) {
 }
 function leggiAi() {
   const g = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
-  return indovinaServizio({ provider: g('prov'), key: g('chiave'), model: g('modello'), preset: g('preset') || 'ollama', url: g('url') });
+  const pv = g('prov');
+  if (pv === 'gemini' || pv === 'groq') return indovinaServizio({ provider: 'compat', key: g('chiave'), model: g('modello'), preset: pv, url: PRESET[pv].url });
+  return indovinaServizio({ provider: pv, key: g('chiave'), model: g('modello'), preset: g('preset') || 'ollama', url: g('url') });
 }
 const AZ = {
   'prova-ai': async () => {
