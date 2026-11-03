@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.26';
+const VERSIONE = '0.27';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -12,7 +12,7 @@ const LS_VECCHIO = 'scio.v0.1';
 const PRESET = {
   ollama:   { nome: 'Ollama sul mio PC (gratis, privato)', url: 'http://localhost:11434/v1', modello: 'gemma4:26b', chiave: false },
   lmstudio: { nome: 'LM Studio sul mio PC (gratis, privato)', url: 'http://localhost:1234/v1', modello: '', chiave: false },
-  gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-2.5-flash', chiave: true },
+  gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-3.8-flash', chiave: true },
   groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true }
 };
 const METODI = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'ascolto', 'libro', 'insieme'];

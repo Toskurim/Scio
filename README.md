@@ -1,4 +1,4 @@
-# AI.st.ain v0.26 — app di studio installabile (PWA)
+# AI.st.ain v0.27 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,9 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.27
+- Gemini: il modello predefinito è ora `gemini-3.8-flash` (il 2.5 non è più disponibile per i nuovi utenti).
 
 ## Novità della v0.26
 - **Aiuto per trovare il proprio metodo di studio (facoltativo)**, in tre parti che il genitore può spegnere separatamente per ogni profilo (modifica profilo › "Aiuto per trovare il proprio metodo di studio"):
