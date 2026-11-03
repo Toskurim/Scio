@@ -290,38 +290,18 @@ footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color
   <section id="chiave">
     <p class="eb">Intelligenza artificiale</p>
     <h2>Si paga solo quello che si usa</h2>
-    <p class="lead" style="margin-top:12px">AI.st.ain non ha abbonamenti. Per leggere i capitoli usa un servizio di intelligenza artificiale a tua scelta, collegato con una chiave personale (chiave API). Il servizio fa pagare solo l'uso reale, un po' come la ricarica del telefono: carichi un piccolo credito e si consuma man mano che studi.</p>
+    <p class="lead" style="margin-top:12px">AI.st.ain non ha abbonamenti. Per leggere i capitoli usa Claude, l'intelligenza artificiale di Anthropic, collegata con una chiave personale (chiave API). Nelle nostre prove è la scelta più veloce e precisa. Il servizio fa pagare solo l'uso reale, un po' come la ricarica del telefono: carichi un piccolo credito e si consuma man mano che studi.</p>
     <div class="priv">
-      <div><h3>1. Crea l'account</h3><p>Ti registri sul sito del servizio che preferisci. È un account tuo, non dell'app.</p></div>
+      <div><h3>1. Crea l'account</h3><p>Ti registri sul sito di Anthropic. È un account tuo, non dell'app.</p></div>
       <div><h3>2. Aggiungi un po' di credito</h3><p>Basta una piccola ricarica. Puoi fissare un limite di spesa e controllare i consumi quando vuoi.</p></div>
       <div><h3>3. Crea la chiave API</h3><p>È un codice segreto che permette all'app di usare il servizio. Non va condiviso con nessuno.</p></div>
-      <div><h3>4. Incollala nell'app</h3><p>In Area genitori › Impostazioni, nella sezione Collegamento all'AI. Resta sul tuo dispositivo.</p></div>
+      <div><h3>4. Incollala nell'app</h3><p>In Area genitori › Impostazioni › Collegamento all'AI scegli Claude (chiave Anthropic), incolla la chiave e premi Prova il collegamento. Resta sul tuo dispositivo.</p></div>
     </div>
     <div class="links">
-      <a class="lk" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener"><b>Claude (Anthropic) · consigliato</b><span>Il più veloce e preciso nelle nostre prove. Crea l'account, ricarica il credito e genera la chiave</span></a>
-      <a class="lk" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"><b>Google Gemini</b><span>Chiave da Google AI Studio, con un livello gratuito a limiti giornalieri. Più lento e a volte occupato</span></a>
-      <a class="lk" href="https://console.groq.com/keys" target="_blank" rel="noopener"><b>Groq</b><span>Alternativa veloce, con chiave dalla console</span></a>
+      <a class="lk" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener"><b>Chiavi API di Claude</b><span>Dopo aver creato l'account e ricaricato il credito, genera qui la tua chiave</span></a>
+      <a class="lk" href="https://docs.claude.com/en/docs/about-claude/pricing" target="_blank" rel="noopener"><b>Prezzi delle API di Claude</b><span>Il listino ufficiale, per capire quanto costa ogni modello</span></a>
     </div>
-    <div class="gem">
-      <p class="eb">Alternativa gratuita</p>
-      <h3>La chiave gratuita di Google Gemini</h3>
-      <p>Per provare senza spendere puoi usare il livello gratuito di Google. Di norma non serve la carta di credito, basta un account Google. Nelle nostre prove è più lento di Claude (anche diversi secondi in più per ogni capitolo) e nelle ore di punta può rispondere "servizio occupato". Va bene per provare, meno per usarlo ogni giorno.</p>
-      <ol>
-        <li>Apri <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> e accedi con il tuo account Google.</li>
-        <li>Premi il pulsante per creare una chiave API (in inglese "Create API key") e accetta le condizioni.</li>
-        <li>Copia il codice che compare. È una lunga serie di lettere e numeri.</li>
-        <li>In AI.st.ain apri <b>Area genitori › Impostazioni › Collegamento all'AI</b>. Nel menu <b>Servizio</b> scegli <b>Google Gemini (chiave gratuita di AI Studio)</b>, incolla la chiave e premi <b>Prova il collegamento</b>. Poi salva.</li>
-        <li>Torna alla home, aggiungi le foto di un capitolo e premi per prepararlo.</li>
-      </ol>
-      <div class="avv"><b>Da sapere</b><ul>
-        <li>Se compare l'errore 503 ("servizio occupato"), l'app riprova da sola con un modello più leggero. Puoi anche scrivere a mano <code>gemini-3.5-flash-lite</code> nel campo Modello.</li>
-        <li>Il livello gratuito ha dei limiti giornalieri. Se un capitolo molto lungo non parte, riprova più tardi o il giorno dopo.</li>
-        <li>Google può cambiare limiti e condizioni quando vuole: controllali sul sito.</li>
-        <li>Nel livello gratuito Google può usare i testi inviati per migliorare i suoi modelli, salvo eccezioni come lo Spazio Economico Europeo. Sono pagine di libro, mai il nome del ragazzo. Se non vuoi, usa una chiave a pagamento.</li>
-        <li>La chiave è personale: non condividerla e tienila solo sui tuoi dispositivi.</li>
-      </ul></div>
-    </div>
-    <p class="nota">Le condizioni, i limiti gratuiti e il trattamento dei dati cambiano da servizio a servizio: leggile sul sito scelto prima di attivare la chiave. Per chi preferisce non usare internet esiste anche l'opzione di un modello installato sul proprio computer.</p>
+    <p class="nota">Condizioni e trattamento dei dati sono quelli di Anthropic: leggili sul sito prima di attivare la chiave. Per chi preferisce non usare internet esiste anche l'opzione di un modello installato sul proprio computer.</p>
   </section>
 
   <section>
@@ -333,7 +313,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color
       <div><h3>Zero spese a vuoto</h3><p>Non studi, non spendi. Niente rinnovi automatici da ricordarsi di disdire.</p></div>
       <div><h3>Spesa che decidi tu</h3><p>Il credito lo ricarichi tu e puoi mettere un tetto mensile dal sito del servizio.</p></div>
     </div>
-    <p class="nota">Listini aggiornati: <a href="https://docs.claude.com/en/docs/about-claude/pricing" target="_blank" rel="noopener">prezzi API Claude</a> · <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">prezzi API Gemini</a></p>
+    <p class="nota">Listino aggiornato: <a href="https://docs.claude.com/en/docs/about-claude/pricing" target="_blank" rel="noopener">prezzi API Claude</a></p>
   </section>
 
   <section id="installa">

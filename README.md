@@ -1,4 +1,4 @@
-# AI.st.ain v0.32 — app di studio installabile (PWA)
+# AI.st.ain v0.33 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,10 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.33
+- Il menu "Servizio" propone solo: demo, Claude, PC di casa (Ollama/LM Studio) e OpenRouter. **Gemini e Groq non sono più proposti** (lenti o instabili nelle prove); restano visibili solo a chi li aveva già impostati.
+- Il campo Modello suggerisce solo i modelli del servizio scelto (con Claude: solo Haiku).
 
 ## Novità della v0.32
 - Groq: modello predefinito `qwen/qwen3.8-27b` (legge le immagini; prima il campo vuoto dava errore 400) e capitoli divisi in blocchi da 3 foto, perché Groq accetta al massimo 3 immagini per richiesta. Con gli altri servizi nulla cambia.

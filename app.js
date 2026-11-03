@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.32';
+const VERSIONE = '0.33';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -16,6 +16,7 @@ const PRESET = {
   groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: 'qwen/qwen3.8-27b', chiave: true }
 };
 let GEM_NORID = false;
+const MODELLI_PER = { anthropic: ['claude-haiku-5-5'], compat: ['gemma4:26b'], openrouter: [], gemini: ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'], groq: ['qwen/qwen3.8-27b'], demo: [] };
 const GEMINI_ALT = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 const METODI = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'ascolto', 'libro', 'insieme'];
 const DSA = {
@@ -1354,16 +1355,18 @@ function vPrivacy() {
 function vFam() {
   const b = V.bozzaFam || {}; const a = Object.assign({}, FAM.ai, b.ai || {});
   const lingua = b.lingua || FAM.lingua;
-  const srv = [['demo', 'srv_demo'], ['gemini', 'srv_gemini'], ['groq', 'srv_groq'], ['compat', 'srv_compat'], ['openrouter', 'srv_or'], ['anthropic', 'srv_anth']];
   const sel = a.provider === 'compat' && (a.preset === 'gemini' || a.preset === 'groq') ? a.preset : a.provider;
+  /* Gemini e Groq non sono più proposti; restano nell'elenco solo per chi li aveva già impostati */
+  const srv = [['demo', 'srv_demo'], ['anthropic', 'srv_anth'], ['compat', 'srv_compat'], ['openrouter', 'srv_or']];
+  if (sel === 'gemini' || sel === 'groq') srv.splice(1, 0, [sel, 'srv_' + sel]);
   return barra() + '<div class="card"><h1>' + t('imp_famiglia') + '</h1>' + (!FAM.pin ? '<p class="muted">' + t('passo_fam') + '</p>' : '') + '</div>' +
     '<div class="card"><label class="f">' + t('lingua_gen') + '<select id="lingua-gen">' + LINGUE_ORD.map(l => '<option value="' + l + '"' + (lingua === l ? ' selected' : '') + '>' + LINGUE[l] + '</option>').join('') + '</select></label><p class="muted">' + t('lingua_nota') + '</p></div>' +
     '<div class="card"><h2>' + t('ai_titolo') + '</h2><label class="f">' + t('servizio') + '<select id="prov">' + srv.map(o => '<option value="' + o[0] + '"' + (sel === o[0] ? ' selected' : '') + '>' + t(o[1]) + '</option>').join('') + '</select></label>' +
     '<div id="boxcompat"' + (sel === 'compat' ? '' : ' hidden') + '><label class="f">' + t('quale') + '<select id="preset">' + Object.keys(PRESET).filter(k => !PRESET[k].chiave).map(k => '<option value="' + k + '"' + ((a.preset === 'lmstudio' ? 'lmstudio' : 'ollama') === k ? ' selected' : '') + '>' + PRESET[k].nome + '</option>').join('') + '</select></label>' +
     '<label class="f">' + t('indirizzo_servizio') + '<input type="text" id="url" value="' + esc(a.url || PRESET.ollama.url) + '" autocomplete="off"></label></div>' +
     '<label class="f">' + t('chiave_api') + '<input type="password" id="chiave" value="' + esc(b.ai && b.ai.key ? b.ai.key : '') + '" placeholder="' + esc(haChiave(FAM.ai) ? t('chiave_salvata') : '') + '" autocomplete="off"></label>' + (haChiave(FAM.ai) ? '<button class="btn sec small" type="button" data-act="rimuovi-chiave">' + t('rimuovi_chiave') + '</button>' : '') +
-    '<label class="f">' + t('modello') + '<input type="text" id="modello" list="mod-sugg" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
-    '<datalist id="mod-sugg">' + ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'qwen/qwen3.8-27b', 'claude-haiku-5-5', 'claude-sonnet-5-5'].map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
+    '<label class="f">' + t('modello') + '<input type="text" id="modello" list="mod-sugg" value="' + esc(a.model) + '" placeholder="' + esc((MODELLI_PER[sel] || [])[0] || '') + '"></label>' +
+    '<datalist id="mod-sugg">' + (MODELLI_PER[sel] || []).map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
     '<button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
     '<details><summary>Guida / Guide: Ollama, LM Studio</summary><p class="muted"><b>Ollama</b>: <code>ollama pull gemma4:26b</code> (GPU ~16 GB). <code>OLLAMA_ORIGINS=' + esc(location.origin.startsWith('http') ? location.origin : 'https://toskurim.github.io') + '</code>. <b>LM Studio</b>: Developer › server + CORS.<br>Funziona solo sul PC dove girano / works only on the PC where they run.</p></details></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" type="button" data-act="priv-apri">' + t('priv_btn') + '</button>' +
@@ -1642,7 +1645,10 @@ function render() {
       /* il menu dei suggerimenti mostra solo i nomi simili a ciò che c'è scritto: allo scatto del campo lo svuoto per mostrarli tutti, e se non scegli nulla lo rimetto */
       m.addEventListener('focus', () => { prima = m.value; if (prima) { m.value = ''; } });
       m.addEventListener('blur', () => { if (!m.value && prima) m.value = prima; prima = ''; }); }
-    prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat'; const x = PRESET[prov.value === 'compat' ? preset.value : prov.value]; if (x && prov.value !== 'anthropic' && prov.value !== 'openrouter' && prov.value !== 'demo') { document.getElementById('url').value = x.url; document.getElementById('modello').value = x.modello || ''; } };
+    prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat';
+      { const lista = MODELLI_PER[prov.value] || [], m = document.getElementById('modello');
+        document.getElementById('mod-sugg').innerHTML = lista.map(x => '<option value="' + x + '"></option>').join(''); m.placeholder = lista[0] || '';
+        const tutti = [].concat(...Object.values(MODELLI_PER)); if (tutti.includes(m.value) && !lista.includes(m.value)) m.value = ''; } const x = PRESET[prov.value === 'compat' ? preset.value : prov.value]; if (x && prov.value !== 'anthropic' && prov.value !== 'openrouter' && prov.value !== 'demo') { document.getElementById('url').value = x.url; document.getElementById('modello').value = x.modello || ''; } };
     preset.onchange = () => { const x = PRESET[preset.value]; document.getElementById('url').value = x.url; if (x.modello) document.getElementById('modello').value = x.modello; };
     document.getElementById('lingua-gen').onchange = e => { V.bozzaFam = { ai: leggiAi(), lingua: e.target.value }; FAM.lingua = e.target.value; render(); };
   }
