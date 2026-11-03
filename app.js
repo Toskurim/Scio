@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.29';
+const VERSIONE = '0.30';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1632,6 +1632,10 @@ function render() {
   if (v === 'fam') {
     const prov = document.getElementById('prov'), preset = document.getElementById('preset');
     document.getElementById('chiave').oninput = () => { if (prov.value !== 'demo') return; const a = leggiAi(); if (a.provider !== 'demo') { prov.value = a.provider; prov.onchange(); } };
+    { const m = document.getElementById('modello'); let prima = '';
+      /* il menu dei suggerimenti mostra solo i nomi simili a ciò che c'è scritto: allo scatto del campo lo svuoto per mostrarli tutti, e se non scegli nulla lo rimetto */
+      m.addEventListener('focus', () => { prima = m.value; if (prima) { m.value = ''; } });
+      m.addEventListener('blur', () => { if (!m.value && prima) m.value = prima; prima = ''; }); }
     prov.onchange = () => { document.getElementById('boxcompat').hidden = prov.value !== 'compat'; const x = PRESET[prov.value === 'compat' ? preset.value : prov.value]; if (x && prov.value !== 'anthropic' && prov.value !== 'openrouter' && prov.value !== 'demo') { document.getElementById('url').value = x.url; document.getElementById('modello').value = x.modello || ''; } };
     preset.onchange = () => { const x = PRESET[preset.value]; document.getElementById('url').value = x.url; if (x.modello) document.getElementById('modello').value = x.modello; };
     document.getElementById('lingua-gen').onchange = e => { V.bozzaFam = { ai: leggiAi(), lingua: e.target.value }; FAM.lingua = e.target.value; render(); };
