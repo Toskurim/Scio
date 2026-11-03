@@ -1,4 +1,4 @@
-# AI.st.ain v0.28 — app di studio installabile (PWA)
+# AI.st.ain v0.29 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,10 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.29
+- Gemini: se il servizio è occupato (errore 503/429) o il modello non esiste più (404), l'app riprova da sola con `gemini-3.6-flash` e poi `gemini-3.5-flash-lite`.
+- Il campo Modello suggerisce i modelli più usati (tocca il campo per vedere l'elenco).
 
 ## Novità della v0.28 (e 0.27)
 - **Gemini e Groq ora hanno una voce propria** nel menu "Servizio" (prima erano nascosti sotto "PC di casa"). "PC di casa" resta solo per Ollama e LM Studio. Le impostazioni già salvate continuano a funzionare.

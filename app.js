@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.28';
+const VERSIONE = '0.29';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -15,6 +15,7 @@ const PRESET = {
   gemini:   { nome: 'Google Gemini (chiave gratuita di AI Studio)', url: 'https://generativelanguage.googleapis.com/v1beta/openai', modello: 'gemini-3.8-flash', chiave: true },
   groq:     { nome: 'Groq', url: 'https://api.groq.com/openai/v1', modello: '', chiave: true }
 };
+const GEMINI_ALT = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 const METODI = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'ascolto', 'libro', 'insieme'];
 const DSA = {
   discalculia: 'Discalculia: spiegazioni di numeri e calcoli passo passo, un passaggio per volta, con esempi concreti e visivi prima delle formule; numeri piccoli negli esempi; nei test valuta il ragionamento e non la velocità o il calcolo mentale.',
@@ -256,9 +257,17 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
   if (chiave) head.authorization = 'Bearer ' + chiave;
   if (!compat) head['x-title'] = 'AI.st.ain';
   let r;
+  /* Gemini: se il servizio è sovraccarico (503, 429) o il modello non c'è più (404), riprova con un modello vicino */
+  const gem = compat && /generativelanguage\.googleapis\.com/.test(a.url);
+  const catena = gem ? [a.model || PRESET.gemini.modello].concat(GEMINI_ALT).filter((m, i, v) => m && v.indexOf(m) === i).slice(0, 3) : [a.model || (compat ? undefined : 'google/gemini-2.5-flash')];
   try {
-    r = await fetch(url, { method: 'POST', headers: head,
-      body: JSON.stringify({ model: a.model || (compat ? undefined : 'google/gemini-2.5-flash'), temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }) });
+    for (let i = 0; i < catena.length; i++) {
+      r = await fetch(url, { method: 'POST', headers: head,
+        body: JSON.stringify({ model: catena[i], temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }) });
+      if (r.ok || !gem || ![429, 500, 503, 404].includes(r.status) || i === catena.length - 1) break;
+      if (typeof toast === 'function') toast('Il servizio è occupato: provo con un altro modello…');
+      await new Promise(x => setTimeout(x, 2500));
+    }
   } catch (e) {
     throw new Error(compat ? 'Non riesco a raggiungere ' + a.url + '. Controlla che il programma sia acceso e che accetti collegamenti dal browser (vedi guida).' : 'Rete non raggiungibile: ' + e.message);
   }
@@ -1347,7 +1356,8 @@ function vFam() {
     '<div id="boxcompat"' + (sel === 'compat' ? '' : ' hidden') + '><label class="f">' + t('quale') + '<select id="preset">' + Object.keys(PRESET).filter(k => !PRESET[k].chiave).map(k => '<option value="' + k + '"' + ((a.preset === 'lmstudio' ? 'lmstudio' : 'ollama') === k ? ' selected' : '') + '>' + PRESET[k].nome + '</option>').join('') + '</select></label>' +
     '<label class="f">' + t('indirizzo_servizio') + '<input type="text" id="url" value="' + esc(a.url || PRESET.ollama.url) + '" autocomplete="off"></label></div>' +
     '<label class="f">' + t('chiave_api') + '<input type="password" id="chiave" value="' + esc(b.ai && b.ai.key ? b.ai.key : '') + '" placeholder="' + esc(haChiave(FAM.ai) ? t('chiave_salvata') : '') + '" autocomplete="off"></label>' + (haChiave(FAM.ai) ? '<button class="btn sec small" type="button" data-act="rimuovi-chiave">' + t('rimuovi_chiave') + '</button>' : '') +
-    '<label class="f">' + t('modello') + '<input type="text" id="modello" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
+    '<label class="f">' + t('modello') + '<input type="text" id="modello" list="mod-sugg" value="' + esc(a.model) + '" placeholder="OpenRouter: google/gemini-2.5-flash · Claude: claude-sonnet-5-5 · Ollama: gemma4:26b"></label>' +
+    '<datalist id="mod-sugg">' + ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'claude-haiku-5-5', 'claude-sonnet-5-5'].map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
     '<button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
     '<details><summary>Guida / Guide: Ollama, LM Studio</summary><p class="muted"><b>Ollama</b>: <code>ollama pull gemma4:26b</code> (GPU ~16 GB). <code>OLLAMA_ORIGINS=' + esc(location.origin.startsWith('http') ? location.origin : 'https://toskurim.github.io') + '</code>. <b>LM Studio</b>: Developer › server + CORS.<br>Funziona solo sul PC dove girano / works only on the PC where they run.</p></details></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" type="button" data-act="priv-apri">' + t('priv_btn') + '</button>' +
