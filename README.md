@@ -9,6 +9,8 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
+- Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
 ## Novità della v0.26
 - **Aiuto per trovare il proprio metodo di studio (facoltativo)**, in tre parti che il genitore può spegnere separatamente per ogni profilo (modifica profilo › "Aiuto per trovare il proprio metodo di studio"):
   1. prima di un test chiede «Come hai studiato?» (le schede usate sono già spuntate; si può saltare);

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="it" style="color-scheme:light dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI.st.ain, l'app di studio</title>
+<meta name="description" content="App gratuita per studiare: dalle foto del libro a riassunti, schemi, mappe e test, con aiuti per i DSA.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: un'unica colonna larga, hero con foto che si trasforma in schede di studio, poi griglia di funzioni, DSA, privacy e installazione */
+:root{
+  --bg:#F3F6FB; --card:#FFFFFF; --ink:#13203B; --muted:#4D5A73; --line:#D9E0EC;
+  --accent:#2F5BEA; --accent-ink:#FFFFFF; --sun:#FFC83D; --sun-ink:#3A2A00; --mint:#12A58A; --soft:#E3EAFB;
+  --f-d:'Lexend',system-ui,sans-serif; --f-b:'Atkinson Hyperlegible',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1526;--card:#16213A;--ink:#EAF0FC;--muted:#A9B6D0;--line:#2A3858;--accent:#7F9CFF;--accent-ink:#0B1226;--sun:#FFC83D;--sun-ink:#3A2A00;--mint:#3DD6B5;--soft:#1E2C50;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1526;--card:#16213A;--ink:#EAF0FC;--muted:#A9B6D0;--line:#2A3858;--accent:#7F9CFF;--accent-ink:#0B1226;--sun:#FFC83D;--sun-ink:#3A2A00;--mint:#3DD6B5;--soft:#1E2C50;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.6 var(--f-b);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+.w{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-d);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:800;letter-spacing:-.01em}
+p{margin:0}
+.lead{color:var(--muted);max-width:60ch}
+section{padding-block:56px 8px}
+.eb{font:600 .78rem var(--f-d);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:6px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px;align-items:center;padding-block:48px 16px}
+.hero h1{font-size:clamp(2.3rem,7vw,4.2rem);font-weight:800;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--sun) 62%);padding:0 .08em}
+.hero .lead{margin-top:18px;font-size:1.2rem}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.btn{font:600 1rem var(--f-d);padding:14px 22px;border-radius:14px;text-decoration:none;display:inline-block;transition:transform .15s}
+.btn.p{background:var(--accent);color:var(--accent-ink)}
+.btn.s{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.btn:hover{transform:translateY(-2px)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tag{font:600 .82rem var(--f-d);background:var(--soft);color:var(--ink);padding:6px 12px;border-radius:99px}
+
+/* scena animata: la foto della pagina diventa schede */
+.scena{position:relative;aspect-ratio:1/1;max-width:460px;width:100%;margin:0 auto}
+.pagina{position:absolute;left:4%;top:18%;width:40%;aspect-ratio:3/4;background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:7px;transform:rotate(-6deg);animation:scatto 7s ease-in-out infinite}
+.pagina i{display:block;height:6px;border-radius:3px;background:var(--line)}
+.pagina i:nth-child(1){width:60%;background:var(--ink);height:8px}
+.pagina i:nth-child(4){width:80%}.pagina i:nth-child(6){width:50%}.pagina i:nth-child(8){width:70%}
+.flash{position:absolute;inset:0;border-radius:8px;background:#fff;opacity:0;animation:fl 7s ease-in-out infinite}
+.sch{position:absolute;width:44%;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:10px 12px;font:600 .82rem/1.3 var(--f-d);box-shadow:0 8px 0 -2px var(--ink);opacity:0;animation:esce 7s ease-out infinite}
+.sch b{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.sch.a{right:2%;top:2%;animation-delay:.0s}
+.sch.b{right:-2%;top:30%;animation-delay:.25s;background:var(--sun);color:var(--sun-ink)}
+.sch.b b{color:var(--sun-ink)}
+.sch.c{right:6%;top:58%;animation-delay:.5s}
+.sch.d{left:6%;bottom:0;animation-delay:.75s;background:var(--soft)}
+@keyframes scatto{0%,8%{transform:rotate(-6deg) scale(1)}12%{transform:rotate(-6deg) scale(1.06)}18%,100%{transform:rotate(-6deg) scale(1)}}
+@keyframes fl{0%,10%{opacity:0}12%{opacity:.9}20%,100%{opacity:0}}
+@keyframes esce{0%,14%{opacity:0;transform:translate(-60px,20px) scale(.6)}26%{opacity:1;transform:none}86%{opacity:1;transform:none}96%,100%{opacity:0;transform:translateY(-8px)}}
+
+/* funzioni */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px;margin-top:28px}
+.fn{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s}
+.fn:hover{transform:translateY(-4px);border-color:var(--accent)}
+.fn svg{width:42px;height:42px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fn h3{font-size:1.15rem;font-weight:600}
+.fn p{color:var(--muted);font-size:.98rem}
+
+/* mappa animata */
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;margin-top:28px}
+.mapbox{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:14px}
+.mapbox svg{width:100%;height:auto;display:block}
+.mapbox text{font:600 13px var(--f-d);fill:var(--ink)}
+.mapbox .n{fill:var(--soft);stroke:var(--accent);stroke-width:2}
+.mapbox .c{fill:var(--sun);stroke:var(--ink);stroke-width:2}
+.mapbox .l{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:200;stroke-dashoffset:200;animation:disegna 6s ease-out infinite}
+.mapbox .l:nth-of-type(2){animation-delay:.3s}.mapbox .l:nth-of-type(3){animation-delay:.6s}.mapbox .l:nth-of-type(4){animation-delay:.9s}
+.mapbox .nd{animation:pop 6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes disegna{0%{stroke-dashoffset:200}25%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:200}}
+@keyframes pop{0%,8%{transform:scale(0)}22%,85%{transform:scale(1)}100%{transform:scale(0)}}
+.list{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px}
+.list li{display:flex;gap:12px;align-items:flex-start}
+.list li::before{content:"";flex:none;width:22px;height:22px;margin-top:3px;border-radius:50%;background:var(--mint) center/12px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.4l2.6 2.6L10 3.4' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+
+/* test: opzioni */
+.quiz{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:22px}
+.quiz .q{font:600 1.05rem var(--f-d);margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;font:400 1rem var(--f-b);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--mint);background:color-mix(in srgb,var(--mint) 18%,var(--card))}
+.opt.no{border-color:#E0556B;background:color-mix(in srgb,#E0556B 14%,var(--card))}
+.fbk{min-height:1.6em;color:var(--muted);font-size:.95rem}
+
+/* DSA */
+.dsa{--d-bg:#13203B;--d-fg:#F2F5FC;--d-sun:#FFC83D;background:var(--d-bg);color:var(--d-fg);border-radius:26px;padding:clamp(24px,5vw,48px);margin-top:56px}
+.dsa .eb{color:var(--d-sun)}
+.dsa h2{color:var(--d-fg)}
+.dsa .lead{color:#C9D4EC}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{font:600 .95rem var(--f-d);padding:9px 16px;border-radius:99px;background:#24345A;color:var(--d-fg);border:1.5px solid #4A5E8C}
+.demo{margin-top:26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.demo div{background:#1D2C4D;color:var(--d-fg);border-radius:16px;padding:16px}
+.demo small{display:block;font:600 .72rem var(--f-d);letter-spacing:.12em;text-transform:uppercase;color:var(--d-sun);margin-bottom:6px}
+.demo .big{font-size:1.25rem;line-height:1.9;letter-spacing:.06em;word-spacing:.2em}
+.demo .mk{background:var(--sun);color:var(--sun-ink);padding:0 4px;border-radius:4px}
+
+/* temi e lingue */
+.temi{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;margin-top:26px}
+.tema{border-radius:18px;padding:20px;border:2px solid;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;font:600 1rem var(--f-d)}
+.tema small{font:400 .88rem var(--f-b);opacity:.85}
+.t1{background:#F6F3EC;color:#1F2A37;border-color:#D8D1C0}
+.t2{background:#FFF1CC;color:#2B1B4D;border-color:#2B1B4D;border-width:3px;border-radius:24px;box-shadow:0 5px 0 #2B1B4D}
+.t3{background:#161B24;color:#E6EAF0;border-color:#3A465A}
+.lingue{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.lingue span{font:600 .95rem var(--f-d);background:var(--card);border:1.5px solid var(--line);padding:8px 16px;border-radius:99px}
+
+/* privacy */
+.priv{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px;margin-top:26px}
+.priv div{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:20px}
+.priv h3{font-size:1.05rem;margin-bottom:6px;font-weight:600}
+.priv p{color:var(--muted);font-size:.97rem}
+
+/* installazione */
+.inst{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:36px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:clamp(22px,4vw,40px);margin-top:28px}
+.qr{background:#fff;padding:14px;border-radius:16px;width:fit-content;border:1.5px solid var(--line)}
+.qr canvas,.qr img{display:block}
+.qrt{text-align:center;font:600 .85rem var(--f-d);margin-top:10px;color:var(--muted)}
+details{border-top:1.5px solid var(--line);padding:14px 0}
+details:first-of-type{margin-top:18px}
+summary{font:600 1rem var(--f-d);cursor:pointer}
+details ol{margin:10px 0 0;padding-left:1.3em;color:var(--muted)}
+.url{font:600 1rem var(--f-d);word-break:break-all}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin-top:20px}
+.lk{display:flex;flex-direction:column;gap:4px;background:var(--accent);color:var(--accent-ink);text-decoration:none;border-radius:16px;padding:18px 20px;transition:transform .15s}
+.lk:hover{transform:translateY(-3px)}
+.lk b{font:600 1.05rem var(--f-d)}
+.lk span{font-size:.93rem;opacity:.92}
+.nota{margin-top:18px;color:var(--muted);font-size:.95rem;max-width:70ch}
+.mascot{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:clamp(20px,4vw,36px)}
+.mascot img{border-radius:32px;border:3px solid var(--ink);box-shadow:0 8px 0 -2px var(--ink);animation:dondola 5s ease-in-out infinite}
+@keyframes dondola{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@media (max-width:560px){.mascot{grid-template-columns:minmax(0,1fr);justify-items:start}}
+footer{margin-top:56px;padding-top:22px;border-top:1.5px solid var(--line);color:var(--muted);font-size:.92rem;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+@media (max-width:760px){
+  .hero,.duo,.inst{grid-template-columns:minmax(0,1fr)}
+  .hero{padding-top:28px}
+  .scena{max-width:360px}
+  .qr{margin:0 auto}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .sch{opacity:1}.mapbox .l{stroke-dashoffset:0}
+  .sch.a{position:static;width:auto}
+}
+</style>
+
+</head>
+<body>
+<div class="w">
+  <header class="hero">
+    <div>
+      <p class="eb">App di studio gratuita</p>
+      <h1>Fotografa il capitolo. <em>Studia</em> a modo tuo.</h1>
+      <p class="lead">AI.st.ain legge le pagine del libro e le trasforma in riassunto, schemi, mappa concettuale e test. Pensata anche per chi ha dislessia, discalculia e altri DSA.</p>
+      <div class="cta">
+        <a class="btn p" href="https://toskurim.github.io/Scio/" target="_blank" rel="noopener">Apri l'app</a>
+        <a class="btn s" href="#installa">Come installarla</a>
+      </div>
+      <div class="tags"><span class="tag">Gratis</span><span class="tag">Senza pubblicità</span><span class="tag">Senza account</span><span class="tag">9 lingue</span></div>
+    </div>
+    <div class="scena" aria-hidden="true">
+      <div class="pagina"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><div class="flash"></div></div>
+      <div class="sch a"><b>Riassunto</b>Le idee principali in poche righe</div>
+      <div class="sch b"><b>Mappa</b>I concetti collegati tra loro</div>
+      <div class="sch c"><b>Test</b>Domande che crescono di livello</div>
+      <div class="sch d"><b>Glossario</b>Le parole difficili spiegate</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="mascot">
+      <img src="data:image/png;base64,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" width="144" height="144" alt="AI.st.ain, il simpatico professore dai capelli bianchi">
+      <div>
+        <p class="eb">Chi è AI.st.ain</p>
+        <h2>Il tuo professore personale</h2>
+        <p class="lead" style="margin-top:10px">Il nome vuol dire <b>A</b>iuto <b>I</b>ntelligente per lo <b>ST</b>udio, l'<b>A</b>utonomia e l'<b>IN</b>clusione. Un piccolo omaggio ad Albert Einstein, che sapeva spiegare le cose difficili con parole semplici.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eb">Cosa fa</p>
+    <h2>Dal libro al ripasso, senza copiare a mano</h2>
+    <p class="lead" style="margin-top:12px">Scatti le foto delle pagine, anche di capitoli molto lunghi. L'app prepara tutto il materiale e tu scegli come studiare.</p>
+    <div class="grid">
+      <article class="fn"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg><h3>Riassunto e schema</h3><p>Il testo diventa breve e ordinato, con le parole chiave evidenziate.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="4.5" cy="5" r="2"/><circle cx="19.5" cy="5" r="2"/><circle cx="12" cy="20" r="2"/><path d="M6 6l4 4M18 6l-4 4M12 15v3"/></svg><h3>Mappa concettuale</h3><p>Sposti, modifichi e apri la mappa a tutto schermo.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 1 1 4.5 2.6c-1 .6-1.5 1.2-1.5 2.4"/><circle cx="12" cy="18" r=".6"/></svg><h3>Spiegazioni e glossario</h3><p>Un passaggio non è chiaro? L'app lo rispiega con parole più semplici.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/><path d="M4 20h16"/></svg><h3>Test a livelli</h3><p>Domande con risposte mescolate. Se vai bene, la difficoltà sale.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><h3>Interrogazione a voce</h3><p>Rispondi parlando, come davanti al professore, e ricevi un parere.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><h3>Lettura ad alta voce</h3><p>Il capitolo viene letto per te, con le parole che si illuminano.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/></svg><h3>Il mio riassunto</h3><p>Scrivi con parole tue, paragrafo per paragrafo. L'app controlla e ti aiuta a iniziare.</p></article>
+      <article class="fn"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/></svg><h3>Punti e premi</h3><p>Ogni ripasso fa guadagnare punti e traguardi, così studiare diventa una sfida.</p></article>
+    </div>
+  </section>
+
+  <section>
+    <div class="duo">
+      <div>
+        <p class="eb">Un metodo tuo</p>
+        <h2>Scopri come studi meglio</h2>
+        <p class="lead" style="margin-top:12px">Prima del test l'app chiede come ti sei preparato. Dopo qualche prova ti mostra cosa funziona di più per te e ti propone piccoli esperimenti.</p>
+        <ul class="list">
+          <li>Confronto tra metodi e risultati dei test</li>
+          <li>Sfide da accettare: "prima del prossimo test prova l'allenamento"</li>
+          <li>Il genitore può spegnere ogni parte, profilo per profilo</li>
+        </ul>
+      </div>
+      <div class="mapbox" aria-hidden="true">
+        <svg viewBox="0 0 360 260">
+          <path class="l" d="M180 130 L80 55"/><path class="l" d="M180 130 L285 55"/><path class="l" d="M180 130 L70 205"/><path class="l" d="M180 130 L290 205"/>
+          <g class="nd"><rect class="c" x="125" y="108" width="110" height="44" rx="14"/><text x="180" y="135" text-anchor="middle">Il capitolo</text></g>
+          <g class="nd" style="animation-delay:.3s"><rect class="n" x="30" y="36" width="100" height="38" rx="12"/><text x="80" y="60" text-anchor="middle">Cause</text></g>
+          <g class="nd" style="animation-delay:.5s"><rect class="n" x="235" y="36" width="100" height="38" rx="12"/><text x="285" y="60" text-anchor="middle">Date</text></g>
+          <g class="nd" style="animation-delay:.7s"><rect class="n" x="20" y="186" width="100" height="38" rx="12"/><text x="70" y="210" text-anchor="middle">Persone</text></g>
+          <g class="nd" style="animation-delay:.9s"><rect class="n" x="240" y="186" width="100" height="38" rx="12"/><text x="290" y="210" text-anchor="middle">Effetti</text></g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eb">Prova subito</p>
+    <h2>Un test, come nell'app</h2>
+    <div class="duo">
+      <p class="lead">Le risposte non sono mai in ordine fisso e la più lunga non è sempre quella giusta. Per indovinare bisogna aver studiato.</p>
+      <div class="quiz">
+        <p class="q">Perché le stagioni cambiano durante l'anno?</p>
+        <button class="opt" data-ok="0">Perché la Terra è più vicina al Sole in estate</button>
+        <button class="opt" data-ok="1">Per l'inclinazione dell'asse terrestre</button>
+        <button class="opt" data-ok="0">Perché il Sole si spegne un poco d'inverno</button>
+        <p class="fbk" id="fbk" role="status">Scegli una risposta.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="dsa">
+    <p class="eb">Pensata per i DSA</p>
+    <h2>Si adatta alla persona, non il contrario</h2>
+    <p class="lead" style="margin-top:12px">Ogni profilo ha le sue impostazioni. Il testo, i colori e il modo di spiegare cambiano in base a ciò che serve.</p>
+    <div class="chips"><span class="chip">Dislessia</span><span class="chip">Discalculia</span><span class="chip">Disortografia</span><span class="chip">Disgrafia</span><span class="chip">ADHD</span><span class="chip">Altri bisogni</span></div>
+    <div class="demo">
+      <div><small>Carattere</small><p class="big">Lettere ben <span class="mk">distinte</span></p></div>
+      <div><small>Spaziatura</small><p>Interlinea, spazio tra lettere e parole regolabili a piacere.</p></div>
+      <div><small>Numeri e formule</small><p>Passaggi spiegati uno alla volta, senza fretta.</p></div>
+      <div><small>Voce</small><p>Lettura ad alta voce e risposte parlate, a velocità scelta.</p></div>
+    </div>
+  </div>
+
+  <section>
+    <p class="eb">Per ogni età</p>
+    <h2>Dalle elementari all'università</h2>
+    <p class="lead" style="margin-top:12px">Il linguaggio cambia con il livello: frasi brevi e giocose per i bambini, termini tecnici e collegamenti tra concetti per chi studia all'università. Anche lo stile dell'app si adatta.</p>
+    <div class="temi">
+      <div class="tema t1">Calmo<small>Sobrio e riposante</small></div>
+      <div class="tema t2">Gioco<small>Vivace, per i più piccoli</small></div>
+      <div class="tema t3">Notte<small>Scuro, per gli occhi stanchi</small></div>
+    </div>
+    <div class="lingue" aria-label="Lingue disponibili"><span>Italiano</span><span>English</span><span>Deutsch</span><span>Français</span><span>Español</span><span>Română</span><span>Shqip</span><span>العربية</span><span>中文</span></div>
+  </section>
+
+  <section>
+    <p class="eb">Privacy</p>
+    <h2>Dati dei ragazzi al sicuro</h2>
+    <div class="priv">
+      <div><h3>Il nome non esce mai</h3><p>Nome e cognome del ragazzo non vengono mai inviati all'intelligenza artificiale.</p></div>
+      <div><h3>Tutto sul tuo dispositivo</h3><p>Profili, capitoli e risultati restano sul telefono o sul computer, senza account.</p></div>
+      <div><h3>Decide il genitore</h3><p>Un'area protetta da PIN regola profili, aiuti e cosa può essere inviato.</p></div>
+      <div><h3>Copia di sicurezza</h3><p>Si salva un file di backup e si ripristina quando serve.</p></div>
+    </div>
+  </section>
+
+  <section id="chiave">
+    <p class="eb">Intelligenza artificiale</p>
+    <h2>Si paga solo quello che si usa</h2>
+    <p class="lead" style="margin-top:12px">AI.st.ain non ha abbonamenti. Per leggere i capitoli usa un servizio di intelligenza artificiale a tua scelta, collegato con una chiave personale (chiave API). Il servizio fa pagare solo l'uso reale, un po' come la ricarica del telefono: carichi un piccolo credito e si consuma man mano che studi.</p>
+    <div class="priv">
+      <div><h3>1. Crea l'account</h3><p>Ti registri sul sito del servizio che preferisci. È un account tuo, non dell'app.</p></div>
+      <div><h3>2. Aggiungi un po' di credito</h3><p>Basta una piccola ricarica. Puoi fissare un limite di spesa e controllare i consumi quando vuoi.</p></div>
+      <div><h3>3. Crea la chiave API</h3><p>È un codice segreto che permette all'app di usare il servizio. Non va condiviso con nessuno.</p></div>
+      <div><h3>4. Incollala nell'app</h3><p>In Area genitori › Impostazioni, nella sezione Collegamento all'AI. Resta sul tuo dispositivo.</p></div>
+    </div>
+    <div class="links">
+      <a class="lk" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener"><b>Claude (Anthropic)</b><span>Crea l'account, ricarica il credito e genera la chiave</span></a>
+      <a class="lk" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"><b>Google Gemini</b><span>Chiave da Google AI Studio, con un livello gratuito a limiti giornalieri</span></a>
+      <a class="lk" href="https://console.groq.com/keys" target="_blank" rel="noopener"><b>Groq</b><span>Alternativa veloce, con chiave dalla console</span></a>
+    </div>
+    <p class="nota">Le condizioni, i limiti gratuiti e il trattamento dei dati cambiano da servizio a servizio: leggile sul sito scelto prima di attivare la chiave. Per chi preferisce non usare internet esiste anche l'opzione di un modello installato sul proprio computer.</p>
+  </section>
+
+  <section>
+    <p class="eb">Costi</p>
+    <h2>Costi bassissimi, sotto controllo</h2>
+    <div class="priv">
+      <div><h3>L'app è gratuita</h3><p>Nessun abbonamento, nessuna pubblicità, nessun costo di licenza.</p></div>
+      <div><h3>Pochi centesimi a capitolo</h3><p>Con i modelli economici un capitolo costa in genere pochi centesimi. È una stima: il prezzo esatto dipende dal servizio e dalla lunghezza.</p></div>
+      <div><h3>Zero spese a vuoto</h3><p>Non studi, non spendi. Niente rinnovi automatici da ricordarsi di disdire.</p></div>
+      <div><h3>Spesa che decidi tu</h3><p>Il credito lo ricarichi tu e puoi mettere un tetto mensile dal sito del servizio.</p></div>
+    </div>
+    <p class="nota">Listini aggiornati: <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">prezzi Claude</a> · <a href="https://ai.google.dev/pricing" target="_blank" rel="noopener">prezzi Gemini</a></p>
+  </section>
+
+  <section id="installa">
+    <p class="eb">Installazione</p>
+    <h2>Pronta in un minuto</h2>
+    <div class="inst">
+      <div>
+        <p class="lead">Non serve passare dallo store. Apri l'indirizzo e aggiungi l'app alla schermata Home.</p>
+        <p class="url" style="margin-top:12px"><a href="https://toskurim.github.io/Scio/" target="_blank" rel="noopener">toskurim.github.io/Scio</a></p>
+        <details open><summary>Android</summary><ol><li>Apri l'indirizzo con Chrome.</li><li>Tocca il menu ⋮ e poi "Installa app".</li><li>Trovi l'icona tra le tue app.</li></ol></details>
+        <details><summary>iPhone e iPad</summary><ol><li>Apri l'indirizzo con Safari.</li><li>Tocca il tasto Condividi.</li><li>Scegli "Aggiungi alla schermata Home".</li></ol></details>
+        <details><summary>Computer Windows o Mac</summary><ol><li>Apri l'indirizzo con Chrome o Edge.</li><li>Clicca l'icona di installazione nella barra dell'indirizzo.</li><li>L'app si apre in una finestra tutta sua.</li></ol></details>
+      </div>
+      <div>
+        <div class="qr" id="qr" role="img" aria-label="Codice QR che apre AI.st.ain"></div>
+        <p class="qrt">Inquadra con il telefono</p>
+      </div>
+    </div>
+  </section>
+
+  <footer><span>AI.st.ain · versione 0.26</span><span>Fatta in famiglia, per chi studia</span></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var f=document.getElementById('fbk');
+  document.querySelectorAll('.opt').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.opt').forEach(function(x){x.classList.remove('ok','no')});
+      var ok=b.dataset.ok==='1';
+      b.classList.add(ok?'ok':'no');
+      f.textContent=ok?'Giusto! Le stagioni dipendono dall\'inclinazione dell\'asse, non dalla distanza dal Sole.':'Non è questa. Riprova: pensa a come è inclinata la Terra.';
+    });
+  });
+  try{
+    new QRCode(document.getElementById('qr'),{text:'https://toskurim.github.io/Scio/',width:168,height:168,colorDark:'#13203B',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){document.getElementById('qr').style.display='none';}
+})();
+</script>
+</body>
+</html>
