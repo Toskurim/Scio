@@ -1,4 +1,4 @@
-# AI.st.ain v0.22 — app di studio installabile (PWA)
+# AI.st.ain v0.23 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -8,6 +8,11 @@ Aiuto allo studio per ragazzi, con adattamenti per i DSA. Funziona nel browser, 
 Nessun server, nessun account, nessun tracciamento: **i dati restano sul dispositivo**.
 
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
+
+## Novità della v0.23
+- **Grafica più curata**: barra in alto fissa con icona e comandi con simboli, schermata iniziale con saluto e icona, materie con icone colorate, ombre morbide, passaggi animati tra le pagine (fermi se il dispositivo chiede meno animazioni). I temi per livello e l'aspetto automatico per i DSA restano invariati.
+- **Guida con frecce**: la prima volta, la pagina iniziale, una materia, un capitolo e l'area genitori mostrano una guida a passi con frecce che indicano menu e comandi. Si rivede in ogni momento dal tasto ❓ nella barra. Si può saltare.
+- **Questionario sui segnali di DSA** (24 domande, 4 aree, circa 3 minuti): proposto quando si crea un nuovo profilo e disponibile nel profilo. Chiarisce che NON è una diagnosi, indica di rivolgersi a pediatra/scuola e a un'équipe specializzata, e può attivare in prova gli aiuti corrispondenti. Le risposte non vengono salvate né inviate. Testi in italiano e inglese; le altre lingue ripiegano sull'inglese (traduzioni da rivedere).
 
 ## Novità della v0.22
 - **Test meno prevedibili**: la risposta giusta non è più quasi sempre la A o la B. Le opzioni vengono mescolate dall'app in modo uniforme (anche nei test già salvati, una sola volta) e all'AI è chiesto di fare opzioni di lunghezza simile, con sbagliate plausibili, e circa metà di affermazioni false nei vero/falso.
@@ -89,7 +94,7 @@ Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.
 - I test hanno da 20 a 30 domande.
 - Chi aggiorna dalla v0.6 ritrova tutto: i dati vengono convertiti da soli al primo avvio.
 
-## Aggiornare il sito su GitHub (da v0.21 a v0.22)
+## Aggiornare il sito su GitHub (da v0.22 a v0.23)
 1. Dalla v0.18 cambiano `style.css`, solo `app.js`, `i18n.js`, `sw.js` e `README.md`.
 2. Nel repository su github.com: **Add file › Upload files** e trascina quei quattro file (stessi nomi: vengono sostituiti).
 3. **Commit changes**. Dopo circa un minuto l'indirizzo è aggiornato.

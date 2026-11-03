@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.22';
+const VERSIONE = '0.23';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1250,10 +1250,11 @@ function voceTick() {
 /* ===== Viste ===== */
 function barra() {
   const p = S.profilo;
-  const brand = p ? '<button class="brand" data-act="home" aria-label="' + esc(t('torna_home')) + '">AI.st.ain<small>v' + VERSIONE + '</small></button>' : '<div class="brand">AI.st.ain<small>v' + VERSIONE + '</small></div>';
-  return '<div class="bar">' + brand + '<div class="row">' +
-    (p ? '<button class="btn sec small" data-act="home">' + t('studio') + '</button><button class="btn sec small" data-act="fs-" aria-label="' + esc(t('testo_piccolo')) + '">A−</button><button class="btn sec small" data-act="fs+" aria-label="' + esc(t('testo_grande')) + '">A+</button><button class="btn sec small" data-act="aspetto">' + t('aspetto_btn') + '</button>' + (DB.figli.length > 1 ? '<button class="btn sec small" data-act="scelta">' + t('cambia_profilo') + '</button>' : '') : '') +
-    '<button class="btn sec small" data-act="genitori">' + t('genitori') + '</button></div></div>';
+  const ico = '<img class="brand-ico" src="icons/favicon.svg" alt="" width="34" height="34">';
+  const brand = p ? '<button class="brand" data-act="home" aria-label="' + esc(t('torna_home')) + '">' + ico + '<span>AI.st.ain<small>v' + VERSIONE + '</small></span></button>' : '<div class="brand">' + ico + '<span>AI.st.ain<small>v' + VERSIONE + '</small></span></div>';
+  return '<div class="bar">' + brand + '<div class="row nav">' +
+    (p ? '<button class="btn sec small" data-act="home">📚 ' + t('studio') + '</button><button class="btn sec small" data-act="fs-" aria-label="' + esc(t('testo_piccolo')) + '">A−</button><button class="btn sec small" data-act="fs+" aria-label="' + esc(t('testo_grande')) + '">A+</button><button class="btn sec small" data-act="aspetto">🎨 ' + t('aspetto_btn') + '</button>' + (DB.figli.length > 1 ? '<button class="btn sec small" data-act="scelta">🔁 ' + t('cambia_profilo') + '</button>' : '') : '') +
+    '<button class="btn sec small" data-act="genitori">👪 ' + t('genitori') + '</button><button class="btn sec small" data-act="tour" aria-label="' + esc(t('tour_btn')) + '" title="' + esc(t('tour_btn')) + '">❓</button></div></div>';
 }
 function cardCap(c) {
   const ult = c.risultati[c.risultati.length - 1];
@@ -1339,11 +1340,11 @@ function vFam() {
 function vSetup() {
   const f = V.edit ? DB.figli.find(x => x.id === V.edit) : null;
   const p = f ? f.profilo : { nome: '', sezioni: {}, livello: 'superiori', dsa: {}, tema: '', fs: 1, lingua: 'it', font: 'tema', lh: 0, ls: 0, ws: 0, vel: 0.9, pin: '' };
-  return barra() + '<div class="card"><h1>' + (f ? esc(p.nome) : t('aggiungi_figlio')) + '</h1></div>' +
+  return barra() + '<div class="card"><h1>' + (f ? esc(p.nome) : t('aggiungi_figlio')) + '</h1></div>' + (f ? '' : quizPromo()) +
     '<div class="card"><label class="f">' + t('nome') + '<input type="text" id="nome" value="' + esc(p.nome) + '" autocomplete="off"></label>' +
     '<label class="f">' + t('livello') + '<select id="livello">' + LIVELLI.map(k => '<option value="' + k + '"' + (p.livello === k ? ' selected' : '') + '>' + t(k) + '</option>').join('') + '</select></label>' +
     '<label class="f">' + t('lingua_figlio') + '<select id="lingua-fig">' + LINGUE_ORD.map(l => '<option value="' + l + '"' + ((p.lingua || 'it') === l ? ' selected' : '') + '>' + LINGUE[l] + '</option>').join('') + '</select></label><p class="muted">' + t('lingua_nota') + '</p></div>' +
-    '<div class="card"><h2>' + t('come_studia') + '</h2><p class="muted">' + t('piu_profili') + '</p>' +
+    '<div class="card"><h2>' + t('come_studia') + '</h2><p class="muted">' + t('piu_profili') + '</p>' + (f ? '<p><button class="btn sec small" type="button" data-act="dsa-quiz">' + t('dsaq_promo_btn') + '</button></p>' : '') +
     Object.keys(DSA).map(k => '<label class="chk"><input type="checkbox" data-dsa="' + k + '"' + (p.dsa && p.dsa[k] ? ' checked' : '') + '>' + t(k) + '</label><div class="dsainfo" id="info-' + k + '"' + (p.dsa && p.dsa[k] ? '' : ' hidden') + '>' + infoDsa(k) + '</div>').join('') +
     '<p class="muted">' + t('nota_dsa') + '</p>' +
     '<label class="chk"><input type="checkbox" id="colori"' + (p.colori === undefined ? ' checked' : (p.colori ? ' checked' : '')) + '>' + t('colori_lbl') + '</label><p class="muted">' + t('colori_nota') + '</p></div>' +
@@ -1358,9 +1359,9 @@ function vHome() {
   const mancanti = MATERIE.filter(m => m !== 'Altro' && !S.materie.some(x => sameM(x, m)));
   const due = ripDovute().length, ver = prossimeVerifiche(21);
   return barra() + (FAM.ai.provider === 'demo' ? '<div class="fb warn" role="status">' + t('demo_banner') + '</div>' : '') +
-    '<div class="card"><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('scegli_materia') + '</p></div>' +
-    '<h2>' + t('le_materie') + '</h2>' + (S.materie.length ? '<div class="mat-grid">' + S.materie.map(m => { const e = elementiMateria(m); return '<button class="mat" data-act="apri-materia" data-m="' + esc(m) + '"><b>' + esc(m) + '</b><span class="muted">' + t('n_cap', { n: e.cap.length }) + ' · ' + t('n_es', { n: e.es.length }) + '</span></button>'; }).join('') + '</div>' : '<div class="card muted">' + t('nessuna_materia') + '</div>') +
-    '<div class="card"><h3>' + t('agg_materia') + '</h3>' + (mancanti.length ? '<div class="row" style="margin-bottom:8px">' + mancanti.map(m => '<button class="btn sec small" data-act="aggiungi-materia" data-m="' + esc(m) + '">+ ' + esc(m) + '</button>').join('') + '</div>' : '') +
+    '<div class="hero"><img src="icons/icon-192.png" alt="" width="64" height="64"><div><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('scegli_materia') + '</p></div></div>' +
+    '<h2>' + t('le_materie') + '</h2>' + (S.materie.length ? '<div class="mat-grid">' + S.materie.map(m => { const e = elementiMateria(m); return '<button class="mat" data-act="apri-materia" data-m="' + esc(m) + '">' + iconaMateria(m) + '<b>' + esc(m) + '</b><span class="muted">' + t('n_cap', { n: e.cap.length }) + ' · ' + t('n_es', { n: e.es.length }) + '</span></button>'; }).join('') + '</div>' : '<div class="card muted">' + t('nessuna_materia') + '</div>') +
+    '<div class="card add-mat"><h3>' + t('agg_materia') + '</h3>' + (mancanti.length ? '<div class="row" style="margin-bottom:8px">' + mancanti.map(m => '<button class="btn sec small" data-act="aggiungi-materia" data-m="' + esc(m) + '">+ ' + esc(m) + '</button>').join('') + '</div>' : '') +
     '<label class="f">' + t('altra_materia') + '<input type="text" id="nuovaM" maxlength="40" autocomplete="off"></label><button class="btn sec small" data-act="aggiungi-materia">' + t('aggiungi') + '</button></div>' +
     (S.capitoli.some(c => arr(c.test).length) ? '<div class="card"><h2>' + t('ripasso_oggi') + '</h2>' + (due ? '<p>' + (due === 1 ? t('una_rip') : t('n_domande_rip', { n: due })) + '</p><button class="btn" data-act="inizia-ripasso">' + t('inizia_ripasso') + '</button>' : '<p class="muted">' + t('nessun_ripasso') + '</p>') + '<p class="muted">' + t('rip_spiega') + '</p></div>' : '') +
     (ver.length ? '<h2>' + t('verifiche') + '</h2>' + ver.map(x => { const pr = pianoRipasso(x.v); const oggi = pr.giorni && pr.giorni[0] ? pr.giorni[0].righe.join(' · ') : ''; return '<div class="card"><div class="row" style="justify-content:space-between"><div><b>' + esc(x.v.materia) + '</b>' + (x.v.argomento ? ' · ' + esc(x.v.argomento) : '') + '</div><span class="chip ' + (x.d <= 3 ? 'warn' : '') + '">' + esc(quando(x.d)) + '</span></div>' + (oggi ? '<p class="muted"><b>' + t('compito_oggi') + ':</b> ' + oggi + '</p>' : '') + '<button class="btn sec small" data-act="apri-materia" data-m="' + esc(x.v.materia) + '">' + t('piano') + '</button></div>'; }).join('') : '') +
@@ -2084,6 +2085,142 @@ document.addEventListener('click', e => {
   if (r === 'async' || (r && typeof r.then === 'function')) return;
   render();
 });
+
+/* ===== v0.23: tutorial guidato con frecce, questionario DSA, rifiniture grafiche ===== */
+const TOUR_PASSI = {
+  home: [['.bar .brand', 'tour_brand'], ['.bar [data-act=fs-]', 'tour_testo'], ['.bar [data-act=aspetto]', 'tour_aspetto'], ['.add-mat', 'tour_addmat'], ['.mat-grid .mat', 'tour_mat'], ['.bar [data-act=genitori]', 'tour_gen'], ['.bar [data-act=tour]', 'tour_ancora']],
+  materia: [['[data-act=nuovo-cap]', 'tour_nuovocap'], ['[data-act=nuovo-es]', 'tour_nuovoes'], ['[data-act=nuovo-controllo]', 'tour_controllo'], ['.bar [data-act=tour]', 'tour_ancora']],
+  capitolo: [['.tabs', 'tour_tabs'], ['[data-act=ascolta]', 'tour_ascolta'], ['.bar [data-act=tour]', 'tour_ancora']],
+  genitori: [['[data-act=aggiungi-figlio]', 'tour_figlio'], ['[data-act=modifica-fam]', 'tour_fam'], ['[data-act=priv-apri]', 'tour_priv'], ['[data-act=esporta]', 'tour_backup'], ['.bar [data-act=tour]', 'tour_ancora']]
+};
+function tourChiave(k) { return (k === 'genitori' ? 'fam' : (S.id || 'x')) + ':' + k; }
+function tourLetti() { try { return JSON.parse(localStorage.getItem('scio.tour') || '{}') || {}; } catch (e) { return {}; } }
+function tourSegna(k) { try { const o = tourLetti(); o[tourChiave(k)] = 1; localStorage.setItem('scio.tour', JSON.stringify(o)); } catch (e) { /* senza memoria locale la guida si ripropone: nessun danno */ } }
+function tourVistaCorrente() { return V.vista === 'home' ? 'home' : V.vista === 'materia' ? 'materia' : V.vista === 'capitolo' ? 'capitolo' : (V.vista === 'genitori' && V.genitoriOk && FAM.pin) ? 'genitori' : null; }
+function tourAuto() {
+  if (navigator.webdriver || document.getElementById('tour') || document.getElementById('dsaq') || V.busy) return;
+  const k = tourVistaCorrente(); if (!k || tourLetti()[tourChiave(k)]) return;
+  const vista = V.vista;
+  setTimeout(() => { if (V.vista === vista && !V.busy && !document.getElementById('tour') && !document.getElementById('dsaq')) tourAvvia(k); }, 800);
+}
+function tourChiudi() {
+  const o = document.getElementById('tour'); if (!o) return;
+  window.removeEventListener('resize', o._ri); document.removeEventListener('keydown', o._kd, true);
+  const f = o._focus; o.remove(); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ }
+}
+function tourAvvia(k) {
+  const passi = (TOUR_PASSI[k] || []).filter(p => document.querySelector(p[0]));
+  if (!passi.length) return;
+  tourSegna(k); tourChiudi();
+  const ov = document.createElement('div'); ov.id = 'tour'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', t('tour_titolo'));
+  ov._focus = document.activeElement;
+  ov.innerHTML = '<div class="tour-spot"></div><svg class="tour-arrow" aria-hidden="true"><defs><marker id="tour-p" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker></defs><path d="" marker-end="url(#tour-p)"/></svg>' +
+    '<div class="tour-box" tabindex="-1" aria-live="polite"><div class="tour-n muted"></div><p class="tour-t"></p><div class="row tour-btns"><button class="btn sec small" data-tour="salta"></button><button class="btn sec small" data-tour="indietro"></button><button class="btn small" data-tour="avanti"></button></div></div>';
+  document.body.appendChild(ov);
+  let i = 0;
+  const box = ov.querySelector('.tour-box'), spot = ov.querySelector('.tour-spot'), path = ov.querySelector('svg > path');
+  const pos = (scroll) => {
+    const el = document.querySelector(passi[i][0]); if (!el) { if (i < passi.length - 1) { i++; pos(true); } else tourChiudi(); return; }
+    if (scroll) el.scrollIntoView({ block: 'center', inline: 'nearest' });
+    const r = el.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, pad = 6;
+    Object.assign(spot.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + 2 * pad) + 'px', height: (r.height + 2 * pad) + 'px' });
+    ov.querySelector('.tour-n').textContent = t('tour_n', { i: i + 1, n: passi.length });
+    ov.querySelector('.tour-t').textContent = t(passi[i][1]);
+    ov.querySelector('[data-tour=salta]').textContent = t('tour_salta'); ov.querySelector('[data-tour=indietro]').textContent = t('tour_indietro'); ov.querySelector('[data-tour=indietro]').hidden = i === 0;
+    ov.querySelector('[data-tour=avanti]').textContent = i === passi.length - 1 ? t('tour_fine') : t('tour_avanti');
+    const bw = Math.min(340, vw - 24); box.style.width = bw + 'px';
+    const bh = box.offsetHeight, sotto = vh - r.bottom, sopra = r.top, gap = 58;
+    let top, dir;
+    if (sotto >= bh + gap + 8) { top = r.bottom + pad + gap; dir = 'su'; } else if (sopra >= bh + gap + 8) { top = r.top - pad - gap - bh; dir = 'giu'; } else { top = vh - bh - 12; dir = r.top + r.height / 2 < vh / 2 ? 'su' : 'giu'; if (top < r.bottom && r.bottom > vh / 2) top = 12; }
+    top = Math.max(8, Math.min(vh - bh - 8, top));
+    const left = Math.max(12, Math.min(vw - bw - 12, r.left + r.width / 2 - bw / 2));
+    box.style.left = left + 'px'; box.style.top = top + 'px';
+    const bx = Math.max(left + 24, Math.min(left + bw - 24, r.left + r.width / 2)), by = dir === 'su' ? top : top + bh;
+    const tx = Math.max(r.left + 4, Math.min(r.right - 4, r.left + r.width / 2)), ty = dir === 'su' ? r.bottom + pad + 3 : r.top - pad - 3;
+    const cx = (bx + tx) / 2 + (bx < tx ? -34 : 34), cy = (by + ty) / 2;
+    path.setAttribute('d', 'M' + bx + ' ' + by + ' Q' + cx + ' ' + cy + ' ' + tx + ' ' + ty);
+  };
+  ov._ri = () => pos(false); window.addEventListener('resize', ov._ri);
+  const avanti = () => { if (i < passi.length - 1) { i++; pos(true); } else tourChiudi(); };
+  ov._kd = e => { if (e.key === 'Escape') { e.stopPropagation(); tourChiudi(); } else if (e.key === 'ArrowRight' || (e.key === 'Enter' && !(e.target.dataset && e.target.dataset.tour))) { e.preventDefault(); avanti(); } else if (e.key === 'ArrowLeft' && i > 0) { i--; pos(true); } };
+  document.addEventListener('keydown', ov._kd, true);
+  ov.addEventListener('click', e => { const b = e.target.closest('[data-tour]'); if (!b) return; if (b.dataset.tour === 'salta') tourChiudi(); else if (b.dataset.tour === 'indietro') { if (i > 0) { i--; pos(true); } } else avanti(); });
+  pos(true); const ab = ov.querySelector('[data-tour=avanti]'); if (ab) ab.focus({ preventScroll: true });
+}
+AZ['tour'] = () => { const k = tourVistaCorrente(); if (!k) { toast(t('tour_altrove')); return 'async'; } tourAvvia(k); return 'async'; };
+
+/* ===== Questionario sui segnali di DSA (NON è una diagnosi; le risposte non vengono salvate né inviate) ===== */
+const DSA_Q = [['dislessia', 6], ['disortografia', 6], ['disgrafia', 6], ['discalculia', 6]];
+function dsaqChiudi() { const o = document.getElementById('dsaq'); if (!o) return; document.removeEventListener('keydown', o._kd, true); const f = o._focus; o.remove(); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ } }
+function dsaq() {
+  dsaqChiudi(); tourChiudi();
+  const ov = document.createElement('div'); ov.id = 'dsaq'; ov.className = 'dsaq'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', t('dsaq_titolo'));
+  ov._focus = document.activeElement;
+  const liv = (document.getElementById('livello') || {}).value || (S.profilo && S.profilo.livello) || '';
+  const ris = {}; let p = -1;   /* -1 introduzione, 0..3 aree, 4 risultato */
+  const box = document.createElement('div'); box.className = 'dsaq-box'; ov.appendChild(box); document.body.appendChild(ov);
+  const punti = a => { let s = 0; for (let n = 1; n <= 6; n++) s += ris[a + n] || 0; return s; };
+  const livello = s => s >= 8 ? 2 : s >= 5 ? 1 : 0;
+  const disegna = () => {
+    let h = '';
+    if (p === -1) {
+      h = '<h2>' + t('dsaq_titolo') + '</h2><div class="fb warn"><b>' + t('dsaq_non_diag') + '</b></div><p>' + t('dsaq_intro') + '</p><p class="muted">' + t('dsaq_priv') + '</p><div class="row"><button class="btn" data-q="avanti">' + t('dsaq_inizia') + '</button><button class="btn sec" data-q="chiudi">' + t('dsaq_chiudi') + '</button></div>';
+    } else if (p < DSA_Q.length) {
+      const a = DSA_Q[p][0];
+      h = '<div class="dsaq-prog" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="' + p + '"><span style="width:' + (p * 25) + '%"></span></div><p class="muted">' + t('dsaq_pag', { i: p + 1, n: DSA_Q.length }) + '</p><h2>' + t(a) + '</h2><p class="muted">' + t('dsaq_scala') + '</p>';
+      for (let n = 1; n <= 6; n++) {
+        h += '<fieldset class="dq"><legend>' + t('dq_' + a + '_' + n) + '</legend><div class="opts">' + [[0, 'dsaq_mai'], [1, 'dsaq_volte'], [2, 'dsaq_spesso']].map(o => '<label><input type="radio" name="' + a + n + '" value="' + o[0] + '"' + (ris[a + n] === o[0] ? ' checked' : '') + '><span>' + t(o[1]) + '</span></label>').join('') + '</div></fieldset>';
+      }
+      h += '<p class="muted" id="dsaq-msg" role="status"></p><div class="row"><button class="btn sec" data-q="indietro">' + t('dsaq_indietro') + '</button><button class="btn" data-q="avanti">' + (p === DSA_Q.length - 1 ? t('dsaq_fine') : t('dsaq_avanti')) + '</button></div>';
+    } else {
+      const liste = DSA_Q.map(a => [a[0], livello(punti(a[0]))]), alcuni = liste.filter(x => x[1] > 0);
+      h = '<h2>' + t('dsaq_risultato') + '</h2><div class="fb warn"><b>' + t('dsaq_non_diag') + '</b></div>' + liste.map(x => '<div class="card"><div class="row" style="justify-content:space-between"><b>' + t(x[0]) + '</b><span class="chip ' + (x[1] === 0 ? 'ok' : 'warn') + '">' + t('dsaq_res_' + x[1]) + '</span></div></div>').join('') +
+        '<p>' + (alcuni.length ? t('dsaq_esito_si') : t('dsaq_esito_ok')) + '</p>' + (liv === 'elementari' && alcuni.length ? '<p class="muted">' + t('dsaq_piccoli') + '</p>' : '') + '<p class="muted">' + t('dsaq_altre_cause') + '</p>' +
+        '<div class="row">' + (alcuni.length && document.querySelector('[data-dsa]') ? '<button class="btn" data-q="attiva">' + t('dsaq_attiva') + '</button>' : '') + '<button class="btn sec" data-q="chiudi">' + t('dsaq_chiudi') + '</button></div>';
+      box._liste = alcuni.map(x => x[0]);
+    }
+    box.innerHTML = h; box.scrollTop = 0;
+    const f = box.querySelector('button.btn:not(.sec)') || box.querySelector('button'); if (f) f.focus({ preventScroll: true }); box.scrollTop = 0;
+  };
+  const leggi = () => { box.querySelectorAll('input[type=radio]:checked').forEach(x => { ris[x.name] = +x.value; }); };
+  box.addEventListener('change', leggi);
+  box.addEventListener('click', e => {
+    const b = e.target.closest('[data-q]'); if (!b) return; const q = b.dataset.q;
+    if (q === 'chiudi') dsaqChiudi();
+    else if (q === 'indietro') { leggi(); p = Math.max(-1, p - 1); disegna(); }
+    else if (q === 'avanti') {
+      if (p >= 0) { leggi(); const a = DSA_Q[p][0]; if ([1, 2, 3, 4, 5, 6].some(n => ris[a + n] === undefined)) { const m = box.querySelector('#dsaq-msg'); if (m) m.textContent = t('dsaq_tutte'); return; } }
+      p++; disegna();
+    } else if (q === 'attiva') {
+      (box._liste || []).forEach(k => { const c = document.querySelector('[data-dsa=' + k + ']'); if (c && !c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } });
+      dsaqChiudi(); toast(t('dsaq_attivati'));
+    }
+  });
+  ov._kd = e => { if (e.key === 'Escape') { e.stopPropagation(); dsaqChiudi(); } };
+  document.addEventListener('keydown', ov._kd, true);
+  disegna();
+}
+AZ['dsa-quiz'] = () => { dsaq(); return 'async'; };
+function quizPromo(compatto) {
+  return '<div class="card promo"><h2>' + t('dsaq_promo_t') + '</h2><p class="muted">' + t('dsaq_promo') + '</p><button class="btn' + (compatto ? ' sec' : '') + '" type="button" data-act="dsa-quiz">' + t('dsaq_promo_btn') + '</button></div>';
+}
+
+/* Icone delle materie e animazione d'ingresso delle pagine */
+const EMOJI_MAT = { italiano: '📖', storia: '🏛️', geografia: '🌍', scienze: '🔬', matematica: '➗', fisica: '⚛️', chimica: '🧪', biologia: '🧬', inglese: '🔤', latino: '🏺', greco: '🦉', filosofia: '💭', 'scienze umane': '🧠', arte: '🎨', tecnologia: '⚙️', musica: '🎵', 'educazione civica': '⚖️', religione: '🕊️', altro: '📌' };
+function iconaMateria(m) {
+  const k = String(m || '').trim().toLowerCase(); let h = 0; for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) % 360;
+  return '<span class="mat-ico" style="--h:' + h + '" aria-hidden="true">' + (EMOJI_MAT[k] || '📘') + '</span>';
+}
+(function () {
+  const render0 = render; let ultima = '';
+  render = function () {
+    render0();
+    const chiave = V.vista + '|' + (V.cap || '') + '|' + (V.materia || '') + '|' + (S.id || '');
+    const app = document.getElementById('app');
+    if (chiave !== ultima && app) { ultima = chiave; app.classList.remove('entra'); void app.offsetWidth; app.classList.add('entra'); setTimeout(() => app.classList.remove('entra'), 700); }
+    tourAuto();
+  };
+})();
 
 /* Migrazione: chiave e PIN di versioni precedenti */
 (async () => {
