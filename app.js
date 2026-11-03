@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.23';
+const VERSIONE = '0.24';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -189,7 +189,10 @@ function toast(t) { const d = document.createElement('div'); d.className = 'toas
 function lg() { return (['genitori', 'fam', 'setup', 'scelta', 'stat', 'privacy'].includes(V.vista) || !S.profilo) ? (FAM.lingua || 'it') : (S.profilo.lingua || 'it'); }
 function applicaTema() {
   const p = S.profilo, b = document.body, r = document.documentElement;
-  b.setAttribute('data-tema', p ? temaValido(p) : 'calmo');
+  /* senza profilo attivo (scelta profilo, area genitori) resta l'ultimo tema usato, così non cambia da solo */
+  let tema = 'calmo';
+  try { if (p) { tema = temaValido(p); localStorage.setItem('scio.tema', tema); } else { const u = localStorage.getItem('scio.tema'); if (TEMI[u]) tema = u; } } catch (e) { if (p) tema = temaValido(p); }
+  b.setAttribute('data-tema', tema);
   r.style.setProperty('--fs', p && p.fs ? p.fs : 1);
   const set = (k, v) => { if (v) b.style.setProperty(k, v); else b.style.removeProperty(k); };
   set('--font', p && FONT_STACK[p.font]); set('--lh', p && p.lh); set('--ls', p && p.ls ? p.ls + 'em' : ''); set('--ws', p && p.ws ? p.ws + 'em' : '');
