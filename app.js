@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.35';
+const VERSIONE = '0.36';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -224,6 +224,64 @@ function profiloTesto() {
     (p.lingua && p.lingua !== 'it' ? '\nLINGUA: il libro è in italiano ma lo studente studia meglio in ' + LINGUE_NOME_IT[p.lingua] + '. Scrivi TUTTO il materiale (riassunti, schema, spiegazioni, glossario, test e feedback) in ' + LINGUE_NOME_IT[p.lingua] + '; i termini tecnici, i nomi propri e le parole chiave del libro compaiono SEMPRE anche in italiano tra parentesi, perché la verifica a scuola sarà in italiano. Nel glossario il campo "termine" è in italiano con la traduzione tra parentesi.' : '') +
     '\nUsa un linguaggio adatto all\'età, sempre incoraggiante, mai giudicante.';
 }
+/* ===== v0.36 · Contatore dei costi API (stima) =====
+   Somma i token letti e scritti da Claude (dichiarati nella risposta) e li moltiplica per i prezzi di prezzi.json, che l'app rilegge una volta al giorno
+   dal proprio sito. È una stima dei soli consumi di questa app su questo dispositivo: il saldo vero è nella console Anthropic. */
+const PREZZI_BASE = { data: '2026-11-04', modelli: { 'claude-haiku-5-5': { soglia: 100000, sotto: { in: 0.10, out: 0.50 }, sopra: { in: 0.50, out: 2.50 } } } };
+let PREZZI = PREZZI_BASE;
+function prezziValidi(p) {
+  try {
+    if (!p || typeof p !== 'object' || !p.modelli || typeof p.modelli !== 'object') return null;
+    const num = x => typeof x === 'number' && isFinite(x) && x >= 0 && x <= 1000, out = { data: String(p.data || '').slice(0, 10), modelli: {} };
+    Object.keys(p.modelli).slice(0, 20).forEach(k => {
+      const m = p.modelli[k];
+      if (m && num(m.soglia) && m.sotto && m.sopra && num(m.sotto.in) && num(m.sotto.out) && num(m.sopra.in) && num(m.sopra.out)) out.modelli[String(k).slice(0, 60)] = { soglia: m.soglia, sotto: { in: m.sotto.in, out: m.sotto.out }, sopra: { in: m.sopra.in, out: m.sopra.out } };
+    });
+    return Object.keys(out.modelli).length ? out : null;
+  } catch (e) { return null; }
+}
+function costiLeggi() {
+  try { const c = JSON.parse(localStorage.getItem('scio.costi') || 'null'); if (c && c.tot && c.mesi) return c; } catch (e) { /* si riparte */ }
+  return { tot: { i: 0, o: 0, usd: 0, n: 0 }, mesi: {}, ultimo: null };
+}
+function costiSalva(c) { try { localStorage.setItem('scio.costi', JSON.stringify(c)); } catch (e) { /* non disponibile */ } }
+function costoStima(modello, i, o) {
+  const m = PREZZI.modelli[modello] || PREZZI.modelli['claude-haiku-5-5']; if (!m) return 0;
+  const p = i > m.soglia ? m.sopra : m.sotto; return (i * p.in + o * p.out) / 1e6;
+}
+function costoRegistra(modello, uso) {
+  try {
+    const i = Math.max(0, +(uso && (uso.input_tokens || 0)) + +(uso && (uso.cache_creation_input_tokens || 0)) + +(uso && (uso.cache_read_input_tokens || 0))) || 0, o = Math.max(0, +(uso && uso.output_tokens) || 0);
+    if (!i && !o) return;
+    const usd = costoStima(modello, i, o), c = costiLeggi(), mese = new Date().toISOString().slice(0, 7);
+    const m = c.mesi[mese] || (c.mesi[mese] = { i: 0, o: 0, usd: 0, n: 0, f: {} });
+    [c.tot, m].forEach(x => { x.i += i; x.o += o; x.usd += usd; x.n += 1; });
+    if (S && S.id) { m.f = m.f || {}; m.f[S.id] = (m.f[S.id] || 0) + usd; }
+    c.ultimo = { usd: usd, i: i, o: o, t: Date.now() }; costiSalva(c);
+  } catch (e) { /* il contatore non deve mai bloccare lo studio */ }
+}
+async function prezziAggiorna() {
+  try {
+    const salvati = JSON.parse(localStorage.getItem('scio.prezzi') || 'null');
+    if (salvati && salvati.t) { const ok = prezziValidi(salvati.dati); if (ok) PREZZI = ok; if (Date.now() - salvati.t < 86400000) return; }
+    if (navigator.onLine === false) return;
+    const r = await fetch('prezzi.json', { cache: 'no-store' }); if (!r.ok) return;
+    const ok = prezziValidi(await r.json()); if (!ok) return;
+    PREZZI = ok; localStorage.setItem('scio.prezzi', JSON.stringify({ t: Date.now(), dati: ok }));
+  } catch (e) { /* si usano gli ultimi prezzi noti */ }
+}
+function fmtUsd(x) { return x < 0.1 ? (x * 100).toLocaleString(LINGUE_VOCE[LINGUA_CORRENTE] || 'it-IT', { maximumFractionDigits: 2 }) + ' ' + t('cent') : '$ ' + x.toLocaleString(LINGUE_VOCE[LINGUA_CORRENTE] || 'it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function costiHtml() {
+  const c = costiLeggi(), mese = new Date().toISOString().slice(0, 7), m = c.mesi[mese] || { i: 0, o: 0, usd: 0, n: 0, f: {} };
+  const perFiglio = DB.figli.filter(f => m.f && m.f[f.id]).map(f => esc(f.profilo ? f.profilo.nome : '') + ': ' + fmtUsd(m.f[f.id])).join(' · ');
+  const nUltimo = c.ultimo ? t('costi_ultimo', { c: fmtUsd(c.ultimo.usd) }) : '';
+  return '<div class="card"><h2>' + t('costi_t') + '</h2>' +
+    '<p>' + t('costi_mese', { c: '<b>' + fmtUsd(m.usd) + '</b>', n: m.n }) + '</p>' + (perFiglio ? '<p class="muted">' + perFiglio + '</p>' : '') +
+    '<p class="muted">' + t('costi_tot', { c: fmtUsd(c.tot.usd) }) + (nUltimo ? ' · ' + nUltimo : '') + '</p>' +
+    '<p class="muted">' + t('costi_nota', { d: esc(PREZZI.data || '') }) + '</p>' +
+    '<div class="row"><a class="btn sec small" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener noreferrer">' + t('costi_saldo') + '</a><button class="btn sec small" type="button" data-act="costi-azzera">' + t('costi_azzera') + '</button></div></div>';
+}
+prezziAggiorna();
 async function chiamaAI(system, testo, immagini, cfg, json) {
   const a = cfg || FAM.ai || {};
   const compat = a.provider === 'compat';
@@ -246,6 +304,7 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
     if (!r.ok && r.status === 400) { const t0 = await r.clone().text(); if (/temperature/i.test(t0)) r = await chiama(corpo); }
     if (!r.ok) throw new Error('Errore ' + r.status + ': ' + (await r.text()).slice(0, 300));
     const j = await r.json();
+    costoRegistra(a.model || 'claude-haiku-5-5', j.usage);
     if (json) {
       if (j.stop_reason === 'max_tokens') throw new Error('La risposta è diventata troppo lunga e si è interrotta. Usa meno foto alla volta oppure scrivi un "Focus" per limitare gli argomenti.');
       const tu = (j.content || []).find(c => c.type === 'tool_use');
@@ -1699,6 +1758,7 @@ function vGenitori() {
   const bk = FAM.ultimoBackup ? t('ultima_copia', { d: esc(new Date(FAM.ultimoBackup).toLocaleDateString(lang)) }) + (Date.now() - new Date(FAM.ultimoBackup).getTime() > 30 * 86400000 ? ' ' + t('copia_vecchia') : '') : '<b>' + t('no_copia') + '</b>';
   return barra() + '<div class="card"><h1>' + t('area_gen') + '</h1></div><h2>' + t('figli') + '</h2>' + (figli || '<div class="card muted">' + t('nessun_profilo') + '</div>') +
     '<div class="card"><button class="btn" data-act="aggiungi-figlio">+ ' + t('aggiungi_figlio') + '</button></div>' +
+    costiHtml() +
     '<div class="card"><h2>' + t('imp_famiglia') + '</h2><p class="muted">' + t('lingua_gen') + ': <b>' + LINGUE[FAM.lingua] + '</b> · ' + t('ai_titolo') + ': <b>' + esc(FAM.ai.provider === 'compat' && (FAM.ai.preset === 'gemini' || FAM.ai.preset === 'groq') ? FAM.ai.preset : FAM.ai.provider) + '</b></p><button class="btn sec" data-act="modifica-fam">' + t('modifica') + '</button></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" data-act="priv-apri">' + t('priv_btn') + '</button></div>' +
     '<div class="card"><h2>' + t('dati_sic') + '</h2><p class="muted">' + t('dati_info') + '</p><p class="muted">' + bk + '</p><div class="row"><button class="btn sec" data-act="esporta">' + t('salva_copia') + '</button><label class="btn sec">' + t('ripristina') + '<input type="file" accept="application/json" id="imp" hidden></label><button class="btn sec" id="installa" data-act="installa"' + (promptInstalla ? '' : ' hidden') + '>' + t('installa') + '</button><button class="btn sec" data-act="azzera">' + t('cancella_tutto') + '</button></div></div>';
@@ -1977,6 +2037,7 @@ const AZ = {
     V.busy = false; render();
   },
   'stop': () => { fermaVoce(); V.lettura = null; },
+  'costi-azzera': () => { if (confirm(t('costi_conf'))) costiSalva({ tot: { i: 0, o: 0, usd: 0, n: 0 }, mesi: {}, ultimo: null }); },
   'vn-scarica': () => { vnScarica(); return 'async'; },
   'vn-usa': el => { vnImposta(!!el.checked); if (!el.checked) fermaVoce(); return 'async'; },
   'vn-elimina': () => { vnElimina(); return 'async'; },

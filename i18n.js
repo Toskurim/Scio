@@ -628,3 +628,13 @@ DE('vn_elimina', 'Elimina la voce scaricata', 'Delete the downloaded voice');
 DE('vn_errore', 'Non sono riuscito a scaricare la voce. Controlla la connessione e riprova.', 'The voice could not be downloaded. Check your connection and try again.');
 DE('vn_errore_uso', 'La voce naturale non parte su questo dispositivo: uso la voce di sistema.', 'The natural voice does not start on this device: using the system voice.');
 DE('vn_prep', 'Preparo la voce… alla prima lettura ci vuole qualche secondo.', 'Getting the voice ready… the first reading takes a few seconds.');
+/* v0.36 · contatore dei costi */
+DE('cent', 'centesimi di $', 'US cents');
+DE('costi_t', 'Spesa stimata per l’AI', 'Estimated AI spending');
+DE('costi_mese', 'Questo mese: {c} ({n} richieste)', 'This month: {c} ({n} requests)');
+DE('costi_tot', 'Dall’inizio: {c}', 'Since the start: {c}');
+DE('costi_ultimo', 'ultima richiesta: {c}', 'last request: {c}');
+DE('costi_nota', 'È una stima: conta solo ciò che AI.st.ain ha chiesto a Claude da questo dispositivo, con i prezzi del {d} (aggiornati una volta al giorno). Il saldo vero è nella console Anthropic.', 'This is an estimate: it only counts what AI.st.ain asked Claude from this device, using prices dated {d} (refreshed once a day). The real balance is in the Anthropic console.');
+DE('costi_saldo', 'Vedi il saldo vero', 'See the real balance');
+DE('costi_azzera', 'Azzera il contatore', 'Reset the counter');
+DE('costi_conf', 'Azzerare il contatore della spesa stimata?', 'Reset the estimated spending counter?');

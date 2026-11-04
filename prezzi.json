@@ -1,0 +1,9 @@
+{
+  "data": "2026-11-04",
+  "valuta": "USD",
+  "fonte": "https://docs.claude.com/en/docs/about-claude/pricing",
+  "nota": "Dollari per milione di token. Sotto la soglia (token del prompt di una richiesta) vale la prima coppia, sopra la seconda.",
+  "modelli": {
+    "claude-haiku-5-5": { "soglia": 100000, "sotto": { "in": 0.10, "out": 0.50 }, "sopra": { "in": 0.50, "out": 2.50 } }
+  }
+}
