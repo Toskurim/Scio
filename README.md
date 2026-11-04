@@ -1,4 +1,4 @@
-# AI.st.ain v0.34 — app di studio installabile (PWA)
+# AI.st.ain v0.35 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,9 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.35
+- **Voce naturale (italiano)**: in Aspetto, il pulsante "Scarica la voce naturale" (circa 95 MB, una volta) installa la voce Piper "Paola" (licenza MIT). Poi legge capitoli e quiz sul dispositivo, anche senza rete, senza inviare nulla. Se non parte, si torna alla voce di sistema. File in `voce/`.
 
 ## Novità della v0.34
 - Durante l'elaborazione di un capitolo compare l'avviso "Può volerci qualche minuto, soprattutto con molte pagine".

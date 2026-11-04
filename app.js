@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.34';
+const VERSIONE = '0.35';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -1167,10 +1167,101 @@ function vociLingua(lang) {
   try { return speechSynthesis.getVoices().map(v => [punteggioVoce(v, lang), v]).filter(x => x[0] > -1000).sort((a, b) => b[0] - a[0]).map(x => x[1]); } catch (e) { return []; }
 }
 function scegliVoce(lang, nome) { const vs = vociLingua(lang); return vs.length ? ((nome && vs.find(v => v.name === nome)) || vs[0]) : null; }
-function fermaVoce() { if (V && V.or) V.or.fermo = true; TOKEN++; try { speechSynthesis.cancel(); } catch (e) { /* non disponibile */ } try { if (V && V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } if (V) V.rec = null; }
-function parlaCb(testo, cb, bnd, opz) {
-  if (!('speechSynthesis' in window)) { toast(t('voce_non')); if (cb) cb(); return null; }
+function fermaVoce() { if (V && V.or) V.or.fermo = true; TOKEN++; vnFermaTutto(); try { speechSynthesis.cancel(); } catch (e) { /* non disponibile */ } try { if (V && V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } if (V) V.rec = null; }
+/* ===== v0.35 · Voce naturale (Piper, licenza MIT, voce italiana "Paola") =====
+   Si scarica una volta dal sito di AI.st.ain (circa 95 MB), poi funziona senza rete e senza inviare nulla a nessuno:
+   la voce è sintetizzata sul dispositivo. Se manca o dà errore, si torna alla voce di sistema. Solo italiano. */
+const VN = { cache: 'scio-voce', ok: false, w: null, job: null, ctx: null, carico: false, fase: '', pct: 0,
+  file: [['worker.js', 4000], ['piper_phonemize.js', 120714], ['piper_phonemize.wasm', 635212], ['ort.wasm.min.js', 48076], ['ort-wasm-simd-threaded.mjs', 20856], ['ort-wasm-simd-threaded.wasm', 11133407], ['it_IT-paola-medium.onnx.json', 7099], ['piper_phonemize.data', 18077249], ['it_IT-paola-medium.onnx', 63511038]] };
+function vnSupportata() { return !!(window.Worker && window.caches && window.WebAssembly && (window.AudioContext || window.webkitAudioContext)); }
+function vnUsa() { try { return localStorage.getItem('scio.vn') === '1'; } catch (e) { return false; } }
+function vnImposta(on) { try { localStorage.setItem('scio.vn', on ? '1' : '0'); } catch (e) { /* non disponibile */ } }
+async function vnControlla() {
+  if (!vnSupportata()) { VN.ok = false; return false; }
+  try { const c = await caches.open(VN.cache); VN.ok = !!(await c.match('voce/ok')); } catch (e) { VN.ok = false; }
+  return VN.ok;
+}
+function vnHtml() {
+  if (!vnSupportata() || ((S.profilo && S.profilo.lingua) || 'it') !== 'it') return '';
+  let h = '<h3>' + t('vn_titolo') + '</h3>';
+  if (VN.fase === 'scarico') return h + '<p><span class="spin"></span> ' + t('vn_scarico', { p: VN.pct }) + '</p>';
+  if (VN.ok) return h + '<label class="chk"><input type="checkbox" id="vn-usa" data-act="vn-usa"' + (vnUsa() ? ' checked' : '') + '>' + t('vn_usa') + '</label><p class="muted">' + t('vn_ok') + '</p><button class="btn sec small" type="button" data-act="vn-elimina">' + t('vn_elimina') + '</button>';
+  return h + '<p class="muted">' + t('vn_desc') + '</p>' + (VN.fase === 'errore' ? '<p class="fb warn">' + t('vn_errore') + '</p>' : '') + '<button class="btn sec small" type="button" data-act="vn-scarica">' + t('vn_scarica') + '</button>';
+}
+function vnAggiorna() { const b = document.getElementById('vn-box'); if (b) b.innerHTML = vnHtml(); }
+async function vnScarica() {
+  if (VN.fase === 'scarico') return;
+  VN.fase = 'scarico'; VN.pct = 0; vnAggiorna();
+  const tot = VN.file.reduce((s, f) => s + f[1], 0); let fatti = 0;
+  try {
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* facoltativo */ }
+    const c = await caches.open(VN.cache); await c.delete('voce/ok');
+    for (const [nome] of VN.file) {
+      const r = await fetch('voce/' + nome, { cache: 'reload' }); if (!r.ok || !r.body) throw new Error(nome);
+      const rd = r.body.getReader(), parti = [];
+      for (;;) { const x = await rd.read(); if (x.done) break; parti.push(x.value); fatti += x.value.length; const p = Math.min(99, Math.floor(100 * fatti / tot)); if (p !== VN.pct) { VN.pct = p; vnAggiorna(); } }
+      await c.put('voce/' + nome, new Response(new Blob(parti), { status: 200, headers: { 'Content-Type': r.headers.get('content-type') || 'application/octet-stream' } }));
+    }
+    await c.put('voce/ok', new Response('1'));
+    VN.ok = true; VN.fase = ''; vnImposta(true); vnFermaTutto(true);
+  } catch (e) {
+    VN.fase = 'errore'; try { const c = await caches.open(VN.cache); for (const f of VN.file) await c.delete('voce/' + f[0]); } catch (x) { /* niente */ }
+  }
+  vnAggiorna();
+}
+async function vnElimina() { vnFermaTutto(true); if (VN.w) { VN.w.terminate(); VN.w = null; VN.carico = false; } try { await caches.delete(VN.cache); } catch (e) { /* niente */ } VN.ok = false; VN.fase = ''; vnAggiorna(); }
+function vnFermaTutto(soloAudio) {
+  const j = VN.job; VN.job = null;
+  if (j) { j.timer.forEach(clearTimeout); j.src.forEach(s => { try { s.onended = null; s.stop(); } catch (e) { /* già fermo */ } }); }
+  if (VN.w) { try { VN.w.postMessage({ tipo: 'ferma' }); } catch (e) { /* niente */ } }
+}
+function vnWorker() {
+  if (VN.w) return VN.w;
+  VN.w = new Worker('voce/worker.js'); VN.w.onmessage = ev => vnMsg(ev.data); VN.w.onerror = () => vnMsg({ tipo: 'errore', id: VN.job && VN.job.id });
+  return VN.w;
+}
+function vnPezzi(testo) {
+  const out = []; let cur = null;
+  const re = /[^.!?;:\n]+[.!?;:]*\s*/g; let m;
+  while ((m = re.exec(testo))) {
+    if (cur && (m.index + m[0].length - cur.s) > 170) { out.push(cur); cur = null; }
+    if (!cur) cur = { s: m.index, e: m.index + m[0].length }; else cur.e = m.index + m[0].length;
+  }
+  if (cur) out.push(cur);
+  const res = [];
+  out.forEach(p => { let s = p.s; const e = p.e; while (e - s > 330) { let k = testo.lastIndexOf(' ', s + 300); if (k <= s + 80) k = s + 300; res.push([s, k]); s = k; } res.push([s, e]); });
+  return res.map(([s, e]) => { const raw = testo.slice(s, e), lead = raw.length - raw.trimStart().length; return { t: raw.trim(), off: s + lead }; }).filter(p => p.t && /[\p{L}\p{N}]/u.test(p.t));
+}
+function vnMsg(m) {
+  const j = VN.job; if (!j || (m.id !== undefined && m.id !== j.id)) return;
+  if (m.tipo === 'errore') { VN.job = null; vnFermaTutto(); toast(t('vn_errore_uso')); if (j.ripiego) j.ripiego(); return; }
+  if (m.tipo !== 'pezzo') return;
+  const ctx = VN.ctx, buf = ctx.createBuffer(1, m.pcm.length, m.sr); buf.copyToChannel(m.pcm, 0);
+  const src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination);
+  const inizio = Math.max(ctx.currentTime + 0.05, j.prossimo); src.start(inizio); j.prossimo = inizio + buf.duration + 0.15; j.src.push(src);
+  if (j.bnd) {
+    const parole = []; const re = /\S+/g; let x; while ((x = re.exec(m.testo))) parole.push([x.index, x[0].length + 1]);
+    const tot = parole.reduce((s, p) => s + p[1], 0); let acc = 0;
+    parole.forEach(p => { const quando = (inizio - ctx.currentTime) + buf.duration * (acc / tot); acc += p[1]; j.timer.push(setTimeout(() => { if (VN.job === j && j.id === TOKEN) j.bnd({ name: 'word', charIndex: m.off + p[0] }); }, Math.max(0, quando * 1000))); });
+  }
+  if (m.i === m.n - 1) src.onended = () => { if (VN.job === j) { VN.job = null; if (j.id === TOKEN && j.cb) j.cb(); } };
+}
+function parlaNat(testo, cb, bnd, ripiego, vel) {
+  const id = ++TOKEN; try { speechSynthesis.cancel(); } catch (e) { /* niente */ } vnFermaTutto();
+  const C = window.AudioContext || window.webkitAudioContext; if (!VN.ctx) VN.ctx = new C(); try { VN.ctx.resume(); } catch (e) { /* niente */ }
+  const job = { id: id, cb: cb, bnd: bnd, src: [], timer: [], prossimo: 0, ripiego: ripiego }; VN.job = job;
+  if (!VN.carico) { VN.carico = true; toast(t('vn_prep')); }
+  const pz = vnPezzi(testo); if (!pz.length) { VN.job = null; if (cb) cb(); return job; }
+  vnWorker().postMessage({ tipo: 'di', id: id, pezzi: pz, vel: vel });
+  return job;
+}
+vnControlla();
+function parlaCb(testo, cb, bnd, opz, senzaNat) {
   opz = opz || {};
+  if (!senzaNat && VN.ok && vnUsa() && String(opz.lingua ? LINGUE_VOCE[opz.lingua] : voceDi()).toLowerCase().startsWith('it')) {
+    return parlaNat(testo, cb, bnd, () => parlaCb(testo, cb, bnd, opz, true), opz.vel || (S.profilo && S.profilo.vel) || 0.9);
+  }
+  if (!('speechSynthesis' in window)) { toast(t('voce_non')); if (cb) cb(); return null; }
   try {
     speechSynthesis.cancel(); const id = ++TOKEN;
     const lang = opz.lingua ? LINGUE_VOCE[opz.lingua] : voceDi();
@@ -1331,6 +1422,7 @@ function bloccoAspetto(p) {
     r('fs', 0.8, 1.6, 0.1, p.fs || 1, 'dimensione') + r('lh', 1.3, 2.4, 0.1, p.lh || 1.6, 'interlinea') + r('ls', 0, 0.2, 0.02, p.ls || 0, 'spaz_lettere') + r('ws', 0, 0.4, 0.05, p.ws || 0, 'spaz_parole') + r('vel', 0.5, 1.4, 0.1, p.vel || 0.9, 'vel_lettura') +
     '<label class="f">' + t('voce_scelta') + '<select data-pref="voce" id="voce-sel" data-cur="' + esc(p.voce || '') + '"><option value="">' + esc(t('voce_auto')) + '</option></select></label>' +
     '<button class="btn sec small" type="button" data-act="prova-voce">' + t('prova_voce') + '</button><p class="muted">' + t('voce_aiuto') + '</p>' +
+    '<div class="fb" id="vn-box">' + vnHtml() + '</div>' +
     '<div class="fb" id="anteprima">' + t('anteprima') + '</div><p class="muted">' + t('aspetto_auto_nota') + '</p><button class="btn sec small" type="button" id="btn-cons" data-act="aspetto-consigliato">' + t('aspetto_ripristina') + '</button>';
 }
 function bloccoTema(p) {
@@ -1885,6 +1977,9 @@ const AZ = {
     V.busy = false; render();
   },
   'stop': () => { fermaVoce(); V.lettura = null; },
+  'vn-scarica': () => { vnScarica(); return 'async'; },
+  'vn-usa': el => { vnImposta(!!el.checked); if (!el.checked) fermaVoce(); return 'async'; },
+  'vn-elimina': () => { vnElimina(); return 'async'; },
   'prova-voce': () => {
     const sv = document.getElementById('voce-sel'), sl = document.getElementById('lingua-fig'), sp = document.querySelector('[data-pref="vel"]');
     const lg = (sl && sl.value) || (S.profilo && S.profilo.lingua) || 'it';

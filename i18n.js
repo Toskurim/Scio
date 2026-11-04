@@ -616,3 +616,15 @@ DE("met_set_confronto", "Mostra quali modi di studiare funzionano meglio (confro
 DE("met_set_esp", "Proponi piccoli esperimenti (provare un modo di studiare nuovo)", "Suggest little experiments (trying a new way of studying)");
 
 D('lavora_nota', 'Può volerci qualche minuto, soprattutto con molte pagine. Puoi lasciare aperta l’app: non serve fare altro.', 'It may take a few minutes, especially with many pages. You can leave the app open: nothing else to do.', 'Das kann einige Minuten dauern, vor allem bei vielen Seiten. Du kannst die App geöffnet lassen.', 'Cela peut prendre quelques minutes, surtout avec beaucoup de pages. Tu peux laisser l’appli ouverte.', 'Puede tardar unos minutos, sobre todo con muchas páginas. Puedes dejar la app abierta.', 'Poate dura câteva minute, mai ales cu multe pagini. Poți lăsa aplicația deschisă.', 'Mund të duhen disa minuta, sidomos me shumë faqe. Mund ta lësh aplikacionin të hapur.', 'قد يستغرق الأمر بضع دقائق، خاصة مع صفحات كثيرة. يمكنك ترك التطبيق مفتوحًا.', '可能需要几分钟，尤其是页数较多时。你可以让应用保持打开。');
+
+/* v0.35 · voce naturale */
+DE('vn_titolo', 'Voce naturale (italiano)', 'Natural voice (Italian only)');
+DE('vn_desc', 'Una voce italiana molto più naturale, gratuita. Si scarica una volta sola (circa 95 MB: meglio con il Wi-Fi) e poi funziona anche senza rete. Tutto resta sul dispositivo: non viene inviato nulla a nessuno.', 'A much more natural Italian voice, free. It downloads once (about 95 MB: better on Wi-Fi) and then works offline. Everything stays on the device: nothing is sent to anyone.');
+DE('vn_scarica', 'Scarica la voce naturale', 'Download the natural voice');
+DE('vn_scarico', 'Scarico la voce… {p}%', 'Downloading the voice… {p}%');
+DE('vn_usa', 'Usa la voce naturale', 'Use the natural voice');
+DE('vn_ok', 'Voce scaricata. Se il dispositivo è lento o poco potente puoi disattivarla: tornerà la voce di sistema.', 'Voice downloaded. If the device is slow you can turn it off: the system voice will come back.');
+DE('vn_elimina', 'Elimina la voce scaricata', 'Delete the downloaded voice');
+DE('vn_errore', 'Non sono riuscito a scaricare la voce. Controlla la connessione e riprova.', 'The voice could not be downloaded. Check your connection and try again.');
+DE('vn_errore_uso', 'La voce naturale non parte su questo dispositivo: uso la voce di sistema.', 'The natural voice does not start on this device: using the system voice.');
+DE('vn_prep', 'Preparo la voce… alla prima lettura ci vuole qualche secondo.', 'Getting the voice ready… the first reading takes a few seconds.');
