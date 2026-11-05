@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" fill="#2f6f6a"/>
+<rect width="512" height="512" rx="102" fill="#2f6f6a"/>
 <g transform="translate(0,8)">
 <!-- capelli bianchi scarmigliati -->
 <g fill="#f4f1ea" stroke="#d7d2c6" stroke-width="4">
