@@ -1,4 +1,4 @@
-# AI.st.ain v0.38 — app di studio installabile (PWA)
+# AI.st.ain v0.39 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,14 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.39
+- **Guida alla chiave API** (`guida-chiave.html`): passo passo per creare l'account, aggiungere il credito e copiare la chiave; linkata dall'app (Impostazioni della famiglia, banner demo) e dalla presentazione. Le immagini stanno in `guida/` (nomi `01-account.png` … `05-incolla.png`; se mancano la pagina funziona lo stesso).
+- Messaggi chiari per gli errori di Claude (chiave non valida, credito finito, troppe richieste, servizio occupato, rete assente) e controllo del formato della chiave.
+- Avviso "C'è una versione nuova" con pulsante Aggiorna ora.
+- Promemoria nella pagina iniziale per la copia di sicurezza (ogni 14 giorni, rimandabile).
+- Nota "l'AI può sbagliare: nel dubbio controlla sul libro" in ogni capitolo.
+- Test automatici ora nel progetto, cartella `tests/` (vedi `tests/README.md`).
 
 ## Novità della v0.38
 - Icona dell'app (barra delle applicazioni, schermata iniziale) con gli angoli arrotondati.

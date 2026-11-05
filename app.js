@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.38';
+const VERSIONE = '0.39';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -282,6 +282,19 @@ function costiHtml() {
     '<div class="row"><a class="btn sec small" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener noreferrer">' + t('costi_saldo') + '</a><button class="btn sec small" type="button" data-act="costi-azzera">' + t('costi_azzera') + '</button></div></div>';
 }
 prezziAggiorna();
+/* v0.38 · messaggi chiari per gli errori più comuni di Claude (chiave, credito, limiti, rete) */
+function erroreAnthropic(st, corpo) {
+  let tipo = '', msg = '';
+  try { const j = JSON.parse(corpo); tipo = (j.error && j.error.type) || ''; msg = (j.error && j.error.message) || ''; } catch (e) { msg = String(corpo || '').slice(0, 200); }
+  if (st === 401 || tipo === 'authentication_error') return t('err_chiave');
+  if (st === 402 || /credit balance|billing/i.test(msg)) return t('err_credito');
+  if (st === 403 || tipo === 'permission_error') return t('err_permesso');
+  if (st === 404 || tipo === 'not_found_error') return t('err_modello');
+  if (st === 429 || tipo === 'rate_limit_error') return t('err_limite');
+  if (st >= 500 || tipo === 'overloaded_error' || tipo === 'api_error') return t('err_occupato');
+  return 'Errore ' + st + ': ' + String(msg || corpo).slice(0, 250);
+}
+function guidaLink() { return ' <a href="guida-chiave.html" target="_blank" rel="noopener">' + esc(t('guida_chiave')) + '</a>'; }
 async function chiamaAI(system, testo, immagini, cfg, json) {
   const a = cfg || FAM.ai || {};
   const compat = a.provider === 'compat';
@@ -298,11 +311,11 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': chiave, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify(c)
-    });
+    }).catch(() => { throw new Error(t('err_rete')); });
     /* temperatura 0: a parità di foto, risultati il più possibile uguali tra una generazione e l'altra */
     let r = await chiama(Object.assign({ temperature: 0 }, corpo));
     if (!r.ok && r.status === 400) { const t0 = await r.clone().text(); if (/temperature/i.test(t0)) r = await chiama(corpo); }
-    if (!r.ok) throw new Error('Errore ' + r.status + ': ' + (await r.text()).slice(0, 300));
+    if (!r.ok) throw new Error(erroreAnthropic(r.status, await r.text()));
     const j = await r.json();
     costoRegistra(a.model || 'claude-haiku-5-5', j.usage);
     if (json) {
@@ -1518,7 +1531,7 @@ function vFam() {
     '<label class="f">' + t('chiave_api') + '<input type="password" id="chiave" value="' + esc(b.ai && b.ai.key ? b.ai.key : '') + '" placeholder="' + esc(haChiave(FAM.ai) ? t('chiave_salvata') : '') + '" autocomplete="off"></label>' + (haChiave(FAM.ai) ? '<button class="btn sec small" type="button" data-act="rimuovi-chiave">' + t('rimuovi_chiave') + '</button>' : '') +
     '<label class="f">' + t('modello') + '<input type="text" id="modello" list="mod-sugg" value="' + esc(a.model) + '" placeholder="' + esc((MODELLI_PER[sel] || [])[0] || '') + '"></label>' +
     '<datalist id="mod-sugg">' + (MODELLI_PER[sel] || []).map(m => '<option value="' + m + '"></option>').join('') + '</datalist>' +
-    '<button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
+    '<p class="muted"><a href="guida-chiave.html" target="_blank" rel="noopener">📘 ' + esc(t('guida_chiave')) + '</a></p><button class="btn sec" type="button" data-act="prova-ai">' + t('prova_coll') + '</button><p class="muted" id="esitoprova" role="status"></p><p class="muted">' + t('srv_note') + '</p>' +
     '<details><summary>Guida / Guide: Ollama, LM Studio</summary><p class="muted"><b>Ollama</b>: <code>ollama pull gemma4:26b</code> (GPU ~16 GB). <code>OLLAMA_ORIGINS=' + esc(location.origin.startsWith('http') ? location.origin : 'https://toskurim.github.io') + '</code>. <b>LM Studio</b>: Developer › server + CORS.<br>Funziona solo sul PC dove girano / works only on the PC where they run.</p></details></div>' +
     '<div class="card"><h2>' + t('priv_btn') + '</h2><p class="muted">' + t('priv_breve') + '</p><button class="btn sec" type="button" data-act="priv-apri">' + t('priv_btn') + '</button>' +
     '<label class="chk"><input type="checkbox" id="dsa-ai"' + ((b.dsaAI !== undefined ? b.dsaAI : FAM.dsaAI) === false ? '' : ' checked') + '>' + t('dsa_ai_lbl') + '</label><p class="muted">' + t('dsa_ai_nota') + '</p>' +
@@ -1544,13 +1557,21 @@ function vSetup() {
     '<div class="card"><h2>' + t('pin_figlio', { n: esc(p.nome || '…') }) + '</h2><label class="f"><input type="password" id="pinf" inputmode="numeric" maxlength="8" value="" autocomplete="off" placeholder="' + esc(p.pin ? t('pin_figlio_tieni') : '') + '"></label>' + (p.pin ? '<label class="chk"><input type="checkbox" id="rmpin">' + t('rimuovi_pin_figlio') + '</label>' : '') + '<p class="muted">' + t('pin_figlio_nota') + '</p></div>' +
     '<button class="btn full" data-act="salva-figlio">' + t('salva') + '</button>' + (DB.figli.length ? '<p></p><button class="btn sec full" data-act="genitori">' + t('annulla') + '</button>' : '');
 }
+function cardBackup() {
+  if (!S.capitoli || !S.capitoli.length) return '';
+  const ub = FAM.ultimoBackup ? new Date(FAM.ultimoBackup).getTime() : 0;
+  if (ub && (Date.now() - ub) / 86400000 < 14) return '';
+  let sn = 0; try { sn = +localStorage.getItem('scio.bk-snooze') || 0; } catch (e) { /* niente */ }
+  if (Date.now() < sn) return '';
+  return '<div class="card" id="bk-card"><h2>💾 ' + t('bk_t') + '</h2><p>' + t('bk_txt') + '</p><div class="row"><button class="btn small" data-act="esporta">' + t('salva_copia') + '</button><button class="btn sec small" data-act="bk-dopo">' + t('bk_dopo') + '</button></div></div>';
+}
 function vHome() {
   const p = S.profilo; if (!p) return vScelta();
   const ultimi = S.capitoli.slice(0, 3);
   const mancanti = MATERIE.filter(m => m !== 'Altro' && !S.materie.some(x => sameM(x, m)));
   const due = ripDovute().length, ver = prossimeVerifiche(21);
-  return barra() + (FAM.ai.provider === 'demo' ? '<div class="fb warn" role="status">' + t('demo_banner') + '</div>' : '') +
-    '<div class="hero"><img src="icons/icon-192.png" alt="" width="64" height="64"><div><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('scegli_materia') + '</p></div></div>' +
+  return barra() + (FAM.ai.provider === 'demo' ? '<div class="fb warn" role="status">' + t('demo_banner') + guidaLink() + '</div>' : '') +
+    cardBackup() + '<div class="hero"><img src="icons/icon-192.png" alt="" width="64" height="64"><div><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('scegli_materia') + '</p></div></div>' +
     '<h2>' + t('le_materie') + '</h2>' + (S.materie.length ? '<div class="mat-grid">' + S.materie.map(m => { const e = elementiMateria(m); return '<button class="mat" data-act="apri-materia" data-m="' + esc(m) + '">' + iconaMateria(m) + '<b>' + esc(m) + '</b><span class="muted">' + t('n_cap', { n: e.cap.length }) + ' · ' + t('n_es', { n: e.es.length }) + '</span></button>'; }).join('') + '</div>' : '<div class="card muted">' + t('nessuna_materia') + '</div>') +
     '<div class="card add-mat"><h3>' + t('agg_materia') + '</h3>' + (mancanti.length ? '<div class="row" style="margin-bottom:8px">' + mancanti.map(m => '<button class="btn sec small" data-act="aggiungi-materia" data-m="' + esc(m) + '">+ ' + esc(m) + '</button>').join('') + '</div>' : '') +
     '<label class="f">' + t('altra_materia') + '<input type="text" id="nuovaM" maxlength="40" autocomplete="off"></label><button class="btn sec small" data-act="aggiungi-materia">' + t('aggiungi') + '</button></div>' +
@@ -1568,7 +1589,7 @@ function fotoBox() {
 function vNuovo(tipo) {
   const demo = FAM.ai.provider === 'demo';
   return barra() + '<div class="card"><h1>' + (tipo === 'cap' ? t('nuovo_cap') : t('nuovo_es')) + '</h1>' +
-    (demo ? '<div class="fb">' + t('demo_banner') + '</div>' : '') +
+    (demo ? '<div class="fb">' + t('demo_banner') + guidaLink() + '</div>' : '') +
     '<p><span class="muted">' + t('materia_lbl') + ':</span> <b>' + esc(V.materia) + '</b> <button class="btn sec small" data-act="home">' + t('cambia_materia') + '</button></p>' +
     (tipo === 'cap' ? '<label class="f">' + t('focus') + '<input type="text" id="focus"></label>' : '') +
     fotoBox() +
@@ -1578,7 +1599,7 @@ function vNuovo(tipo) {
 function vControllo() {
   const r = V.controllo;
   const cl = e => e === 'ok' ? 'ok' : e === 'errore' ? 'warn' : '';
-  return barra() + '<div class="card"><h1>' + t('controlla_svol') + '</h1><p class="muted">' + t('svol_intro') + '</p>' + (FAM.ai.provider === 'demo' ? '<div class="fb">' + t('demo_banner') + '</div>' : '') +
+  return barra() + '<div class="card"><h1>' + t('controlla_svol') + '</h1><p class="muted">' + t('svol_intro') + '</p>' + (FAM.ai.provider === 'demo' ? '<div class="fb">' + t('demo_banner') + guidaLink() + '</div>' : '') +
     '<p><span class="muted">' + t('materia_lbl') + ':</span> <b>' + esc(V.materia) + '</b></p>' +
     '<label class="f">' + t('cosa_chiedeva') + '<textarea id="cosa">' + esc(V.cosa || '') + '</textarea></label>' + fotoBox() +
     (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + '</p>' : '<button class="btn full" data-act="controlla-svol">' + t('controlla_btn') + '</button>') + '</div>' +
@@ -1614,7 +1635,7 @@ function vCapitolo() {
   else if (V.tab === 'glossario') corpo = '<div class="card">' + c.glossario.map(g => '<p><b>' + esc(g.termine) + '</b>: ' + md(g.definizione) + '</p>').join('') + '</div>';
   else corpo = vTestPartenza(c);
   const gr = V.genRiass && V.genRiass.id === c.id ? '<div class="card" dir="' + (FAM.lingua === 'ar' ? 'rtl' : 'ltr') + '" lang="' + FAM.lingua + '"><h3>' + t('gen_in_lingua') + '</h3>' + md(V.genRiass.testo) + '</div>' : '';
-  return barra() + '<div class="card"><div class="muted">' + esc(c.materia) + '</div><h1>' + esc(c.titolo) + '</h1>' + (c.avvisi.length ? '<div class="fb warn">' + c.avvisi.map(esc).join('<br>') + '</div>' : '') +
+  return barra() + '<div class="card"><div class="muted">' + esc(c.materia) + '</div><h1>' + esc(c.titolo) + '</h1><p class="muted ai-nota">ℹ️ ' + t('ai_sbaglia') + '</p>' + (c.avvisi.length ? '<div class="fb warn">' + c.avvisi.map(esc).join('<br>') + '</div>' : '') +
     (mancano(c) ? '<div class="fb warn" role="alert"><b>!</b> (' + esc(mancano(c)) + '). <button class="btn small" data-act="completa"' + (V.busy ? ' disabled' : '') + '>' + (V.busy ? '…' : t('completa')) + '</button></div>' : '') +
     '<div class="row" style="margin-top:8px"><button class="btn sec small" data-act="apri-materia" data-m="' + esc(c.materia) + '">‹ ' + esc(c.materia) + '</button><button class="btn small" data-act="ascolta">' + t('ascolta') + '</button><button class="btn sec small" data-act="stop">' + t('ferma') + '</button>' + (stampabile ? '<button class="btn sec small" data-act="stampa">' + t('stampa') + '</button><button class="btn sec small" data-act="scarica">' + t('scarica') + '</button>' : '') + (FAM.lingua !== 'it' && sezOk('riassunto') ? '<button class="btn sec small" data-act="spiega-gen"' + (V.busy ? ' disabled' : '') + '>' + t('spiega_gen') + '</button>' : '') + '</div></div>' + boxLettura() + gr +
     '<div class="tabs" role="tablist">' + TB.map(x => '<button class="tab' + (V.tab === x ? ' on' : '') + '" role="tab" data-act="tab" data-t="' + x + '">' + t(x) + '</button>').join('') + '</div>' + corpo + boxSposta(c, 'cap');
@@ -1861,6 +1882,7 @@ const AZ = {
   'prova-ai': async () => {
     const out = document.getElementById('esitoprova'); const a = leggiAi(); if (!a.key) { a.kc = FAM.ai.kc; a.key = FAM.ai.key; }
     if (a.provider === 'demo') { out.textContent = '–'; return; }
+    if (a.provider === 'anthropic' && a.key && !/^sk-ant-/.test(a.key)) { out.textContent = t('err_formato'); return; }
     out.textContent = '…';
     try { const r = await chiamaAI('Rispondi solo con la parola OK.', 'Rispondi OK.', [], a); out.textContent = t('esito_prova_ok') + ' ' + r.slice(0, 40); }
     catch (e) { out.textContent = e.message === 'NODEMO' ? t('chiave_api') + '?' : e.message; }
@@ -2040,6 +2062,7 @@ const AZ = {
     V.busy = false; render();
   },
   'stop': () => { fermaVoce(); V.lettura = null; },
+  'bk-dopo': () => { try { localStorage.setItem('scio.bk-snooze', String(Date.now() + 3 * 86400000)); } catch (e) { /* niente */ } },
   'costi-azzera': () => { if (confirm(t('costi_conf'))) costiSalva({ tot: { i: 0, o: 0, usd: 0, n: 0 }, mesi: {}, ultimo: null }); },
   'vn-scarica': () => { vnScarica(); return 'async'; },
   'vn-usa': el => { vnImposta(!!el.checked); if (!el.checked) fermaVoce(); return 'async'; },
@@ -2551,9 +2574,20 @@ function bloccaScroll(on) { const r = document.documentElement; if (on) { r.styl
 /* Installazione e aggiornamenti */
 var promptInstalla = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstalla = e; const b = document.getElementById('installa'); if (b) b.hidden = false; });
+/* v0.38 · avviso "c'è una versione nuova": il nuovo service worker prende il controllo da solo, ma la pagina aperta resta la vecchia finché non si ricarica */
+function mostraAggiorna() {
+  if (document.getElementById('upd')) return;
+  const d = document.createElement('div'); d.id = 'upd'; d.className = 'upd'; d.setAttribute('role', 'status');
+  d.innerHTML = '<span>' + esc(t('upd_txt')) + '</span><button class="btn small" type="button" data-upd="ora">' + esc(t('upd_ora')) + '</button><button class="btn sec small" type="button" data-upd="dopo">' + esc(t('upd_dopo')) + '</button>';
+  d.addEventListener('click', e => { const b = e.target.closest('[data-upd]'); if (!b) return; if (b.dataset.upd === 'ora') location.reload(); else d.remove(); });
+  document.body.appendChild(d);
+}
 if ('serviceWorker' in navigator && location.protocol === 'https:' || location.hostname === 'localhost') {
   navigator.serviceWorker && navigator.serviceWorker.register('sw.js').then(r => {
-    r.addEventListener('updatefound', () => { const w = r.installing; if (w) w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) toast('Nuova versione di AI.st.ain pronta: chiudi e riapri l\'app.'); }); });
+    const aveva = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (aveva) mostraAggiorna(); });
+    const cerca = () => { try { r.update(); } catch (e) { /* offline: si riprova */ } };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) cerca(); }); setInterval(cerca, 3600000);
   }).catch(() => {});
 }
 render();

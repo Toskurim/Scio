@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it" style="color-scheme:light dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Come ottenere la chiave API di Claude</title>
+<meta name="description" content="Guida passo passo, con immagini, per creare l'account, aggiungere credito e copiare la chiave API da incollare in AI.st.ain.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F3F6FB; --card:#FFFFFF; --ink:#13203B; --muted:#4D5A73; --line:#D9E0EC;
+  --accent:#2F5BEA; --accent-ink:#FFFFFF; --sun:#FFC83D; --sun-ink:#3A2A00; --mint:#12A58A; --soft:#E3EAFB;
+  --f-d:'Lexend',system-ui,sans-serif; --f-b:'Atkinson Hyperlegible',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1526;--card:#16213A;--ink:#EAF0FC;--muted:#A9B6D0;--line:#2A3858;--accent:#7F9CFF;--accent-ink:#0B1226;--sun:#FFC83D;--sun-ink:#3A2A00;--mint:#3DD6B5;--soft:#1E2C50;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1526;--card:#16213A;--ink:#EAF0FC;--muted:#A9B6D0;--line:#2A3858;--accent:#7F9CFF;--accent-ink:#0B1226;--sun:#FFC83D;--sun-ink:#3A2A00;--mint:#3DD6B5;--soft:#1E2C50;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--f-b);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.w{max-width:780px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-d);line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.35rem;font-weight:800}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:6px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:28px;font:600 .95rem var(--f-d)}
+.lead{color:var(--muted);margin-top:12px;font-size:1.1rem}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:20px 22px;margin-top:22px}
+.box ul{margin:10px 0 0;padding-left:1.2em}
+.step{display:grid;grid-template-columns:48px minmax(0,1fr);gap:6px 18px;margin-top:34px}
+.num{width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:800 1.4rem var(--f-d);display:flex;align-items:center;justify-content:center}
+.step h2{align-self:center}
+.step .t{grid-column:2}
+.step .t p{color:var(--ink);margin-top:2px}
+.step .t b{font-weight:700}
+code{background:var(--soft);padding:2px 7px;border-radius:6px;font-size:.95em;word-break:break-all}
+.go{display:inline-block;margin-top:14px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font:600 1rem var(--f-d);padding:12px 20px;border-radius:14px}
+.shot{margin:16px 0 0;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px}
+.shot img{display:block;width:100%;height:auto;border-radius:10px}
+.shot figcaption{font-size:.88rem;color:var(--muted);margin-top:8px}
+.warn{border-color:var(--sun);background:var(--card)}
+.warn h2{display:flex;gap:10px;align-items:center}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.98rem}
+th,td{text-align:left;padding:10px 12px;border-top:1.5px solid var(--line);vertical-align:top}
+th{width:38%;font-family:var(--f-d);font-weight:600}
+.nota{margin-top:26px;color:var(--muted);font-size:.93rem}
+footer{margin-top:40px;padding-top:18px;border-top:1.5px solid var(--line);color:var(--muted);font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="w">
+<div class="top"><a href="./">&#8249; Torna ad AI.st.ain</a><a href="presentazione.html">Cos'è AI.st.ain</a></div>
+<h1>Come ottenere la chiave API di Claude</h1>
+<p class="lead">AI.st.ain non ha abbonamenti: per leggere i capitoli usa Claude, l'intelligenza artificiale di Anthropic, tramite una chiave personale. Servono circa 10 minuti, una carta di pagamento e pochi euro.</p>
+<div class="box">
+<h2>Prima di cominciare</h2>
+<ul>
+<li><b>Quanto costa:</b> si paga solo l'uso reale. Con Claude Haiku un capitolo di cinque pagine costa circa <b>un centesimo di dollaro</b>. La ricarica minima è di 5 dollari: bastano per molti capitoli (è una stima, dipende dalla lunghezza).</li>
+<li><b>Cos'è la chiave:</b> un codice segreto, come una password, che permette all'app di usare il tuo credito. Resta cifrata sul tuo dispositivo e viene inviata solo ad Anthropic.</li>
+<li><b>Chi la fa:</b> un genitore o un adulto. L'account e la carta sono tuoi, non dell'app.</li>
+</ul>
+</div>
+
+<section class="step"><div class="num" aria-hidden="true">1</div><h2>Crea il tuo account</h2><div class="t"><p>Apri il sito della console di Anthropic e registrati con la tua email (oppure con un account Google, se lo offre). Conferma l'indirizzo dalla mail che ricevi. Il sito può chiederti un nome per l'organizzazione: scrivi quello che vuoi, per esempio il cognome della famiglia. Alla prima visita potrebbe anche chiederti per cosa userai il servizio e in quali paesi: rispondi con sincerità, sono domande di routine.</p><a class="go" href="https://platform.claude.com" target="_blank" rel="noopener noreferrer">Apri la console di Anthropic ›</a><figure class="shot"><img src="guida/01-account.png" alt="Pagina di registrazione della console" loading="lazy" onerror="this.closest('figure').hidden=true"><figcaption>Pagina di registrazione della console</figcaption></figure></div></section>
+<section class="step"><div class="num" aria-hidden="true">2</div><h2>Aggiungi un po' di credito</h2><div class="t"><p>Nel menu a sinistra apri <b>Settings</b> › <b>Billing</b> (Fatturazione) e premi <b>Purchase credits</b> (Acquista credito). Scegli l'importo: l'offerta minima è <b>5 dollari</b>. Inserisci l'indirizzo di fatturazione e i dati della carta: li vede solo Anthropic, mai AI.st.ain. Il pagamento è in dollari, con le imposte aggiunte. Se non vuoi ricariche automatiche, controlla che l'opzione sia spenta.</p><a class="go" href="https://platform.claude.com/settings/billing" target="_blank" rel="noopener noreferrer">Apri la pagina del credito ›</a><figure class="shot"><img src="guida/02-credito.png" alt="Pagina di acquisto del credito" loading="lazy" onerror="this.closest('figure').hidden=true"><figcaption>Pagina di acquisto del credito</figcaption></figure></div></section>
+<section class="step"><div class="num" aria-hidden="true">3</div><h2>Crea la chiave API</h2><div class="t"><p>Nel menu a sinistra apri <b>API keys</b> (Chiavi API) e premi <b>Create key</b> (Crea chiave). Lascia l'area di lavoro <b>Default</b> e scrivi un nome che ti ricordi, per esempio «AI.st.ain». Se la console ti chiede una scadenza, scegli <b>nessuna scadenza</b> o la più lunga: se scade, l'app smette di funzionare. Premi <b>Add</b> (Aggiungi).</p><a class="go" href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener noreferrer">Apri la pagina delle chiavi ›</a><figure class="shot"><img src="guida/03-crea-chiave.png" alt="Finestra «Create key»" loading="lazy" onerror="this.closest('figure').hidden=true"><figcaption>Finestra «Create key»</figcaption></figure></div></section>
+<section class="step"><div class="num" aria-hidden="true">4</div><h2>Copia la chiave: si vede una volta sola</h2><div class="t"><p>Compare una finestra con la chiave, un codice lungo che inizia con <code>sk-ant-</code>. Premi il pulsante <b>Copy</b> (Copia) <b>prima di chiudere</b>: dopo non potrai più rivederla. Se la perdi nessun problema: se ne crea una nuova e si cancella la vecchia.</p><figure class="shot"><img src="guida/04-copia.png" alt="Finestra «Save your API key»" loading="lazy" onerror="this.closest('figure').hidden=true"><figcaption>Finestra «Save your API key»</figcaption></figure></div></section>
+<section class="step"><div class="num" aria-hidden="true">5</div><h2>Incollala in AI.st.ain</h2><div class="t"><p>In AI.st.ain apri <b>Genitori</b> › <b>Impostazioni della famiglia</b>. Nella sezione «Collegamento all'AI» scegli il servizio <b>Claude (chiave Anthropic)</b>. Tocca il campo <b>Chiave API</b>, tieni premuto e scegli <b>Incolla</b> (sul computer: Ctrl+V). Premi <b>Prova il collegamento</b>: se tutto è a posto leggi «Collegamento riuscito». Infine premi <b>Salva</b>.</p><figure class="shot"><img src="guida/05-incolla.png" alt="Impostazioni della famiglia in AI.st.ain" loading="lazy" onerror="this.closest('figure').hidden=true"><figcaption>Impostazioni della famiglia in AI.st.ain</figcaption></figure></div></section>
+
+<div class="box warn">
+<h2>La chiave è come una password</h2>
+<ul>
+<li>Non mandarla a nessuno, nemmeno per WhatsApp o email, e non pubblicarla.</li>
+<li>Se pensi che qualcuno l'abbia vista, vai in <b>API keys</b> nella console e cancellala: poi ne crei una nuova.</li>
+<li>Per tenere sotto controllo la spesa, controlla ogni tanto il credito nella console. AI.st.ain mostra anche una stima nell'Area genitori.</li>
+</ul>
+</div>
+<section class="box">
+<h2>Se qualcosa non va</h2>
+<table>
+<tr><th>L'app dice che la chiave non è valida</th><td>Ricopiala dalla console senza spazi prima o dopo. Se non l'hai più, crea una chiave nuova.</td></tr>
+<tr><th>Il credito è finito</th><td>Apri la pagina del credito nella console e fai una nuova ricarica.</td></tr>
+<tr><th>Il servizio è occupato</th><td>Aspetta qualche minuto e riprova: succede nei momenti di molto traffico.</td></tr>
+<tr><th>«Non riesco a leggere la chiave salvata»</th><td>Succede se i dati del browser sono stati cancellati o si usa un altro dispositivo. Inserisci di nuovo la chiave in Impostazioni della famiglia.</td></tr>
+<tr><th>La console non ha le voci che vedi qui</th><td>Il sito di Anthropic cambia ogni tanto. Cerca le voci simili (Billing, API keys): il percorso è sempre quello.</td></tr>
+</table>
+</section>
+<p class="nota">Questa guida è scritta dalla famiglia che ha creato AI.st.ain, non da Anthropic. Le condizioni del servizio, i prezzi e il trattamento dei dati sono quelli di Anthropic: leggili sul loro sito prima di attivare la chiave. Prezzi aggiornati: <a href="https://docs.claude.com/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">listino ufficiale</a>.</p>
+<footer>AI.st.ain · Fatta in famiglia, per chi studia</footer>
+</div>
+</body>
+</html>

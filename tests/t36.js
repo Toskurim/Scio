@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+(async()=>{
+ const b=await chromium.launch(); const ctx=await b.newContext(); const p=await ctx.newPage(); const errs=[];
+ p.on('pageerror',e=>errs.push(String(e).slice(0,200))); p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});
+ await ctx.route('https://api.anthropic.com/**',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({content:[{type:'text',text:'ciao'}],usage:{input_tokens:10000,output_tokens:2000}})}));
+ const ok=(c,m)=>console.log(c?'OK  ':'FALLITO',m);
+ await p.goto('http://localhost:8766/index.html'); await p.waitForTimeout(1500);
+ ok((await p.locator('.brand').first().innerText()).includes('v0.'),'brand con versione');
+ console.log('prezzi data',await p.evaluate(()=>PREZZI.data), await p.evaluate(()=>localStorage.getItem('scio.prezzi')?'salvati':'no'));
+ await p.evaluate(()=>chiamaAI('sys','ciao',[],{provider:'anthropic',key:'sk-ant-test',model:'claude-haiku-5-5'}));
+ const c=await p.evaluate(()=>costiLeggi());
+ ok(Math.abs(c.tot.usd-0.002)<1e-9&&c.tot.i===10000&&c.tot.o===2000,'costo 10000/2000 = 0,002 $ ('+c.tot.usd+')');
+ ok(Math.abs(await p.evaluate(()=>costoStima('claude-haiku-5-5',150000,2000))-(150000*0.5+2000*2.5)/1e6)<1e-9,'sopra soglia 100K: tariffa alta');
+ ok(!!(await p.evaluate(()=>prezziValidi({modelli:{x:{soglia:1,sotto:{in:1,out:1},sopra:{in:'a',out:1}}}}))) === false,'prezzi non validi scartati');
+ await p.evaluate(()=>{V.genitoriOk=true;V.vista='genitori';FAM.pin='';render();});
+ await p.evaluate(()=>{V.vista='genitori';V.genitoriOk=true;});
+ const h=await p.evaluate(()=>costiHtml()); ok(/(Spesa stimata|Estimated AI spending)/.test(h)&&/0[.,]2/.test(h)&&/console\.anthropic\.com/.test(h),'scheda costi: '+h.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,200));
+ await p.evaluate(()=>{ localStorage.setItem('scio.prezzi',JSON.stringify({t:0,dati:{data:'x',modelli:{'claude-haiku-5-5':{soglia:100000,sotto:{in:9,out:9},sopra:{in:9,out:9}}}}})); });
+ await p.evaluate(()=>prezziAggiorna()); ok(await p.evaluate(()=>PREZZI.modelli['claude-haiku-5-5'].sotto.in)===0.10,'dopo 1 giorno rilegge prezzi.json dal sito (0,10)');
+ console.log('errori',errs); await b.close();
+})();

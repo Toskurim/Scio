@@ -284,3 +284,7 @@ body[data-liv=universita] .btn,body[data-liv=universita] .tab,body[data-liv=univ
 body[data-liv=universita] h1,body[data-liv=universita] h2{font-weight:600;letter-spacing:0}
 body[data-liv=universita] .mat-ico{display:none}
 body[data-liv=universita] *{animation:none!important}
+
+/* v0.39 · avviso di versione nuova */
+.upd{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:50;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;background:var(--card);color:var(--ink);border:2px solid var(--accent);border-radius:14px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.ai-nota{font-size:.9rem;margin:4px 0 8px}

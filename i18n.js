@@ -667,3 +667,20 @@ DE('tour_s_pin', 'Consiglio: il PIN del ragazzo (facoltativo) serve se i fratell
 DE('tour_s_voce', 'Consiglio: la voce di lettura. Con «Voce naturale» scarichi una voce italiana più naturale, che funziona anche senza rete.', 'Tip: the reading voice. With “Natural voice” you download a more natural Italian voice that also works offline.');
 DE('tour_stat_corpo', 'Qui sotto trovi i risultati dei test, la media, gli argomenti più deboli e i ripassi fatti.', 'Below you will find test results, the average, the weakest topics and the reviews done.');
 DE('tour_stat_stampa', 'Con «Stampa» ottieni la pagina da portare a un colloquio o da conservare.', 'With “Print” you get a page to bring to a meeting or to keep.');
+/* v0.39 · errori chiari, guida chiave, copia, versione nuova */
+DE('guida_chiave', 'Come ottenere la chiave API (guida con immagini)', 'How to get the API key (illustrated guide)');
+DE('err_chiave', 'La chiave API non è valida: ricopiala dalla console senza spazi prima o dopo, oppure creane una nuova (vedi la guida in Impostazioni della famiglia).', 'The API key is not valid: copy it again from the console without spaces, or create a new one (see the guide in Family settings).');
+DE('err_credito', 'Il credito sulla console è finito (o non è stato ancora aggiunto): fai una ricarica e riprova.', 'The console credit has run out (or has not been added yet): top up and try again.');
+DE('err_permesso', 'La chiave non ha il permesso di usare questo modello. Controlla la chiave e il nome del modello.', 'The key is not allowed to use this model. Check the key and the model name.');
+DE('err_modello', 'Il modello indicato non esiste. Lascia vuoto il campo «Modello» per usare quello consigliato.', 'The model does not exist. Leave the “Model” field empty to use the recommended one.');
+DE('err_limite', 'Troppe richieste in poco tempo: aspetta un minuto e riprova.', 'Too many requests in a short time: wait a minute and try again.');
+DE('err_occupato', 'Il servizio di Claude è momentaneamente occupato: riprova tra qualche minuto.', 'The Claude service is busy at the moment: try again in a few minutes.');
+DE('err_rete', 'Non riesco a collegarmi al servizio: controlla la connessione a internet e riprova.', 'Cannot reach the service: check your internet connection and try again.');
+DE('err_formato', 'Le chiavi di Claude iniziano con «sk-ant-»: controlla di aver copiato quella giusta.', 'Claude keys start with “sk-ant-”: check you copied the right one.');
+DE('upd_txt', 'C’è una versione nuova di AI.st.ain.', 'A new version of AI.st.ain is available.');
+DE('upd_ora', 'Aggiorna ora', 'Update now');
+DE('upd_dopo', 'Più tardi', 'Later');
+DE('bk_t', 'Salva una copia dei tuoi dati', 'Save a backup of your data');
+DE('bk_txt', 'I capitoli e i risultati stanno solo su questo dispositivo: se cambi telefono o cancelli i dati del browser si perdono. Salva una copia (chiedi a un genitore, se serve) e tienila al sicuro.', 'Chapters and results are stored only on this device: if you change phone or clear the browser data they are lost. Save a backup (ask a parent if needed) and keep it safe.');
+DE('bk_dopo', 'Più tardi', 'Later');
+DE('ai_sbaglia', 'Riassunti e spiegazioni sono preparati dall’AI, che può sbagliare: nel dubbio controlla sul libro.', 'Summaries and explanations are prepared by AI, which can make mistakes: when in doubt, check the book.');
