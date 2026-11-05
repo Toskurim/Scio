@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.36';
+const VERSIONE = '0.37';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -275,7 +275,7 @@ function costiHtml() {
   const c = costiLeggi(), mese = new Date().toISOString().slice(0, 7), m = c.mesi[mese] || { i: 0, o: 0, usd: 0, n: 0, f: {} };
   const perFiglio = DB.figli.filter(f => m.f && m.f[f.id]).map(f => esc(f.profilo ? f.profilo.nome : '') + ': ' + fmtUsd(m.f[f.id])).join(' · ');
   const nUltimo = c.ultimo ? t('costi_ultimo', { c: fmtUsd(c.ultimo.usd) }) : '';
-  return '<div class="card"><h2>' + t('costi_t') + '</h2>' +
+  return '<div class="card" id="costi-card"><h2>' + t('costi_t') + '</h2>' +
     '<p>' + t('costi_mese', { c: '<b>' + fmtUsd(m.usd) + '</b>', n: m.n }) + '</p>' + (perFiglio ? '<p class="muted">' + perFiglio + '</p>' : '') +
     '<p class="muted">' + t('costi_tot', { c: fmtUsd(c.tot.usd) }) + (nUltimo ? ' · ' + nUltimo : '') + '</p>' +
     '<p class="muted">' + t('costi_nota', { d: esc(PREZZI.data || '') }) + '</p>' +
@@ -948,7 +948,7 @@ function assegnaPremi(c, ts) {
 function vTraguardi() {
   const P = premi(), r = rango(P.xp), prox = RANGHI[r + 1];
   const testo = prox != null ? t('verso_rango', { r: t('rango_' + (r + 1)), n: prox - P.xp }) : t('rango_max');
-  return '<div class="card"><h2>' + t('traguardi') + '</h2><p><b>⭐ ' + esc(t('rango_' + r)) + '</b> · ' + t('n_punti', { n: P.xp }) + '</p>' +
+  return '<div class="card" id="tg-card"><h2>' + t('traguardi') + '</h2><p><b>⭐ ' + esc(t('rango_' + r)) + '</b> · ' + t('n_punti', { n: P.xp }) + '</p>' +
     (prox != null ? '<progress max="' + (prox - RANGHI[r]) + '" value="' + (P.xp - RANGHI[r]) + '" aria-label="' + esc(testo) + '"></progress>' : '') + '<p class="muted">' + esc(testo) + '</p>' +
     '<div class="badges">' + BADGE.map(b => { const on = P.badge.includes(b); return '<span class="badge' + (on ? ' on' : '') + '" title="' + esc(t('badge_' + b + '_d')) + '">' + (on ? '🏅 ' : '🔒 ') + esc(t('badge_' + b)) + '</span>'; }).join('') + '</div></div>';
 }
@@ -1585,7 +1585,10 @@ function vControllo() {
     (r ? '<div class="card"><h2>' + md(r.riepilogo || '') + '</h2>' + arr(r.passi).map(x => '<div class="step"><span class="num ' + (x.esito === 'ok' ? 'done' : '') + '">' + (x.esito === 'ok' ? '✓' : x.esito === 'errore' ? '!' : '?') + '</span><div style="flex:1"><b>' + md(x.cosa_hai_fatto || '') + '</b> <span class="chip ' + cl(x.esito) + '">' + t(x.esito === 'ok' ? 'esito_ok' : x.esito === 'errore' ? 'esito_err' : 'esito_dub') + '</span>' + (x.suggerimento ? '<div class="fb ' + (x.esito === 'errore' ? 'warn' : '') + '">' + md(x.suggerimento) + '</div>' : '') + '</div></div>').join('') + (r.domanda_guida ? '<div class="fb"><b>?</b> ' + md(r.domanda_guida) + '</div>' : '') + (arr(r.passi).some(x => x.esito !== 'ok') ? '<p class="muted">' + t('prova_correggere') + '</p>' : '') + '</div>' : '');
 }
 function sezOk(k) { return k === 'test' || !!V.genVede || !S.profilo || !S.profilo.sezioni || S.profilo.sezioni[k] !== false; }
-function tabsAttive() { return ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'test'].filter(sezOk); }
+function tabsAttive() {
+  const ordine = sezOk('riassunto') ? ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale', 'test'] : ['costruisci', 'schema', 'mappa', 'spiegazioni', 'glossario', 'pratica', 'orale', 'test'];
+  return ordine.filter(sezOk);
+}
 function primoTab() { return tabsAttive()[0]; }
 function mancano(c) {
   const m = [];
@@ -2302,31 +2305,52 @@ document.addEventListener('click', e => {
 });
 
 /* ===== v0.23: tutorial guidato con frecce, questionario DSA, rifiniture grafiche ===== */
+/* v0.37 · guida a fasi: al primo avvio solo l'essenziale (fase 1); dopo qualche giorno di uso compaiono i consigli sul resto (fasi 2 e 3).
+   Ogni passo: [selettore o null (messaggio centrale), testo, fase]; fase 0 = promemoria finale, sempre in coda. */
 const TOUR_PASSI = {
-  home: [['.bar .brand', 'tour_brand'], ['.bar [data-act=fs-]', 'tour_testo'], ['.bar [data-act=aspetto]', 'tour_aspetto'], ['.add-mat', 'tour_addmat'], ['.mat-grid .mat', 'tour_mat'], ['.bar [data-act=genitori]', 'tour_gen'], ['.bar [data-act=tour]', 'tour_ancora']],
-  materia: [['[data-act=nuovo-cap]', 'tour_nuovocap'], ['[data-act=nuovo-es]', 'tour_nuovoes'], ['[data-act=nuovo-controllo]', 'tour_controllo'], ['.bar [data-act=tour]', 'tour_ancora']],
-  capitolo: [['.tabs', 'tour_tabs'], ['[data-act=ascolta]', 'tour_ascolta'], ['.bar [data-act=tour]', 'tour_ancora']],
-  genitori: [['[data-act=aggiungi-figlio]', 'tour_figlio'], ['[data-act=modifica-fam]', 'tour_fam'], ['[data-act=priv-apri]', 'tour_priv'], ['[data-act=esporta]', 'tour_backup'], ['.bar [data-act=tour]', 'tour_ancora']]
+  home: [[null, 'tour_benvenuto', 1], ['.bar .brand', 'tour_brand', 1], ['.add-mat', 'tour_addmat', 1], ['.mat-grid .mat', 'tour_mat', 1], ['.bar [data-act=genitori]', 'tour_gen', 1],
+    ['.bar [data-act=fs-]', 'tour_testo', 2], ['.bar [data-act=aspetto]', 'tour_aspetto', 2], ['[data-act=inizia-ripasso]', 'tour_ripasso', 2], ['#tg-card', 'tour_traguardi', 3], ['#met-card', 'tour_metodo_home', 3], ['.bar [data-act=tour]', 'tour_ancora', 0]],
+  materia: [['[data-act=nuovo-cap]', 'tour_nuovocap', 1], ['[data-act=nuovo-es]', 'tour_nuovoes', 2], ['[data-act=nuovo-controllo]', 'tour_controllo', 2], ['.bar [data-act=tour]', 'tour_ancora', 0]],
+  capitolo: [['.tabs', 'tour_tabs', 1], ['[data-act=tab][data-t=costruisci]', 'tour_costruisci', 1], ['[data-act=ascolta]', 'tour_ascolta', 1],
+    ['[data-act=tab][data-t=test]', 'tour_testtab', 2], ['[data-act=tab][data-t=mappa]', 'tour_mappatab', 2], ['[data-act=tab][data-t=orale]', 'tour_oraletab', 3], ['[data-act=tab][data-t=pratica]', 'tour_pratica', 3], ['.bar [data-act=tour]', 'tour_ancora', 0]],
+  genitori: [['[data-act=aggiungi-figlio]', 'tour_figlio', 1], ['[data-act=modifica-figlio]', 'tour_modfiglio', 1], ['[data-act=stat-apri]', 'tour_stat', 1], ['[data-act=modifica-fam]', 'tour_fam', 1],
+    ['#costi-card', 'tour_costi', 2], ['[data-act=priv-apri]', 'tour_priv', 2], ['[data-act=esporta]', 'tour_backup', 2], ['.bar [data-act=tour]', 'tour_ancora', 0]],
+  setup: [['#nome', 'tour_s_nome', 1], ['[data-dsa]', 'tour_s_dsa', 1], ['[data-sez]', 'tour_s_sez', 1], ['#met-chiedi', 'tour_s_met', 2], ['#colori', 'tour_s_col', 2], ['#pinf', 'tour_s_pin', 2], ['#vn-box', 'tour_s_voce', 3], ['.bar [data-act=tour]', 'tour_ancora', 0]],
+  stat: [['.card h1', 'tour_stat_corpo', 1], ['[data-act=stat-stampa]', 'tour_stat_stampa', 1], ['.bar [data-act=tour]', 'tour_ancora', 0]]
 };
-function tourChiave(k) { return (k === 'genitori' ? 'fam' : (S.id || 'x')) + ':' + k; }
+const TOUR_FAM = ['genitori', 'setup', 'stat'];
+/* Giorni di uso: il 1° giorno solo l'essenziale, dal 2° i consigli di fase 2, dal 4° quelli di fase 3 */
+const FASE_TOUR = (function () {
+  try {
+    const u = JSON.parse(localStorage.getItem('scio.usi') || '{}') || {}, g = Array.isArray(u.g) ? u.g : [], oggi = new Date().toISOString().slice(0, 10);
+    if (!g.includes(oggi)) { g.push(oggi); localStorage.setItem('scio.usi', JSON.stringify({ g: g.slice(-60) })); }
+    return g.length >= 4 ? 3 : g.length >= 2 ? 2 : 1;
+  } catch (e) { return 1; }
+})();
+function tourChiave(k) { return (TOUR_FAM.includes(k) ? 'fam' : (S.id || 'x')) + ':' + k; }
 function tourLetti() { try { return JSON.parse(localStorage.getItem('scio.tour') || '{}') || {}; } catch (e) { return {}; } }
-function tourSegna(k) { try { const o = tourLetti(); o[tourChiave(k)] = 1; localStorage.setItem('scio.tour', JSON.stringify(o)); } catch (e) { /* senza memoria locale la guida si ripropone: nessun danno */ } }
-function tourVistaCorrente() { return V.vista === 'home' ? 'home' : V.vista === 'materia' ? 'materia' : V.vista === 'capitolo' ? 'capitolo' : (V.vista === 'genitori' && V.genitoriOk && FAM.pin) ? 'genitori' : null; }
+function tourSegna(k, f) { try { const o = tourLetti(), c = tourChiave(k); o[c] = Math.max(+o[c] || 0, f || 1); localStorage.setItem('scio.tour', JSON.stringify(o)); } catch (e) { /* senza memoria locale la guida si ripropone: nessun danno */ } }
+function tourVistaCorrente() {
+  const v = V.vista;
+  return v === 'home' ? 'home' : v === 'materia' ? 'materia' : v === 'capitolo' ? 'capitolo' : (v === 'genitori' && V.genitoriOk && FAM.pin) ? 'genitori' : (v === 'setup' && (V.genitoriOk || !FAM.pin)) ? 'setup' : (v === 'stat' && V.genitoriOk) ? 'stat' : null;
+}
 function tourAuto() {
   if (navigator.webdriver || V.mFull || document.getElementById('tour') || document.getElementById('dsaq') || V.busy) return;
-  const k = tourVistaCorrente(); if (!k || tourLetti()[tourChiave(k)]) return;
+  const k = tourVistaCorrente(); if (!k) return;
+  const letti = +tourLetti()[tourChiave(k)] || 0; if (letti >= FASE_TOUR) return;
   const vista = V.vista;
-  setTimeout(() => { if (V.vista === vista && !V.busy && !document.getElementById('tour') && !document.getElementById('dsaq')) tourAvvia(k); }, 800);
+  setTimeout(() => { if (V.vista === vista && !V.busy && !document.getElementById('tour') && !document.getElementById('dsaq')) tourAvvia(k, { da: letti + 1, fino: FASE_TOUR }); }, 800);
 }
 function tourChiudi() {
   const o = document.getElementById('tour'); if (!o) return;
   window.removeEventListener('resize', o._ri); document.removeEventListener('keydown', o._kd, true);
   const f = o._focus; o.remove(); if (!document.getElementById('dsaq')) bloccaScroll(false); try { if (f && f.focus) f.focus(); } catch (e) { /* nulla */ }
 }
-function tourAvvia(k) {
-  const passi = (TOUR_PASSI[k] || []).filter(p => document.querySelector(p[0]));
-  if (!passi.length) return;
-  tourSegna(k); tourChiudi();
+function tourAvvia(k, fasi) {
+  const da = fasi ? fasi.da : 0, fino = fasi ? fasi.fino : 9;
+  const passi = (TOUR_PASSI[k] || []).filter(p => { const f = p[2] === undefined ? 1 : p[2]; return (f === 0 || (f >= da && f <= fino)) && (!p[0] || document.querySelector(p[0])); });
+  if (!passi.some(p => p[2] !== 0)) { if (fasi) tourSegna(k, fasi.fino); return; }
+  tourSegna(k, fasi ? fasi.fino : FASE_TOUR); tourChiudi();
   const ov = document.createElement('div'); ov.id = 'tour'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', t('tour_titolo'));
   ov._focus = document.activeElement;
   ov.innerHTML = '<div class="tour-spot"></div><svg class="tour-arrow" aria-hidden="true"><defs><marker id="tour-p" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker></defs><path d="" marker-end="url(#tour-p)"/></svg>' +
@@ -2336,15 +2360,17 @@ function tourAvvia(k) {
   let i = 0;
   const box = ov.querySelector('.tour-box'), spot = ov.querySelector('.tour-spot'), path = ov.querySelector('svg > path');
   const pos = (scroll) => {
-    const el = document.querySelector(passi[i][0]); if (!el) { if (i < passi.length - 1) { i++; pos(true); } else tourChiudi(); return; }
-    if (scroll) el.scrollIntoView({ block: 'center', inline: 'nearest' });
-    const r = el.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, pad = 6;
+    const sel = passi[i][0], el = sel ? document.querySelector(sel) : null; if (sel && !el) { if (i < passi.length - 1) { i++; pos(true); } else tourChiudi(); return; }
+    if (scroll && el) el.scrollIntoView({ block: 'center', inline: 'nearest' });
+    const r = el ? el.getBoundingClientRect() : { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }, vw = window.innerWidth, vh = window.innerHeight, pad = 6;
     Object.assign(spot.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + 2 * pad) + 'px', height: (r.height + 2 * pad) + 'px' });
     ov.querySelector('.tour-n').textContent = t('tour_n', { i: i + 1, n: passi.length });
     ov.querySelector('.tour-t').textContent = t(passi[i][1]);
     ov.querySelector('[data-tour=salta]').textContent = t('tour_salta'); ov.querySelector('[data-tour=indietro]').textContent = t('tour_indietro'); ov.querySelector('[data-tour=indietro]').hidden = i === 0;
     ov.querySelector('[data-tour=avanti]').textContent = i === passi.length - 1 ? t('tour_fine') : t('tour_avanti');
     const bw = Math.min(340, vw - 24); box.style.width = bw + 'px';
+    if (!el) { spot.style.display = 'none'; path.setAttribute('d', ''); const bh0 = box.offsetHeight; box.style.left = Math.max(12, (vw - bw) / 2) + 'px'; box.style.top = Math.max(8, (vh - bh0) / 2) + 'px'; return; }
+    spot.style.display = '';
     const bh = box.offsetHeight, sotto = vh - r.bottom, sopra = r.top, gap = 58;
     let top, dir;
     if (sotto >= bh + gap + 8) { top = r.bottom + pad + gap; dir = 'su'; } else if (sopra >= bh + gap + 8) { top = r.top - pad - gap - bh; dir = 'giu'; } else { top = vh - bh - 12; dir = r.top + r.height / 2 < vh / 2 ? 'su' : 'giu'; if (top < r.bottom && r.bottom > vh / 2) top = 12; }
@@ -2475,7 +2501,7 @@ function proponiEsperimento(A) {
 function cardMetodo() {
   if (!metodoOn('confronto') && !metodoOn('esperimento')) return '';
   const A = analisiMetodo(); if (!A.n) return '';
-  let h = '<div class="card"><h2>🧭 ' + t('met_titolo') + '</h2>';
+  let h = '<div class="card" id="met-card"><h2>🧭 ' + t('met_titolo') + '</h2>';
   if (metodoOn('confronto')) {
     if (!A.per.length) h += '<p class="muted">' + t('met_pochi', { n: A.n }) + '</p>';
     else {
