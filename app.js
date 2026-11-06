@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.40';
+const VERSIONE = '0.41';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -664,7 +664,7 @@ Regole:
 const SYS_ESERCIZIO = `Sei AI.st.ain, un tutor che GUIDA IL RAGIONAMENTO. Ricevi la foto di un esercizio (matematica, fisica, latino, greco o altro).
 REGOLA ASSOLUTA: non dare MAI la soluzione, né il risultato finale, né la traduzione completa. Lo studente deve arrivarci da solo.
 Dividi l'esercizio in 3-6 passi di ragionamento (cosa chiede, cosa so, quale regola o metodo serve, come si combinano, controllo finale).
-Per matematica e fisica controlla con cura i calcoli per te stesso. Per latino e greco guida l'analisi (verbo, soggetto, casi, complementi) senza tradurre.
+Per matematica e fisica controlla con cura i calcoli per te stesso (rifalli due volte) e scrivi nell'"obiettivo" del passo finale il RISULTATO ESATTO atteso, con unità di misura. Per latino e greco guida l'analisi (verbo, soggetto, casi, complementi) senza tradurre.
 Rispondi SOLO con un JSON valido:
 {"materia":"...","richiesta":"l'esercizio riscritto in modo chiaro","passi":[{"titolo":"...","domanda":"domanda guida per lo studente","obiettivo":"cosa deve aver capito o ottenuto (SOLO per te, può contenere la risposta attesa)","indizi":["indizio leggero","indizio medio","indizio più chiaro ma senza soluzione"],"esempio_simile":"un esempio breve con dati diversi che mostra il metodo, senza risolvere questo esercizio"}]}
 Scrivi in italiano, con tono incoraggiante.`;
@@ -866,10 +866,10 @@ async function controllaIdea() {
   try {
     let r;
     if (FAM.ai.provider === 'demo') { await new Promise(x => setTimeout(x, 500)); r = ris.length > 14 ? { esito: 'giusto', feedback: 'Ben ragionato! Passiamo al passo successivo.' } : { esito: 'quasi', feedback: 'Ci sei vicino. Prova a spiegarlo con una frase intera: cosa succede e perché?' }; }
-    else { r = await chiediJSON(SYS_VALUTA + '\n\n' + profiloTesto(), 'Esercizio: ' + es.richiesta + '\nPasso: ' + p.titolo + '\nDomanda: ' + p.domanda + '\nObiettivo (riservato): ' + p.obiettivo + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA); }
+    else { r = await chiediJSON(sysValuta(SYS_VALUTA, es.materia) + '\n\n' + profiloTesto(), 'Esercizio: ' + es.richiesta + '\nPasso: ' + p.titolo + '\nDomanda: ' + p.domanda + '\nObiettivo (riservato): ' + p.obiettivo + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA); }
     V.busy = false;
-    if (r.esito === 'giusto') { es.fatti.push({ i: es.i, risposta: ris }); V.fb = { tipo: 'ok', testo: r.feedback || 'Giusto!' }; V.passoOk = true; }
-    else { V.fb = { tipo: 'warn', testo: r.feedback || 'Quasi: riprova.' }; V.passoOk = false; }
+    if (r.esito === 'giusto') { es.fatti.push({ i: es.i, risposta: ris }); V.fb = { tipo: 'ok', esito: 'giusto', testo: r.feedback || '' }; V.passoOk = true; }
+    else { V.fb = { tipo: 'warn', esito: r.esito === 'quasi' ? 'quasi' : 'da_rivedere', testo: r.feedback || 'Riprova.' }; V.passoOk = false; }
     salva(); render();
   } catch (e) { V.busy = false; V.errore = e.message; render(); }
 }
@@ -977,6 +977,10 @@ const SCHEMA_PRATICA = OBJ({ pratica: { type: 'array', description: '6 esercizi 
 const SYS_VALUTA_PRATICA = `Sei AI.st.ain, tutor che guida il ragionamento. Ricevi un esercizio, la sua soluzione (RISERVATA) e la risposta dello studente.
 Valuta se la risposta è corretta nella sostanza: accetta formulazioni diverse da quella della soluzione. Non rivelare MAI la soluzione. Se la risposta è sbagliata o incompleta, individua il punto in cui il ragionamento si inceppa e fai UNA domanda che aiuti lo studente a rendersene conto.
 Rispondi SOLO con JSON: {"esito":"giusto"|"quasi"|"da_rivedere","feedback":"massimo 3 frasi, tono incoraggiante, in italiano"}`;
+const MAT_RX = /matemat|geometr|aritmet|algebr/i;
+const SYS_MAT = `\nREGOLE PER LA MATEMATICA (valgono qui): 1) Controlla i calcoli per conto tuo e confronta il RISULTATO dello studente con quello atteso: accetta forme equivalenti (2/4 = 1/2 = 0,5; ordine diverso dei termini; unità di misura equivalenti). 2) Se il risultato è esatto, "esito" è "giusto" e il feedback inizia con "Risposta esatta!"; poi spiega in 2-4 frasi semplici il ragionamento che porta a quel risultato (qui puoi mostrarlo, perché lo studente lo ha già trovato). 3) Se il risultato è sbagliato, "esito" è "da_rivedere" e il feedback dice chiaramente "Non è ancora corretto" SENZA dare la soluzione: indica dove si inceppa e fai UNA domanda. 4) Se il metodo è giusto ma c'è un errore di calcolo o manca un passaggio, "esito" è "quasi" e lo dici chiaramente. Non essere mai vago: lo studente deve capire subito se ha sbagliato o no.`;
+function sysValuta(base, materia) { return base + (MAT_RX.test(materia || '') ? SYS_MAT : ''); }
+function fbHtml(fb) { const lab = { giusto: t('fb_giusto'), quasi: t('fb_quasi'), da_rivedere: t('fb_rivedi') }[fb.esito]; return (lab ? '<b>' + (fb.esito === 'giusto' ? '✓ ' : fb.esito === 'da_rivedere' ? '✗ ' : '≈ ') + lab + '</b> ' : '') + md(fb.testo); }
 const DEMO_PRATICA = [
   { testo: 'Spiega con parole tue perché le prime civiltà sono nate vicino ai fiumi.', soluzione: 'I fiumi danno acqua e terra fertile: si coltiva di più e si può vivere in gruppi numerosi.', indizi: ['Pensa a cosa serve per far crescere le piante.', 'Cosa porta un fiume quando straripa?', 'Acqua e terra fertile permettono di avere più...?'] },
   { testo: 'A cosa serve l\'irrigazione? Fai un esempio.', soluzione: 'Porta l\'acqua del fiume ai campi lontani con canali, così i raccolti crescono.', indizi: ['È una parola legata all\'acqua e ai campi.', 'Pensa ai canali.', 'I canali portano l\'acqua dove i campi sono lontani dal fiume.'] }
@@ -1011,7 +1015,7 @@ function vPratica(c) {
       (e.ind ? '<div class="fb"><b>' + t('pr_indizio') + '</b>' + e.indizi.slice(0, e.ind).map((x, j) => '<p>' + (j + 1) + '. ' + md(x) + '</p>').join('') + '</div>' : '') +
       '<label class="f">' + t('pr_tua') + '<textarea id="pr' + i + '" rows="3" maxlength="3000">' + esc(V.prBozza[i] || '') + '</textarea></label>' +
       '<div class="row"><button class="btn small" data-act="pratica-controlla" data-i="' + i + '"' + (V.busy ? ' disabled' : '') + '>' + t('pr_controlla') + '</button>' + (e.ind < e.indizi.length ? '<button class="btn sec small" data-act="pratica-indizio" data-i="' + i + '">' + t('pr_dammi_indizio') + '</button>' : '') + '</div>' +
-      (fb ? '<div class="fb ' + fb.tipo + '" role="status">' + md(fb.testo) + '</div>' : '') + '</div>'; }).join('');
+      (fb ? '<div class="fb ' + fb.tipo + '" role="status">' + fbHtml(fb) + '</div>' : '') + '</div>'; }).join('');
 }
 /* ===== v0.15: costruisci il tuo riassunto ===== */
 function titoliSezioni(c) {
@@ -1715,9 +1719,9 @@ function vEsercizio() {
     else if (i === es.i) {
       const sh = V.mostra || {};
       h += '<div class="card" style="border-color:var(--accent)"><div class="step"><span class="num">' + (i + 1) + '</span><div style="flex:1"><h2>' + esc(p.titolo) + '</h2><p>' + md(p.domanda) + '</p>' +
-        (V.passoOk ? '<div class="fb ok">' + md(V.fb.testo) + '</div><button class="btn" data-act="passo-avanti">' + (i + 1 >= es.passi.length ? t('concludi') : t('passo_succ')) + '</button>' :
+        (V.passoOk ? '<div class="fb ok" role="status">' + fbHtml(V.fb) + '</div><button class="btn" data-act="passo-avanti">' + (i + 1 >= es.passi.length ? t('concludi') : t('passo_succ')) + '</button>' :
           '<label class="f">' + t('la_tua_idea') + '<textarea id="idea" placeholder="' + esc(t('scrivi_qui')) + '">' + esc(V.bozza || '') + '</textarea></label>' +
-          (V.fb ? '<div class="fb warn">' + md(V.fb.testo) + '</div>' : '') +
+          (V.fb ? '<div class="fb warn" role="status">' + fbHtml(V.fb) + '</div>' : '') +
           arr(p.indizi).slice(0, sh.n || 0).map((x, k) => '<div class="fb"><b>' + t('indizio_n', { n: k + 1 }) + '</b> ' + md(x) + '</div>').join('') +
           (sh.es ? '<div class="fb"><b>' + t('es_simile') + ':</b> ' + md(p.esempio_simile) + '</div>' : '') +
           (V.errore ? '<div class="fb warn" role="alert">' + esc(V.errore) + '</div>' : '') +
@@ -2184,12 +2188,12 @@ const AZ = {
     try {
       let r;
       if (FAM.ai.provider === 'demo') r = ris.length > 12 ? { esito: 'giusto', feedback: 'Ben ragionato!' } : { esito: 'quasi', feedback: 'Ci sei vicino: prova a spiegare anche il perché.' };
-      else r = await chiediJSON(SYS_VALUTA_PRATICA + '\n\n' + profiloTesto(), 'Esercizio: ' + e.testo + '\nSoluzione (riservata): ' + e.soluzione + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA);
+      else r = await chiediJSON(sysValuta(SYS_VALUTA_PRATICA, c.materia) + '\n\n' + profiloTesto(), 'Esercizio: ' + e.testo + '\nSoluzione (riservata): ' + e.soluzione + '\nRisposta dello studente: ' + ris, [], SCHEMA_VALUTA);
       V.prFb = V.prFb || {}; e.tent++;
       if (r.esito === 'giusto') {
         if (!e.ok) { e.ok = true; const P = premi(); P.pratica++; P.xp += 3; if (P.pratica >= 5 && !P.badge.includes('allenato')) { P.badge.push('allenato'); toast('🏅 ' + t('nuovo_badge', { b: t('badge_allenato') })); } }
-        V.prFb[i] = { tipo: 'ok', testo: r.feedback || 'Giusto!' };
-      } else V.prFb[i] = { tipo: 'warn', testo: r.feedback || 'Quasi: riprova.' };
+        V.prFb[i] = { tipo: 'ok', esito: 'giusto', testo: r.feedback || '' };
+      } else V.prFb[i] = { tipo: 'warn', esito: r.esito === 'quasi' ? 'quasi' : 'da_rivedere', testo: r.feedback || 'Riprova.' };
       salva();
     } catch (err) { toast(err.message); }
     V.busy = false; render(); return 'async';

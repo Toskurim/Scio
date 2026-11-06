@@ -1,4 +1,4 @@
-# AI.st.ain v0.40 — app di studio installabile (PWA)
+# AI.st.ain v0.41 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,9 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.41
+- Matematica: dopo ogni risposta l'app dice chiaramente «✓ Risposta esatta!», «≈ Ci sei quasi» o «✗ Non è ancora corretto»; se è esatta spiega il ragionamento che porta al risultato. Vale sia negli esercizi guidati sia nell'Allenamento.
 
 ## Novità della v0.40
 - «Ho un esercizio»: con più esercizi nelle foto, l'app li elenca col numero del libro, tu spunti quali fare (o «Seleziona tutti») e li guida uno dopo l'altro, con il pulsante «Prossimo».

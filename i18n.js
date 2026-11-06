@@ -695,3 +695,8 @@ DE('es_guidami_n', 'Guidami negli esercizi scelti ({n})', 'Guide me through the 
 DE('es_scegli_almeno', 'Spunta almeno un esercizio.', 'Tick at least one exercise.');
 DE('es_prog', 'esercizio {i} di {n}', 'exercise {i} of {n}');
 DE('es_prossimo', 'Prossimo: esercizio {n}', 'Next: exercise {n}');
+
+/* v0.41: esito chiaro delle risposte */
+DE('fb_giusto', 'Risposta esatta!', 'Correct answer!');
+DE('fb_quasi', 'Ci sei quasi.', 'Almost there.');
+DE('fb_rivedi', 'Non è ancora corretto.', 'Not correct yet.');
