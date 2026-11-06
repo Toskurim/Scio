@@ -1,5 +1,5 @@
 /* AI.st.ain — service worker: apre l'app anche senza rete. Mai le chiamate AI. */
-const V = 'scio-0.39';
+const V = 'scio-0.40';
 const FILE = ['./', 'index.html', 'style.css', 'app.js', 'i18n.js', 'manifest.webmanifest', 'icons/favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'fonts/lexend-latin-400-normal.woff2', 'fonts/lexend-latin-500-normal.woff2', 'fonts/lexend-latin-600-normal.woff2', 'fonts/lexend-latin-700-normal.woff2',
   'fonts/lexend-latin-ext-400-normal.woff2', 'fonts/lexend-latin-ext-500-normal.woff2', 'fonts/lexend-latin-ext-600-normal.woff2', 'fonts/lexend-latin-ext-700-normal.woff2',

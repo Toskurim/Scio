@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.39';
+const VERSIONE = '0.40';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -376,6 +376,8 @@ const SCHEMA_ESERCIZIO = OBJ({
   materia: T, richiesta: T,
   passi: { type: 'array', description: '3-6 passi di ragionamento', items: OBJ({ titolo: T, domanda: T, obiettivo: T, indizi: Object.assign({ description: 'Esattamente 3 indizi dal più leggero al più chiaro, senza la soluzione' }, LS_), esempio_simile: T }) }
 });
+const SYS_ELENCO = `Sei AI.st.ain. Ricevi le foto di una o più pagine di esercizi di un libro. Elenca TUTTI gli esercizi che vedi, in ordine, con il numero ESATTAMENTE come è stampato sulla pagina (es. "5", "12", "3a"; se un esercizio ha sotto-punti a, b, c tienili insieme nello stesso esercizio). Per ognuno riporta il testo completo della consegna e dei dati. NON risolvere nulla. Non inventare esercizi che non si vedono e non saltarne. Se la numerazione non è leggibile, usa "?" come numero. Rispondi nello stesso formato richiesto dallo strumento.`;
+const SCHEMA_ELENCO = OBJ({ materia: T, esercizi: { type: 'array', description: 'Tutti gli esercizi visibili nelle foto, in ordine di pagina', items: OBJ({ numero: T, testo: T }) } });
 const SCHEMA_VALUTA = OBJ({ esito: { type: 'string', enum: ['giusto', 'quasi', 'da_rivedere'] }, feedback: T });
 
 /* ===== Mappe concettuali ===== */
@@ -807,19 +809,54 @@ async function preparaCapitolo() {
     V.foto = []; V.cap = cap.id; V.genVede = false; V.tab = primoTab(); V.vista = 'capitolo'; V.busy = false; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave: la inserisci in Area genitori › Impostazioni. Intanto puoi provare la modalità demo.' : e.message; render(); }
 }
+const DEMO_ELENCO = { esercizi: [{ numero: '3', testo: 'Risolvi l\'equazione (x² − 4) / (x − 2) = 0.' }, { numero: '4', testo: 'Risolvi l\'equazione 3x + 5 = 20.' }, { numero: '5', testo: 'Calcola il valore di 2·(7 − 3) + 4.' }] };
 async function preparaEsercizio() {
-  const materia = V.materia;
   if (!V.foto.length && FAM.ai.provider !== 'demo') { toast('Aggiungi la foto dell\'esercizio.'); return; }
-  V.busy = true; V.errore = ''; render();
+  V.busy = true; V.errore = ''; V.prog2 = null; render();
   try {
-    let c;
-    if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 700)); c = JSON.parse(JSON.stringify(DEMO_ES)); }
-    else { c = await chiediJSON(SYS_ESERCIZIO + '\n\n' + profiloTesto(), 'Materia: ' + materia + '. Guida lo studente passo per passo.', V.foto, SCHEMA_ESERCIZIO); }
-    const es = { id: uid(), data: new Date().toISOString(), materia: materia, richiesta: c.richiesta || '', passi: arr(c.passi), i: 0, indizi: 0, indiziTotali: 0, fatti: [], finito: false };
-    if (!es.passi.length) throw new Error('Non sono riuscito a dividere l\'esercizio in passi. Prova con una foto più chiara.');
-    S.esercizi.unshift(es); salva();
-    V.foto = []; V.es = es.id; V.vista = 'esercizio'; V.busy = false; V.fb = null; V.mostra = {}; V.bozza = ''; render();
+    let el;
+    if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 600)); el = JSON.parse(JSON.stringify(DEMO_ELENCO)); }
+    else { el = await chiediJSON(SYS_ELENCO + '\n\n' + profiloTesto(), 'Materia: ' + V.materia + '. Elenca tutti gli esercizi presenti nelle foto.', V.foto, SCHEMA_ELENCO); }
+    const items = arr(el.esercizi).filter(x => x && String(x.testo || '').trim()).map(x => ({ numero: String(x.numero || '?').slice(0, 12), testo: String(x.testo).slice(0, 2000) }));
+    if (!items.length) throw new Error('Non ho trovato esercizi nelle foto. Prova con una foto più chiara e vicina.');
+    V.elenco = items; V.sel = {}; V.busy = false;
+    if (items.length === 1) { V.sel[0] = true; await avviaEsercizi(); return; }
+    V.vista = 'scegli-es'; render();
   } catch (e) { V.busy = false; V.errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave (Area genitori › Impostazioni).' : e.message; render(); }
+}
+async function avviaEsercizi() {
+  const items = arr(V.elenco).filter((x, i) => V.sel && V.sel[i]);
+  if (!items.length) { toast(t('es_scegli_almeno')); return; }
+  V.busy = true; V.errore = ''; render();
+  const serie = uid(), creati = []; let errore = '';
+  for (let k = 0; k < items.length; k++) {
+    V.prog2 = { i: k + 1, n: items.length }; render();
+    try {
+      let c;
+      if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); c = JSON.parse(JSON.stringify(DEMO_ES)); c.richiesta = items[k].testo; }
+      else { c = await chiediJSON(SYS_ESERCIZIO + '\n\n' + profiloTesto(), 'Materia: ' + V.materia + '. Guida lo studente passo per passo SOLO sull\'esercizio n. ' + items[k].numero + ' (testo letto dalle foto: «' + items[k].testo + '»). Le foto possono contenere altri esercizi: ignorali.', V.foto, SCHEMA_ESERCIZIO); }
+      const es = { id: uid(), data: new Date().toISOString(), materia: V.materia, richiesta: c.richiesta || items[k].testo, passi: arr(c.passi), i: 0, indizi: 0, indiziTotali: 0, fatti: [], finito: false, serie: serie, num: items[k].numero };
+      if (!es.passi.length) throw new Error('Non sono riuscito a dividere l\'esercizio n. ' + items[k].numero + ' in passi.');
+      creati.push(es);
+    } catch (e) { errore = e.message === 'NODEMO' ? 'Per usare l\'AI serve una chiave (Area genitori › Impostazioni).' : e.message; break; }
+  }
+  V.busy = false; V.prog2 = null;
+  if (creati.length) {
+    S.esercizi = creati.concat(S.esercizi); salva();
+    V.foto = []; V.elenco = null; V.sel = {}; V.es = creati[0].id; V.vista = 'esercizio'; V.fb = null; V.mostra = {}; V.bozza = ''; V.passoOk = false;
+    if (errore) toast(errore);
+  } else { V.errore = errore; }
+  render();
+}
+function vScegliEs() {
+  const el = arr(V.elenco), n = el.filter((x, i) => V.sel && V.sel[i]).length;
+  return barra() + '<div class="card"><h1>' + t('es_trovati', { n: el.length }) + '</h1><p class="muted">' + t('es_scegli_da') + '</p>' +
+    '<div class="row" style="margin-bottom:8px"><button class="btn sec small" data-act="es-tutti">' + t('es_tutti') + '</button><button class="btn sec small" data-act="es-nessuno">' + t('es_nessuno') + '</button></div>' +
+    el.map((x, i) => '<label class="card" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin:6px 0"><input type="checkbox" data-act="es-toggle" data-i="' + i + '"' + (V.sel && V.sel[i] ? ' checked' : '') + (V.busy ? ' disabled' : '') + ' style="margin-top:4px;width:22px;height:22px"><span style="flex:1"><b>' + t('es_num', { n: esc(x.numero) }) + '</b><br>' + esc(x.testo).slice(0, 220) + (x.testo.length > 220 ? '…' : '') + '</span></label>').join('') +
+    (V.errore ? '<div class="fb warn" role="alert">' + esc(V.errore) + '</div>' : '') +
+    (V.busy ? '<p><span class="spin"></span> ' + t('lavora') + (V.prog2 ? ' (' + t('es_prog', { i: V.prog2.i, n: V.prog2.n }) + ')' : '') + '</p><p class="muted">' + t('lavora_nota') + '</p>' :
+      '<button class="btn full" data-act="es-avvia"' + (n ? '' : ' disabled') + '>' + t('es_guidami_n', { n: n }) + '</button>') +
+    '<p class="muted">' + t('foto_privacy') + '</p></div>';
 }
 async function controllaIdea() {
   const es = S.esercizi.find(x => x.id === V.es); const p = es.passi[es.i];
@@ -1669,9 +1706,10 @@ function vTest(c) {
 function vRipasso() {
   return barra() + '<div class="card"><h1>' + t('ripasso_oggi') + '</h1></div>' + (V.ripCap && V.test ? vTest(V.ripCap) : '<div class="card muted">' + t('nessun_ripasso') + '</div><button class="btn" data-act="home">' + t('studio') + '</button>');
 }
+function prossimoSerie(es) { if (!es.serie) return null; const l = S.esercizi.filter(x => x.serie === es.serie); const k = l.findIndex(x => x.id === es.id); return l.slice(k + 1).find(x => !x.finito) || l.find(x => !x.finito && x.id !== es.id) || null; }
 function vEsercizio() {
   const es = S.esercizi.find(x => x.id === V.es); if (!es) return vHome();
-  let h = barra() + '<div class="card"><div class="muted">' + esc(es.materia) + ' · ' + t('es_guidato') + '</div><h2>' + md(es.richiesta) + '</h2></div>';
+  let h = barra() + '<div class="card"><div class="muted">' + esc(es.materia) + ' · ' + t('es_guidato') + (es.num ? ' · ' + t('es_num', { n: esc(es.num) }) : '') + '</div><h2>' + md(es.richiesta) + '</h2></div>';
   es.passi.forEach((p, i) => {
     if (i < es.i || es.finito) h += '<div class="card"><div class="step"><span class="num done">✓</span><div><b>' + esc(p.titolo) + '</b><div class="muted">' + t('hai_scritto') + ' ' + esc((es.fatti.find(f => f.i === i) || {}).risposta || '') + '</div></div></div></div>';
     else if (i === es.i) {
@@ -1687,7 +1725,7 @@ function vEsercizio() {
         '</div></div></div>';
     } else h += '<div class="card muted"><b>' + (i + 1) + '. ' + esc(p.titolo) + '</b> · ' + t('si_sblocca') + '</div>';
   });
-  if (es.finito) h += '<div class="card"><div class="fb ok"><b>' + t('es_completato') + '</b> ' + t('indizi_usati', { n: es.indiziTotali }) + '</div><button class="btn" data-act="home">' + t('torna_studio') + '</button></div>';
+  if (es.finito) h += '<div class="card"><div class="fb ok"><b>' + t('es_completato') + '</b> ' + t('indizi_usati', { n: es.indiziTotali }) + '</div>' + (prossimoSerie(es) ? '<button class="btn" data-act="es-prossimo" data-id="' + prossimoSerie(es).id + '">' + t('es_prossimo', { n: esc(prossimoSerie(es).num) }) + '</button> ' : '') + '<button class="btn sec" data-act="home">' + t('torna_studio') + '</button></div>';
   return h + '<div class="row" style="margin-bottom:12px"><button class="btn sec small" data-act="apri-materia" data-m="' + esc(es.materia) + '">‹ ' + esc(es.materia) + '</button></div>' + boxSposta(es, 'es') + '<p class="muted" style="text-align:center">' + t('no_soluzione') + '</p>';
 }
 /* ===== Statistiche per i genitori ===== */
@@ -1792,11 +1830,11 @@ function render() {
   if (V.or && V.or.fase === 'ascolto' && !(V.vista === 'capitolo' && V.tab === 'orale' && V.cap === V.or.cap)) { V.or.fermo = true; V.or.fase = 'pronto'; try { if (V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } V.rec = null; }
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
-  if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
+  if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'scegli-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
   if (!['genitori', 'fam', 'setup', 'stat', 'privacy'].includes(V.vista)) V.genitoriOk = false;
   applicaTema();
   const v = V.vista;
-  const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
+  const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, 'scegli-es': vScegliEs, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
   document.getElementById('app').oninput = null;
   document.getElementById('app').innerHTML = (M[v] || vHome)();
   if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit || V.mFull) fitMappa(); }
@@ -1920,6 +1958,11 @@ const AZ = {
   'del': el => { V.foto.splice(+el.dataset.i, 1); },
   'prepara-cap': () => { preparaCapitolo(); return 'async'; },
   'prepara-es': () => { preparaEsercizio(); return 'async'; },
+  'es-toggle': el => { V.sel = V.sel || {}; const i = +el.dataset.i; if (el.checked) V.sel[i] = true; else delete V.sel[i]; },
+  'es-tutti': () => { V.sel = {}; arr(V.elenco).forEach((x, i) => V.sel[i] = true); },
+  'es-nessuno': () => { V.sel = {}; },
+  'es-avvia': () => { avviaEsercizi(); return 'async'; },
+  'es-prossimo': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
   'apri-cap': el => { V.coAiuto = {}; V.mzFit = true; V.prFb = {}; V.prBozza = {}; V.mEdit = false; V.mSel = null; V.mundo = []; V.cap = el.dataset.id; V.genVede = false; V.tab = primoTab(); V.test = null; V.vista = 'capitolo'; },
   'apri-es': el => { V.es = el.dataset.id; V.fb = null; V.passoOk = false; V.mostra = {}; V.bozza = ''; V.vista = 'esercizio'; },
   'tab': el => { if (!tabsAttive().includes(el.dataset.t)) return; { const c0 = S.capitoli.find(x => x.id === V.cap); if (c0 && V.tab === 'pratica') salvaBozzePratica(c0); if (c0 && V.tab === 'costruisci') salvaBozzeCo(c0); if (V.or && V.or.fase === 'rivedi') V.or.trascr = ((document.getElementById('or-testo') || {}).value || V.or.trascr || ''); } V.tab = el.dataset.t; if (V.tab !== 'mappa') V.mEdit = false; else V.mzFit = true; },

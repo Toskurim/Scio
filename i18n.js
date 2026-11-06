@@ -684,3 +684,14 @@ DE('bk_t', 'Salva una copia dei tuoi dati', 'Save a backup of your data');
 DE('bk_txt', 'I capitoli e i risultati stanno solo su questo dispositivo: se cambi telefono o cancelli i dati del browser si perdono. Salva una copia (chiedi a un genitore, se serve) e tienila al sicuro.', 'Chapters and results are stored only on this device: if you change phone or clear the browser data they are lost. Save a backup (ask a parent if needed) and keep it safe.');
 DE('bk_dopo', 'Più tardi', 'Later');
 DE('ai_sbaglia', 'Riassunti e spiegazioni sono preparati dall’AI, che può sbagliare: nel dubbio controlla sul libro.', 'Summaries and explanations are prepared by AI, which can make mistakes: when in doubt, check the book.');
+
+/* v0.40: scelta degli esercizi */
+DE('es_trovati', 'Ho trovato {n} esercizi', 'I found {n} exercises');
+DE('es_scegli_da', 'Spunta quelli che vuoi fare adesso (anche tutti): li facciamo uno alla volta, nell’ordine del libro.', 'Tick the ones you want to do now (or all of them): we do them one at a time, in book order.');
+DE('es_tutti', 'Seleziona tutti', 'Select all');
+DE('es_nessuno', 'Deseleziona', 'Clear');
+DE('es_num', 'Esercizio {n}', 'Exercise {n}');
+DE('es_guidami_n', 'Guidami negli esercizi scelti ({n})', 'Guide me through the chosen exercises ({n})');
+DE('es_scegli_almeno', 'Spunta almeno un esercizio.', 'Tick at least one exercise.');
+DE('es_prog', 'esercizio {i} di {n}', 'exercise {i} of {n}');
+DE('es_prossimo', 'Prossimo: esercizio {n}', 'Next: exercise {n}');
