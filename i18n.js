@@ -700,3 +700,20 @@ DE('es_prossimo', 'Prossimo: esercizio {n}', 'Next: exercise {n}');
 DE('fb_giusto', 'Risposta esatta!', 'Correct answer!');
 DE('fb_quasi', 'Ci sei quasi.', 'Almost there.');
 DE('fb_rivedi', 'Non è ancora corretto.', 'Not correct yet.');
+
+/* v0.42: messaggi brevi */
+DE('ts_occupato', 'Il servizio è occupato: provo con un altro modello…', 'The service is busy: trying another model…');
+DE('ts_foto', 'Aggiungi almeno una foto.', 'Add at least one photo.');
+DE('ts_foto_es', 'Aggiungi la foto dell’esercizio.', 'Add the photo of the exercise.');
+DE('ts_idea', 'Scrivi prima la tua idea, anche solo a metà.', 'Write your idea first, even if only half of it.');
+DE('ts_mat_nome', 'Scrivi il nome della materia.', 'Write the name of the subject.');
+DE('ts_mat_gia', 'Questa materia c’è già.', 'This subject already exists.');
+DE('ts_stampa', 'La stampa non è disponibile.', 'Printing is not available.');
+DE('ts_nodo_vuoto', 'Il testo del nodo non può essere vuoto.', 'The node text cannot be empty.');
+DE('ts_nodo_nuovo', 'Scrivi il testo del nuovo nodo.', 'Write the text of the new node.');
+DE('ts_nodi_max', 'La mappa ha già 60 nodi: è il massimo.', 'The map already has 60 nodes: that is the maximum.');
+DE('ts_nodi_gia', 'Questi due nodi sono già collegati.', 'These two nodes are already linked.');
+DE('ts_mappa_piccola', 'La mappa dell’AI era troppo piccola: ho costruito quella dallo schema.', 'The AI map was too small: I built it from the outline.');
+DE('ts_demo_no', 'In modalità demo non si può completare.', 'This cannot be completed in demo mode.');
+DE('ts_foto_err', 'Una foto non si apre:', 'A photo cannot be opened:');
+DE('ts_non_riuscito', 'Non sono riuscito:', 'It did not work:');

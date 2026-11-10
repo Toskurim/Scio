@@ -20,7 +20,18 @@ const { chromium } = require('playwright');
   ok(/(Esercizio|Exercise) 3/.test(await pg.locator(".card").first().innerText()), 'si parte dal primo scelto');
   await pg.evaluate(() => { const e = S.esercizi.find(x => x.id === V.es); e.finito = true; render(); });
   ok(/(Esercizio|Exercise|esercizio) 4|4/.test(await pg.locator('[data-act=es-prossimo]').innerText()), 'a fine esercizio propone il prossimo (4)');
-  // caso singolo: parte diretto
+  // v0.42: numero e serie restano dopo il riavvio, e ogni esercizio usa solo la sua foto
+  await pg.evaluate(() => salva()); await pg.reload(); await pg.waitForTimeout(500);
+  const tenuti = await pg.evaluate(() => { const e = DB.figli[DB.figli.length - 1].esercizi; return e.length === 3 && e.map(x => x.num).join(',') === '3,4,5' && !!e[0].serie && e[0].serie === e[2].serie; });
+  ok(tenuti, 'numero e serie restano dopo il riavvio');
+  // con la chiave vera: per ogni esercizio parte solo la foto della sua pagina
+  const inviate = await pg.evaluate(async () => {
+    S = DB.figli[DB.figli.length - 1]; FAM.ai.provider = 'anthropic'; V.materia = 'Matematica'; V.vista = 'nuovo-es'; V.foto = ['data:image/jpeg;base64,AAA', 'data:image/jpeg;base64,BBB'];
+    const viste = [];
+    window.chiediJSON = async (sys, testo, img, schema) => { if (schema === SCHEMA_ELENCO) return { esercizi: [{ numero: '7', testo: 'Calcola 2+2', foto: 1 }, { numero: '12', testo: 'Calcola 3·3', foto: 2 }, { numero: '13', testo: 'Calcola 5−1', foto: 9 }] }; viste.push(img.map(x => x.slice(-3)).join('+')); return { richiesta: 'r', passi: [{ titolo: 't', domanda: 'd', obiettivo: 'o', indizi: ['a', 'b', 'c'], esempio_simile: 'e' }] }; };
+    await preparaEsercizio(); V.sel = { 0: true, 1: true, 2: true }; await avviaEsercizi(); return viste.join(' | ');
+  });
+  ok(inviate === 'AAA | BBB | AAA+BBB', 'una foto per esercizio; se la pagina non è chiara le manda tutte (' + inviate + ')');
   ok(err.length === 0, 'errori pagina: ' + err.join('|'));
   await b.close();
 })();

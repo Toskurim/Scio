@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.41';
+const VERSIONE = '0.42';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
 const LS = 'scio.v0.3';
@@ -164,7 +164,7 @@ function pulisciDati(o) {
     const esercizi = A(c.esercizi).filter(e => e && typeof e === 'object').slice(0, 500).map(e => ({
       id: ID(e.id), data: Tx(e.data, 40), materia: Tx(e.materia, 60), richiesta: Tx(e.richiesta, 5000),
       passi: A(e.passi).filter(x => x && typeof x === 'object').map(x => ({ titolo: Tx(x.titolo, 300), domanda: Tx(x.domanda, 3000), obiettivo: Tx(x.obiettivo, 3000), indizi: L(x.indizi, 3000), esempio_simile: Tx(x.esempio_simile, 3000) })),
-      i: N(e.i), indizi: N(e.indizi), indiziTotali: N(e.indiziTotali), fatti: A(e.fatti).filter(x => x && typeof x === 'object').map(x => ({ i: N(x.i), risposta: Tx(x.risposta, 3000) })), finito: !!e.finito
+      i: N(e.i), indizi: N(e.indizi), indiziTotali: N(e.indiziTotali), fatti: A(e.fatti).filter(x => x && typeof x === 'object').map(x => ({ i: N(x.i), risposta: Tx(x.risposta, 3000) })), finito: !!e.finito, serie: Tx(e.serie, 40), num: Tx(e.num, 12)
     }));
     const ripetizioni = {};
     if (c.rip && typeof c.rip === 'object') Object.keys(c.rip).slice(0, 3000).forEach(k => { const r = c.rip[k]; if (/^[A-Za-z0-9_-]{1,40}\|\d{1,4}$/.test(k) && r && typeof r === 'object' && DATA(r.next)) ripetizioni[k] = { b: Math.max(0, Math.min(6, Math.floor(N(r.b)))), next: DATA(r.next) }; });
@@ -341,7 +341,7 @@ async function chiamaAI(system, testo, immagini, cfg, json) {
         body: JSON.stringify(Object.assign({ model: catena[i], temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: content }] }, gem && !GEM_NORID ? { reasoning_effort: 'low' } : {})) });
       if (r.status === 400 && gem && !GEM_NORID) { GEM_NORID = true; i--; continue; }   /* il modello non accetta l'impostazione: da ora senza */
       if (r.ok || !gem || ![429, 500, 503, 404].includes(r.status) || i === catena.length - 1) break;
-      if (typeof toast === 'function') toast('Il servizio è occupato: provo con un altro modello…');
+      if (typeof toast === 'function') toast(t('ts_occupato'));
       await new Promise(x => setTimeout(x, 2500));
     }
   } catch (e) {
@@ -376,8 +376,8 @@ const SCHEMA_ESERCIZIO = OBJ({
   materia: T, richiesta: T,
   passi: { type: 'array', description: '3-6 passi di ragionamento', items: OBJ({ titolo: T, domanda: T, obiettivo: T, indizi: Object.assign({ description: 'Esattamente 3 indizi dal più leggero al più chiaro, senza la soluzione' }, LS_), esempio_simile: T }) }
 });
-const SYS_ELENCO = `Sei AI.st.ain. Ricevi le foto di una o più pagine di esercizi di un libro. Elenca TUTTI gli esercizi che vedi, in ordine, con il numero ESATTAMENTE come è stampato sulla pagina (es. "5", "12", "3a"; se un esercizio ha sotto-punti a, b, c tienili insieme nello stesso esercizio). Per ognuno riporta il testo completo della consegna e dei dati. NON risolvere nulla. Non inventare esercizi che non si vedono e non saltarne. Se la numerazione non è leggibile, usa "?" come numero. Rispondi nello stesso formato richiesto dallo strumento.`;
-const SCHEMA_ELENCO = OBJ({ materia: T, esercizi: { type: 'array', description: 'Tutti gli esercizi visibili nelle foto, in ordine di pagina', items: OBJ({ numero: T, testo: T }) } });
+const SYS_ELENCO = `Sei AI.st.ain. Ricevi le foto di una o più pagine di esercizi di un libro. Elenca TUTTI gli esercizi che vedi, in ordine, con il numero ESATTAMENTE come è stampato sulla pagina (es. "5", "12", "3a"; se un esercizio ha sotto-punti a, b, c tienili insieme nello stesso esercizio). Per ognuno riporta il testo completo della consegna e dei dati. NON risolvere nulla. Non inventare esercizi che non si vedono e non saltarne. Se la numerazione non è leggibile, usa "?" come numero. In "foto" scrivi in quale foto si trova (1 = prima foto ricevuta). Rispondi nello stesso formato richiesto dallo strumento.`;
+const SCHEMA_ELENCO = OBJ({ materia: T, esercizi: { type: 'array', description: 'Tutti gli esercizi visibili nelle foto, in ordine di pagina', items: OBJ({ numero: T, testo: T, foto: { type: 'integer', description: 'Numero della foto (1 = prima foto) in cui si trova l\'esercizio' } }, ['numero', 'testo']) } });
 const SCHEMA_VALUTA = OBJ({ esito: { type: 'string', enum: ['giusto', 'quasi', 'da_rivedere'] }, feedback: T });
 
 /* ===== Mappe concettuali ===== */
@@ -737,7 +737,7 @@ async function riduci(file) {
 async function aggiungiFoto(files) {
   files = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name || ''));
   if (files.length > 1) files.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it', { numeric: true }));
-  for (const f of files) { try { V.foto.push(await riduci(f)); } catch (e) { toast('Una foto non si apre: ' + e.message); } }
+  for (const f of files) { try { V.foto.push(await riduci(f)); } catch (e) { toast(t('ts_foto_err') + ' ' + e.message); } }
   render();
 }
 
@@ -796,7 +796,7 @@ async function preparaCapitolo() {
   const materia = V.materia;
   const focus = document.getElementById('focus').value.trim();
   V.bozza = { materia, focus };
-  if (!V.foto.length && FAM.ai.provider !== 'demo') { toast('Aggiungi almeno una foto.'); return; }
+  if (!V.foto.length && FAM.ai.provider !== 'demo') { toast(t('ts_foto')); return; }
   V.busy = true; V.errore = ''; render();
   try {
     let c;
@@ -811,13 +811,13 @@ async function preparaCapitolo() {
 }
 const DEMO_ELENCO = { esercizi: [{ numero: '3', testo: 'Risolvi l\'equazione (x² − 4) / (x − 2) = 0.' }, { numero: '4', testo: 'Risolvi l\'equazione 3x + 5 = 20.' }, { numero: '5', testo: 'Calcola il valore di 2·(7 − 3) + 4.' }] };
 async function preparaEsercizio() {
-  if (!V.foto.length && FAM.ai.provider !== 'demo') { toast('Aggiungi la foto dell\'esercizio.'); return; }
+  if (!V.foto.length && FAM.ai.provider !== 'demo') { toast(t('ts_foto_es')); return; }
   V.busy = true; V.errore = ''; V.prog2 = null; render();
   try {
     let el;
     if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 600)); el = JSON.parse(JSON.stringify(DEMO_ELENCO)); }
     else { el = await chiediJSON(SYS_ELENCO + '\n\n' + profiloTesto(), 'Materia: ' + V.materia + '. Elenca tutti gli esercizi presenti nelle foto.', V.foto, SCHEMA_ELENCO); }
-    const items = arr(el.esercizi).filter(x => x && String(x.testo || '').trim()).map(x => ({ numero: String(x.numero || '?').slice(0, 12), testo: String(x.testo).slice(0, 2000) }));
+    const items = arr(el.esercizi).filter(x => x && String(x.testo || '').trim()).map(x => ({ numero: String(x.numero || '?').slice(0, 12), testo: String(x.testo).slice(0, 2000), foto: Number.isInteger(x.foto) && x.foto >= 1 && x.foto <= V.foto.length ? x.foto : 0 }));
     if (!items.length) throw new Error('Non ho trovato esercizi nelle foto. Prova con una foto più chiara e vicina.');
     V.elenco = items; V.sel = {}; V.busy = false;
     if (items.length === 1) { V.sel[0] = true; await avviaEsercizi(); return; }
@@ -834,7 +834,7 @@ async function avviaEsercizi() {
     try {
       let c;
       if (FAM.ai.provider === 'demo') { await new Promise(r => setTimeout(r, 400)); c = JSON.parse(JSON.stringify(DEMO_ES)); c.richiesta = items[k].testo; }
-      else { c = await chiediJSON(SYS_ESERCIZIO + '\n\n' + profiloTesto(), 'Materia: ' + V.materia + '. Guida lo studente passo per passo SOLO sull\'esercizio n. ' + items[k].numero + ' (testo letto dalle foto: «' + items[k].testo + '»). Le foto possono contenere altri esercizi: ignorali.', V.foto, SCHEMA_ESERCIZIO); }
+      else { c = await chiediJSON(SYS_ESERCIZIO + '\n\n' + profiloTesto(), 'Materia: ' + V.materia + '. Guida lo studente passo per passo SOLO sull\'esercizio n. ' + items[k].numero + ' (testo letto dalle foto: «' + items[k].testo + '»). Le foto possono contenere altri esercizi: ignorali.', items[k].foto ? [V.foto[items[k].foto - 1]] : V.foto, SCHEMA_ESERCIZIO); }
       const es = { id: uid(), data: new Date().toISOString(), materia: V.materia, richiesta: c.richiesta || items[k].testo, passi: arr(c.passi), i: 0, indizi: 0, indiziTotali: 0, fatti: [], finito: false, serie: serie, num: items[k].numero };
       if (!es.passi.length) throw new Error('Non sono riuscito a dividere l\'esercizio n. ' + items[k].numero + ' in passi.');
       creati.push(es);
@@ -861,7 +861,7 @@ function vScegliEs() {
 async function controllaIdea() {
   const es = S.esercizi.find(x => x.id === V.es); const p = es.passi[es.i];
   const ris = document.getElementById('idea').value.trim();
-  if (ris.length < 2) { toast('Scrivi prima la tua idea, anche solo a metà.'); return; }
+  if (ris.length < 2) { toast(t('ts_idea')); return; }
   V.bozza = ris; V.busy = true; V.errore = ''; render();
   try {
     let r;
@@ -1595,7 +1595,7 @@ function vSetup() {
     '<div class="card"><h2>' + t('met_set_t') + '</h2><p class="muted">' + t('met_set_nota') + '</p>' +
     [['chiedi', 'met_set_chiedi'], ['confronto', 'met_set_confronto'], ['esperimento', 'met_set_esp']].map(o => '<label class="chk"><input type="checkbox" id="met-' + o[0] + '"' + (!p.metodo || p.metodo[o[0]] !== false ? ' checked' : '') + '>' + t(o[1]) + '</label>').join('') + '</div>' +
     '<div class="card"><h2>' + t('aspetto') + '</h2><div id="cons">' + bloccoTema(p) + '</div>' + bloccoAspetto(p) + '</div>' +
-    '<div class="card"><h2>' + t('pin_figlio', { n: esc(p.nome || '…') }) + '</h2><label class="f"><input type="password" id="pinf" inputmode="numeric" maxlength="8" value="" autocomplete="off" placeholder="' + esc(p.pin ? t('pin_figlio_tieni') : '') + '"></label>' + (p.pin ? '<label class="chk"><input type="checkbox" id="rmpin">' + t('rimuovi_pin_figlio') + '</label>' : '') + '<p class="muted">' + t('pin_figlio_nota') + '</p></div>' +
+    '<div class="card"><h2>' + t('pin_figlio', { n: esc(p.nome || '…') }) + '</h2><label class="f"><input type="password" id="pinf" aria-label="' + esc(t('pin_figlio', { n: p.nome || '…' })) + '" inputmode="numeric" maxlength="8" value="" autocomplete="off" placeholder="' + esc(p.pin ? t('pin_figlio_tieni') : '') + '"></label>' + (p.pin ? '<label class="chk"><input type="checkbox" id="rmpin">' + t('rimuovi_pin_figlio') + '</label>' : '') + '<p class="muted">' + t('pin_figlio_nota') + '</p></div>' +
     '<button class="btn full" data-act="salva-figlio">' + t('salva') + '</button>' + (DB.figli.length ? '<p></p><button class="btn sec full" data-act="genitori">' + t('annulla') + '</button>' : '');
 }
 function cardBackup() {
@@ -1713,7 +1713,7 @@ function vRipasso() {
 function prossimoSerie(es) { if (!es.serie) return null; const l = S.esercizi.filter(x => x.serie === es.serie); const k = l.findIndex(x => x.id === es.id); return l.slice(k + 1).find(x => !x.finito) || l.find(x => !x.finito && x.id !== es.id) || null; }
 function vEsercizio() {
   const es = S.esercizi.find(x => x.id === V.es); if (!es) return vHome();
-  let h = barra() + '<div class="card"><div class="muted">' + esc(es.materia) + ' · ' + t('es_guidato') + (es.num ? ' · ' + t('es_num', { n: esc(es.num) }) : '') + '</div><h2>' + md(es.richiesta) + '</h2></div>';
+  let h = barra() + '<div class="card"><div class="muted">' + esc(es.materia) + ' · ' + t('es_guidato') + (es.num ? ' · ' + t('es_num', { n: esc(es.num) }) : '') + '</div><h1 class="h-es">' + md(es.richiesta) + '</h1></div>';
   es.passi.forEach((p, i) => {
     if (i < es.i || es.finito) h += '<div class="card"><div class="step"><span class="num done">✓</span><div><b>' + esc(p.titolo) + '</b><div class="muted">' + t('hai_scritto') + ' ' + esc((es.fatti.find(f => f.i === i) || {}).risposta || '') + '</div></div></div></div>';
     else if (i === es.i) {
@@ -1795,7 +1795,7 @@ function statisticheCorpo(f, st) {
     '<span class="chip">' + t('n_es', { n: st.esercizi }) + '</span><span class="chip">' + t('stat_controlli') + ': ' + st.controlli + '</span></div>' +
     '<h3 style="margin-top:16px">' + t('stat_attivita') + '</h3><p>' + t('stat_giorni7', { a: st.attivi7 }) + ' · ' + t('stat_giorni30', { a: st.attivi30 }) + '</p>' + graficoAttivita(st, lang) + '<p class="muted">' + t('stat_giorni_nota') + '</p>' +
     '<h3 style="margin-top:16px">' + t('stat_test_tempo') + '</h3>' + (st.ultimiTest.length ? graficoTest(st) + '<p class="muted">' + t('stat_soglia') + '</p>' : vuoto) +
-    '<h3 style="margin-top:16px">' + t('stat_materie') + '</h3>' + (st.materie.length ? '<div class="st-scroll"><table class="st-tab"><thead><tr><th>' + t('stat_materia') + '</th><th>' + t('stat_cap') + '</th><th>' + t('stat_test') + '</th><th>' + t('stat_media_c') + '</th><th>' + t('stat_trend') + '</th></tr></thead><tbody>' +
+    '<h3 style="margin-top:16px">' + t('stat_materie') + '</h3>' + (st.materie.length ? '<div class="st-scroll" tabindex="0" role="region" aria-label="' + esc(t('stat_materie')) + '"><table class="st-tab"><thead><tr><th>' + t('stat_materia') + '</th><th>' + t('stat_cap') + '</th><th>' + t('stat_test') + '</th><th>' + t('stat_media_c') + '</th><th>' + t('stat_trend') + '</th></tr></thead><tbody>' +
       st.materie.map(m => '<tr><td>' + esc(m.materia) + '</td><td>' + m.capitoli + '</td><td>' + m.test + '</td><td>' + (m.media != null ? m.media + '%' : '–') + '</td><td>' + tr[m.trend] + '</td></tr>').join('') + '</tbody></table></div>' : vuoto) +
     '<h3 style="margin-top:16px">' + t('stat_deboli') + '</h3>' + (st.deboli.length ? '<ul>' + st.deboli.map(d => '<li><b>' + esc(d.argomento) + '</b> — ' + t('stat_volte', { n: d.volte }) + (d.materie.length ? ' <span class="muted">(' + esc(d.materie.join(', ')) + ')</span>' : '') + '</li>').join('') + '</ul>' : vuoto) +
     '<h3 style="margin-top:16px">' + t('stat_ripasso') + '</h3><p>' + t('stat_rip_riga', { a: st.ripasso.totale, b: st.ripasso.dovute, c: st.ripasso.ritardo }) + '</p>' +
@@ -1939,9 +1939,9 @@ const AZ = {
   'aggiungi-materia': el => {
     let n = el.dataset.m; if (!n) { const i = document.getElementById('nuovaM'); n = i ? i.value : ''; }
     n = String(n || '').replace(/\s+/g, ' ').trim().slice(0, 40);
-    if (!n) { toast('Scrivi il nome della materia.'); return 'async'; }
+    if (!n) { toast(t('ts_mat_nome')); return 'async'; }
     n = n.charAt(0).toUpperCase() + n.slice(1);
-    if (S.materie.some(m => sameM(m, n))) { toast('Questa materia c\'è già.'); return 'async'; }
+    if (S.materie.some(m => sameM(m, n))) { toast(t('ts_mat_gia')); return 'async'; }
     S.materie.push(n); salva();
   },
   'elimina-materia': () => {
@@ -1983,14 +1983,14 @@ const AZ = {
       : c.titolo;
     leggiConEvidenza(tx); return 'async';
   },
-  'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const t = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = t; return 'async'; },
+  'stampa': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; document.getElementById('stampa').innerHTML = dispensaHTML(c); const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast(t('ts_stampa')); } document.title = tt; return 'async'; },
   'scarica': () => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; const b = new Blob(['\ufeff' + dispensaTesto(c)], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (c.titolo || 'capitolo').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) + '.txt'; document.body.appendChild(a); a.click(); a.remove(); return 'async'; },
   'stat-apri': el => { V.statF = el.dataset.id; V.vista = 'stat'; },
   'stat-indietro': () => { V.vista = 'genitori'; },
   'stat-stampa': () => {
     const f = DB.figli.find(x => x.id === V.statF); if (!f) return 'async';
     document.getElementById('stampa').innerHTML = '<section><h1>' + t('stat_di', { n: esc(f.profilo.nome) }) + '</h1><p class="meta">' + esc(new Date().toLocaleDateString(LINGUE_VOCE[LINGUA_CORRENTE])) + ' · AI.st.ain</p>' + statisticheCorpo(f, statisticheFiglio(f)) + '</section>';
-    const tt = document.title; document.title = t('stat_di', { n: f.profilo.nome }); try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
+    const tt = document.title; document.title = t('stat_di', { n: f.profilo.nome }); try { window.print(); } catch (e) { toast(t('ts_stampa')); } document.title = tt; return 'async';
   },
   'mappa-full': () => { V.mFull = true; V.mzFit = true; try { const e = document.documentElement; if (e.requestFullscreen && !document.fullscreenElement) e.requestFullscreen().catch(() => {}); } catch (e) { /* senza schermo intero del dispositivo la pagina riempie comunque lo schermo */ } window.scrollTo(0, 0); },
   'mappa-chiudi-full': () => { V.mFull = false; V.mzFit = true; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) { /* già fuori */ } },
@@ -2003,7 +2003,7 @@ const AZ = {
   'mappa-sel': el => { V.mSel = el.dataset.id; rinfresca(); const p = document.getElementById('mp-pannello'); if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' }); return 'async'; },
   'mappa-salva': () => {
     const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, n = m.nodi.find(x => x.id === V.mSel); if (!n) return 'async';
-    const tx = vv('mp-testo').trim().slice(0, 120); if (!tx) { toast('Il testo del nodo non può essere vuoto.'); return 'async'; }
+    const tx = vv('mp-testo').trim().slice(0, 120); if (!tx) { toast(t('ts_nodo_vuoto')); return 'async'; }
     mappaPrima(c); n.testo = tx;
     const gi = mpGenIdx(m, n.id); if (gi >= 0) m.relazioni[gi].etichetta = vv('mp-etich').trim().slice(0, 60);
     salva(); rinfresca(); return 'async';
@@ -2024,15 +2024,15 @@ const AZ = {
   },
   'mappa-aggiungi': () => {
     const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa;
-    const tx = vv('mp-nuovo').trim().slice(0, 120); if (!tx) { toast('Scrivi il testo del nuovo nodo.'); return 'async'; }
-    if (m.nodi.length >= 60) { toast('La mappa ha già 60 nodi: è il massimo.'); return 'async'; }
+    const tx = vv('mp-nuovo').trim().slice(0, 120); if (!tx) { toast(t('ts_nodo_nuovo')); return 'async'; }
+    if (m.nodi.length >= 60) { toast(t('ts_nodi_max')); return 'async'; }
     mappaPrima(c); const id = nuovoIdNodo(m); m.nodi.push({ id, testo: tx }); m.relazioni.push({ da: V.mSel, a: id, etichetta: vv('mp-nuovo-et').trim().slice(0, 60), x: false });
     V.mSel = id; salva(); rinfresca(); return 'async';
   },
   'mappa-collega': () => {
     const c = mappaCorr(); if (!c) return 'async'; const m = c.mappa, verso = vv('mp-verso');
     if (!m.nodi.some(n => n.id === verso) || verso === V.mSel) return 'async';
-    if (m.relazioni.some(r => r.da === V.mSel && r.a === verso)) { toast('Questi due nodi sono già collegati.'); return 'async'; }
+    if (m.relazioni.some(r => r.da === V.mSel && r.a === verso)) { toast(t('ts_nodi_gia')); return 'async'; }
     mappaPrima(c); m.relazioni.push({ da: V.mSel, a: verso, etichetta: vv('mp-verso-et').trim().slice(0, 60), x: true });
     salva(); rinfresca(); return 'async';
   },
@@ -2072,7 +2072,7 @@ const AZ = {
   'stampa-mappa': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || !haMappa(c)) return 'async';
     document.getElementById('stampa').innerHTML = '<section class="mappa-pg"><h1>' + esc(c.titolo) + '</h1><p class="meta">' + esc(c.materia) + ' · ' + t('mappa') + '</p>' + mappaSVG(c.mappa, 0, c.titolo) + '</section>';
-    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
+    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast(t('ts_stampa')); } document.title = tt; return 'async';
   },
   'crea-mappa': async () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
@@ -2085,7 +2085,7 @@ const AZ = {
       else m = pulisciMappa(await chiediJSON(SYS_MAPPA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_MAPPA));
       if ((m.nodi.length < 4 || m.relazioni.length < 3) && FAM.ai.provider !== 'anthropic') {
         const r = mappaDaSchema(c);
-        if (r.nodi.length >= 4 && r.relazioni.length >= 3) { m = r; toast('La mappa dell\'AI era troppo piccola: ho costruito quella dallo schema.'); }
+        if (r.nodi.length >= 4 && r.relazioni.length >= 3) { m = r; toast(t('ts_mappa_piccola')); }
       }
       if (m.nodi.length < 4 || m.relazioni.length < 3) throw new Error('la mappa è venuta troppo piccola: riprova');
       c.mappa = m; V.mz = 1; V.mzFit = true; salva();
@@ -2094,7 +2094,7 @@ const AZ = {
   },
   'completa': async () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c || V.busy) return;
-    if (FAM.ai.provider === 'demo') { toast('In modalità demo non si può completare.'); return; }
+    if (FAM.ai.provider === 'demo') { toast(t('ts_demo_no')); return; }
     V.busy = true; render();
     try {
       const n = await chiediJSON(SYS_COMPLETA + '\n\n' + profiloTesto(), 'Titolo: ' + c.titolo + '\nMateria: ' + c.materia + '\nRiassunto breve:\n- ' + c.riassunto_breve.join('\n- ') + '\n\nRiassunto completo:\n' + c.riassunto_completo, [], SCHEMA_CAPITOLO);
@@ -2105,7 +2105,7 @@ const AZ = {
       if (!arr(c.pratica).length) c.pratica = normPratica(n.pratica);
       if (!arr(c.inventario).length) c.inventario = arr(n.inventario);
       salva(); toast(mancano(c) ? 'Alcune parti mancano ancora: riprova.' : 'Fatto: ora c\'è tutto.');
-    } catch (e) { toast('Non sono riuscito: ' + e.message); }
+    } catch (e) { toast(t('ts_non_riuscito') + ' ' + e.message); }
     V.busy = false; render();
   },
   'stop': () => { fermaVoce(); V.lettura = null; },
@@ -2177,7 +2177,7 @@ const AZ = {
   'co-stampa': () => {
     const c = S.capitoli.find(x => x.id === V.cap); if (!c) return 'async'; salvaBozzeCo(c);
     document.getElementById('stampa').innerHTML = '<section><h1>' + esc(c.titolo) + '</h1><p class="meta">' + esc(c.materia) + ' · ' + t('co_finale') + '</p>' + mioDi(c).sez.filter(s => s.testo.trim()).map(s => '<h3>' + esc(s.t) + '</h3><p>' + esc(s.testo).replace(/\n/g, '<br>') + '</p>').join('') + '</section>';
-    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast('La stampa non è disponibile.'); } document.title = tt; return 'async';
+    const tt = document.title; document.title = c.titolo; try { window.print(); } catch (e) { toast(t('ts_stampa')); } document.title = tt; return 'async';
   },
   'pratica-indizio': el => { const c = S.capitoli.find(x => x.id === V.cap); if (!c) return; salvaBozzePratica(c); const e = arr(c.pratica)[+el.dataset.i]; if (e && e.ind < e.indizi.length) { e.ind++; salva(); } },
   'pratica-controlla': async el => {
