@@ -1,0 +1,363 @@
+tema_solo_elem	小学阶段使用“游戏”主题。
+tema_dalle_medie	初中及以上可以在“宁静”和“夜间”之间选择。
+aspetto_auto_nota	外观会根据所选的学习障碍自动调整。没有选择时使用标准字体和间距。你可以随时手动更改。
+aspetto_ripristina	恢复推荐设置
+mappa_trascina	用手指或鼠标拖动方框和连线上的标签。也可以先选一个节点，再用下面的箭头移动。
+mappa_muovi	移动所选节点
+mappa_riordina	自动排列
+mappa_stampa	打印导图
+pratica	练习
+pr_vuota	这里有针对本章内容的练习题，参考课本上的题目，但数据不同。
+pr_crea	生成练习题
+pr_altri	更多练习题
+pr_aiuto	写下你的答案，然后点“检查”。卡住了可以要一个提示：答案永远不会直接给出。
+pr_n	练习 {n}
+pr_tua	你的答案
+pr_controlla	检查
+pr_indizio	提示
+pr_dammi_indizio	给我一个提示
+pr_scrivi	请先写下你的答案。
+livello_test	第 {n} 级 · {nome}
+liv_1	基础
+liv_2	中等
+liv_3	进阶
+liv_4	专家
+liv_5	大师
+test_altre	本级的其他题目
+test_piu_difficile	更难的题目
+test_piu_facile	更容易的题目
+test_sali	升到第 {n} 级：{nome}
+preparo_domande	正在准备新题目…
+serve_chiave_ai	此功能需要 AI 密钥：由家长在“家长专区 › 设置”中填写。
+traguardi	你的成就
+n_punti	{n} 分
+verso_rango	再得 {n} 分就能成为{r}
+rango_max	你已达到最高等级：恭喜！
+rango_0	好奇者
+rango_1	好学者
+rango_2	科学家
+rango_3	天才
+punti_guadagnati	+{n} 分
+nuovo_rango	新等级：{r}！
+nuovo_badge	新成就：{b}
+badge_primo	第一次测验
+badge_primo_d	你完成了第一次测验。
+badge_dieci	十次测验
+badge_dieci_d	你完成了 10 次测验。
+badge_perfetto	全部正确
+badge_perfetto_d	一次没有错误的测验。
+badge_liv3	进阶级
+badge_liv3_d	第 3 级至少达到 80%。
+badge_liv5	大师
+badge_liv5_d	第 5 级至少达到 80%。
+badge_allenato	训练有素
+badge_allenato_d	完成了 5 道练习题。
+acronimo	面向学习、自主与融合的智能助手
+costruisci	我的摘要
+co_intro	自己来写摘要，一次写一段。先读课本上的一段，再用自己的话写下来：我会告诉你哪些已经掌握、哪些最好再看一遍，但不会替你写。
+co_metodo_t	四步学习法
+co_m1	把整段读完。
+co_m2	划出 3–5 个关键词：人名、日期、概念。
+co_m3	合上书，用自己的话写 1–3 句。
+co_m4	检查并修改。
+co_avanz	已完成段落：{a} / {n}
+co_chiave	我的关键词
+co_tuo	我对这一段的摘要
+co_controlla	检查
+co_aiuto	我不知道从哪里开始
+co_aiuto_t	先试着说出来，然后写下来：
+co_aiuto_txt	“{t}”讲的是什么？最需要记住的是什么？你会怎样用两句话讲给朋友听？
+co_scrivi	请先用自己的话至少写一句。
+co_va_bene	这样就可以
+co_esito_completo	很好：你抓住了主要内容！
+co_esito_quasi	就差一点了。
+co_esito_da_rivedere	再读一遍这一段，然后重试。
+co_pensa	想一想这些问题：
+co_finale	我的摘要
+co_stampa	打印或保存为 PDF
+co_nota_sez	如果隐藏摘要，孩子仍然可以在“我的摘要”中自己写，有 AI 的帮助，但看不到现成的摘要。
+badge_autore	摘要作者
+badge_autore_d	你独立写出了一章的摘要。
+orale	口头提问
+or_intro	像在学校一样，把学过的内容说出来：我听你说，告诉你哪些说得好、哪些需要改正、哪些忘了，并问你几个问题。我只评价内容，不评价你说话的方式。
+or_parte	你想被提问哪一部分？
+or_tutto	整章
+or_inizia	开始口头提问
+or_nota_it	语音识别使用意大利语收听。
+or_privacy	注意：为了把语音转成文字，浏览器可能会把音频发送给其开发商（例如 Google 或 Microsoft）；转写的文字会发送给家长选择的 AI 服务。你也可以直接写答案。
+or_nomic	此设备或浏览器不支持语音识别：你可以写答案。
+or_mic_negato	麦克风未获许可：请在浏览器设置中开启，或者写答案。
+or_prima	给我讲讲：{t}。准备好了就点“说话”。
+or_parla	说话
+or_ho_finito	我说完了
+or_annulla	取消
+or_scrivi	改为书写
+or_riascolta	再听一遍
+or_ascolto_t	我在听…说完后请点“我说完了”。
+or_rivedi_t	这是我听到的内容。发送之前你可以修改文字。
+or_invia	发送答案
+or_aggiungi	再用语音补充
+or_cancella	清除并重试
+or_attesa	正在评价你的回答…
+or_poco	请再多说或多写一些。
+or_turno	第 {n} 个回答，共 {m} 个
+or_giusto	说得好：
+or_correggi	需要改正：
+or_manca	还可以想想：
+or_esito_ottimo	非常好！
+or_esito_bene	不错，但还可以补充。
+or_esito_da_rivedere	需要复习：再读一遍，然后重试。
+or_concludi	结束口头提问
+or_voce_ai	AI 的声音
+or_fine_t	口头提问已结束
+or_risultato	结果：{p}%
+or_da_ripassare	需要复习：
+or_ancora	新的口头提问
+badge_oratore	演说家
+badge_oratore_d	口头提问至少达到 80%。
+gi_scegli	选一个游戏吧！
+gi_nota_adulto	游戏会说话：请把音量调大。游戏不使用 AI，也不需要任何费用。
+gi_n_conta	数一数
+gi_n_numeri	数字
+gi_n_dipiu	多和少
+gi_n_colori	颜色
+gi_n_forme	形状
+gi_n_lettere	字母
+gi_n_iniziali	第一个字母
+gi_n_sequenze	接下来是什么？
+gi_n_intruso	找不同类
+gi_d_conta	一共有几个？
+gi_d_numeri	点一点数字 {n}
+gi_d_piu	哪边比较多？
+gi_d_meno	哪边比较少？
+gi_d_colore	点一点{c}
+gi_d_forma	点一点{f}
+gi_d_lettera	点一点字母 {l}
+gi_d_iniziale	{p} 是哪个字母开头的？
+gi_d_sequenza	接下来是什么？
+gi_d_intruso	哪一个不是同一类？
+gi_c_rosso	红色
+gi_c_blu	蓝色
+gi_c_giallo	黄色
+gi_c_verde	绿色
+gi_c_arancione	橙色
+gi_c_viola	紫色
+gi_c_rosa	粉色
+gi_c_marrone	棕色
+gi_c_nero	黑色
+gi_f_cerchio	圆形
+gi_f_quadrato	正方形
+gi_f_triangolo	三角形
+gi_f_rettangolo	长方形
+gi_f_stella	星星
+gi_f_cuore	爱心
+gi_bravo1	答对了！
+gi_bravo2	没错，真棒！
+gi_bravo3	对！做得很好！
+gi_riprova	再试一次！
+gi_fine	完成了！星星：{n}
+gi_fine_voce	完成了！你得到了 {n} 颗星星。
+gi_ancora	再玩一次
+gi_altri	其他游戏
+gi_riascolta	再听一遍问题
+gi_stelle_n	星星：{n}
+gi_stat	游戏（幼儿园）
+gi_stat_gioco	游戏
+gi_stat_partite	局数
+gi_stat_primo	一次答对
+gi_stat_liv	难度
+gi_stat_nota	孩子错得少时难度会自动提高，觉得吃力时会自动降低。
+tour_titolo	使用指南
+tour_btn	怎么用
+tour_avanti	下一步
+tour_indietro	上一步
+tour_salta	跳过
+tour_fine	我明白了
+tour_altrove	指南可以在首页、科目页、章节页和家长专区打开。
+tour_brand	这是 AI.st.ain：点它可以随时回到首页。
+tour_testo	用 A− 和 A+ 缩小或放大文字。（提示：对整个应用都有效。）
+tour_aspetto	提示：在这里更改主题、字体、间距、朗读速度和声音。还可以下载更自然的意大利语声音，不用联网也能用。
+tour_addmat	先添加你的科目：点下面的名称，或者自己写一个。
+tour_mat	每个方框是一个科目：打开它来添加章节和练习题。
+tour_gen	家长专区（需要 PIN 码）用来连接 AI、选择对每个孩子隐藏哪些功能、查看统计以及做备份。
+tour_ancora	想再看这份指南，请点问号。
+tour_nuovocap	从这里开始：拍下这一章的页面（很多页也可以）。AI.st.ain 会准备摘要、提纲、导图、讲解和测验。需要几分钟：请保持页面打开。
+tour_nuovoes	拍下一道题：它会一步一步引导你，但不会直接给出答案。
+tour_controllo	已经做完一道题了吗？拍下来，让它检查你的思路。
+tour_tabs	章节的各个标签：每一个都是学习同一内容的不同方式。从左边第一个开始，依次向右。
+tour_ascolta	点这个按钮，可以听这一章的朗读。
+tour_figlio	在这里添加孩子的档案：年级、学习辅助和 PIN 码。
+tour_fam	在家庭设置中连接 AI 服务并选择语言。
+tour_priv	提示：在这里可以看到哪些内容留在设备上，哪些会发送给外部服务。
+tour_backup	提示：请不时保存一份备份。换设备时可以从这里恢复。
+dsaq_promo_t	了解怎样学习更适合你
+dsaq_promo	一份约 3 分钟的问卷，了解可能提示特定学习障碍的迹象。它不是诊断：只是帮助判断是否值得进一步了解，以及可以尝试哪些辅助。
+dsaq_promo_btn	填写问卷
+dsaq_titolo	学习障碍迹象问卷
+dsaq_non_diag	这不是诊断测试，不能代替专业人员的评估。
+dsaq_intro	这些句子说的是学习的人：可以自己回答，也可以和家长一起回答。请想想最近 6 个月，以及在努力之后的实际情况。共 24 个问题，分为 4 部分。
+dsaq_priv	答案只留在这台设备上：不会保存，也不会发送给任何人。
+dsaq_inizia	开始
+dsaq_chiudi	关闭
+dsaq_avanti	下一步
+dsaq_indietro	上一步
+dsaq_fine	查看结果
+dsaq_pag	第 {i} 部分，共 {n} 部分
+dsaq_scala	这种情况多久出现一次？
+dsaq_mai	从不或几乎从不
+dsaq_volte	有时
+dsaq_spesso	经常
+dsaq_tutte	请回答所有问题后再继续。
+dsaq_risultato	结果
+dsaq_res_0	迹象很少
+dsaq_res_1	有一些迹象
+dsaq_res_2	迹象较多
+dsaq_esito_ok	从回答来看没有特别的迹象。如果发现困难长期存在，可以过一段时间再做一次问卷，或者和老师谈一谈。
+dsaq_esito_si	迹象较多的方面可能值得进一步了解：请和儿科医生或学校谈一谈。特定学习障碍只能由专业团队（儿童神经精神科医生、心理医生）诊断。在此期间，可以试用应用中的辅助功能：随时可以关闭。
+dsaq_piccoli	在小学二、三年级结束之前，通常还无法作出诊断：需要长期观察这些迹象。
+dsaq_altre_cause	视力或听力、疲劳、焦虑，或者用非母语学习，也可能出现类似的迹象。
+dsaq_attiva	试用建议的辅助功能
+dsaq_attivati	已选择辅助功能：请检查并保存档案。
+dq_dislessia_1	阅读比别人慢很多，或者更吃力。
+dq_dislessia_2	阅读时会跳字、跳行，或者找不到读到哪里。
+dq_dislessia_3	会混淆相似的字母（b/d、p/q、m/n），或者把音节读反。
+dq_dislessia_4	读完一段文字后，很难记住讲了什么。
+dq_dislessia_5	回避朗读，或者在需要朗读时感到紧张。
+dq_dislessia_6	读长文章学习时，比别人累得多。
+dq_disortografia_1	即使是简单、熟悉的词，也经常拼写错误。
+dq_disortografia_2	同一篇文字里，同一个词会写成不同的样子。
+dq_disortografia_3	会漏写或写错重音符号、撇号、双写字母和 h。
+dq_disortografia_4	写字时会漏掉、多写或调换字母或音节。
+dq_disortografia_5	重读时发现不了自己的错误。
+dq_disortografia_6	听写时比自由书写时差很多。
+dq_disgrafia_1	手写的字很难辨认，或者很不整齐。
+dq_disgrafia_2	写字很慢，而且很快就累。
+dq_disgrafia_3	握笔很用力，写一会儿手就疼。
+dq_disgrafia_4	行写歪，间距不均匀，字母大小不一。
+dq_disgrafia_5	从黑板或课本上抄写很慢，而且错误很多。
+dq_disgrafia_6	回避手写，明显更喜欢用电脑。
+dq_discalculia_1	很难记住乘法表和基本运算（例如 7+8）。
+dq_discalculia_2	即使是简单的计算，也还要数手指或在心里一个一个数。
+dq_discalculia_3	会混淆运算符号（+ − × ÷），竖式对不齐，或者把数字写反。
+dq_discalculia_4	在看钟表、日历、度量或用钱方面有困难。
+dq_discalculia_5	做多步骤的应用题时会理不清思路。
+dq_discalculia_6	即使理解了解题思路，计算时还是会出错。
+mappa_full	全屏
+mappa_chiudi	关闭
+met_titolo	我的学习方法
+met_pochi	我已经记录了你在 {n} 次测验中是怎样学习的。再做几次测验后，我会告诉你哪些方法对你更有效。
+met_riga	使用{m}：平均 {a}%（{na} 次测验），不使用：{b}%（{nb} 次测验）
+met_nessuno	目前还没有哪种学习方法特别突出：继续这样做，并多尝试不同的方法。
+met_cautela	数据还很少，题目难度也有影响：把它当作参考，而不是规则。
+esp_t	小实验：
+esp_prop	下次测验前试着使用{m}，然后我们比较结果。
+esp_accetta	我接受挑战
+esp_corso	实验进行中：下次测验前请使用{m}。
+esp_annulla	算了
+esp_esito	实验：使用{m}学习后，你得了 {p}%（之前平均 {b}%）。
+esp_v_su	看起来对你有帮助！
+esp_v_giu	这次没有帮助：可以试试别的方法。
+esp_v_pari	差不多：还需要再试几次。
+come_t	你是怎样学习的？
+come_nota	勾选你为这次测验做准备时用过的方法（应用已经记录到的会自动勾选）。这样可以了解哪些方法对你更有效。
+come_ok	开始测验
+come_salta	跳过
+met_riassunto	摘要
+met_schema	提纲
+met_mappa	导图
+met_spiegazioni	讲解
+met_glossario	词汇表
+met_costruisci	自己写摘要
+met_pratica	练习
+met_orale	口头提问
+met_ascolto	听章节朗读
+met_libro	课本或我的笔记
+met_insieme	和别人一起学习
+met_set_t	帮助找到适合自己的学习方法（可选）
+met_set_nota	觉得太打扰的项目可以关闭。这些信息只留在设备上。
+met_set_chiedi	测验前询问“你是怎样学习的？”
+met_set_confronto	显示哪些学习方法更有效（与测验结果对比）
+met_set_esp	建议做小实验（尝试一种新的学习方法）
+vn_titolo	自然语音（意大利语）
+vn_desc	更自然的意大利语声音，免费。只需下载一次（约 95 MB：建议使用 Wi-Fi），之后不联网也能用。所有内容都留在设备上：不会发送给任何人。
+vn_scarica	下载自然语音
+vn_scarico	正在下载语音… {p}%
+vn_usa	使用自然语音
+vn_ok	语音已下载。如果设备较慢或性能较低，可以关闭它：会恢复使用系统语音。
+vn_elimina	删除已下载的语音
+vn_errore	语音下载失败。请检查网络后重试。
+vn_errore_uso	自然语音无法在此设备上运行：改用系统语音。
+vn_prep	正在准备语音…第一次朗读需要几秒钟。
+cent	美分
+costi_t	AI 预计费用
+costi_mese	本月：{c}（{n} 次请求）
+costi_tot	累计：{c}
+costi_ultimo	最近一次请求：{c}
+costi_nota	这是估算：只统计 AI.st.ain 从这台设备向 Claude 发出的请求，按 {d} 的价格计算（每天更新一次）。实际余额请在 Anthropic 控制台查看。
+costi_saldo	查看实际余额
+costi_azzera	清零计数
+costi_conf	要把预计费用的计数清零吗？
+tour_benvenuto	欢迎使用 AI.st.ain！开始只需要三步：1）添加一个科目，2）打开它并拍下一章的页面，3）从章节的第一个标签开始学习，然后做测验。我来陪你：请点“下一步”。
+tour_costruisci	“我的摘要”：用自己的话写下你理解的内容，AI.st.ain 会告诉你还缺什么。这是开始学习的最好方式。
+tour_ripasso	提示：今天的复习。AI.st.ain 挑选的少量题目，帮你复习可能会忘记的内容：每天几分钟就够了。
+tour_traguardi	提示：这里是你的积分和成就。通过做测验、复习和坚持学习来获得。
+tour_metodo_home	提示：AI.st.ain 会观察你用哪些标签学得更好（摘要、导图、提纲…），并建议你怎样学习。家长可以关闭此功能。
+tour_testtab	提示：最终测验。题目分等级，选项每次都会打乱：做得好，难度就会提高。
+tour_mappatab	提示：概念导图。可以移动、放大、修改，也可以打印。
+tour_oraletab	提示：口头部分。帮你练习像口头提问时那样把内容讲出来，并给你评语。
+tour_pratica	提示：练习。通过做题运用学过的内容。
+tour_modfiglio	点“修改”可以更改档案的所有内容：年级、学习障碍辅助、隐藏哪些部分（例如摘要或口头部分）、学习方法和 PIN 码。
+tour_stat	孩子的统计：测验结果、需要加强的内容、复习情况和即将到来的考试。也可以打印。
+tour_costi	提示：AI 预计费用。显示本应用发出的请求花了多少钱；实际余额请在 Anthropic 控制台查看。
+tour_s_nome	姓名和年级：年级会调整语言、测验和外观。姓名只留在设备上，永远不会发送给 AI。
+tour_s_dsa	学习障碍辅助（阅读障碍、拼写障碍、书写障碍、计算障碍）：开启后，讲解和文字会相应调整。如有疑问，可以做一份参考问卷（不是诊断）。
+tour_s_sez	在这里选择孩子在每一章能看到什么：摘要、提纲、导图、讲解、词汇表、“我的摘要”、练习、口头部分。取消勾选即可隐藏；测验始终保留。如果隐藏摘要，就从“我的摘要”开始。
+tour_s_met	提示：学习方法。AI.st.ain 可以询问是怎样学习的、比较结果并建议做小实验。在这里开启或关闭。
+tour_s_col	提示：摘要中的颜色有助于区分概念、日期和数字、人名。
+tour_s_pin	提示：孩子的 PIN 码（可选）适用于兄弟姐妹之间不应看到彼此内容的情况。你始终可以打开任何档案。
+tour_s_voce	提示：朗读声音。通过“自然语音”下载更自然的意大利语声音，不联网也能用。
+tour_stat_corpo	下面可以看到测验结果、平均分、最薄弱的内容和已完成的复习。
+tour_stat_stampa	点“打印”可以得到一页内容，方便带去家长会或留存。
+guida_chiave	如何获取 API 密钥（图文指南）
+err_chiave	API 密钥无效：请从控制台重新复制，前后不要有空格，或者新建一个（参见家庭设置中的指南）。
+err_credito	控制台里的余额已用完（或尚未充值）：请充值后重试。
+err_permesso	该密钥无权使用此模型。请检查密钥和模型名称。
+err_modello	指定的模型不存在。请将“模型”一栏留空，以使用推荐的模型。
+err_limite	短时间内请求过多：请等一分钟后重试。
+err_occupato	Claude 服务暂时繁忙：请几分钟后重试。
+err_rete	无法连接到服务：请检查网络连接后重试。
+err_formato	Claude 的密钥以“sk-ant-”开头：请确认复制的是正确的密钥。
+upd_txt	AI.st.ain 有新版本。
+upd_ora	立即更新
+upd_dopo	稍后
+bk_t	保存一份你的数据
+bk_txt	章节和成绩只保存在这台设备上：换手机或清除浏览器数据就会丢失。请保存一份副本（需要时请家长帮忙），并妥善保管。
+bk_dopo	稍后
+ai_sbaglia	摘要和讲解由 AI 生成，可能会出错：有疑问时请对照课本。
+es_trovati	我找到了 {n} 道题
+es_scegli_da	勾选你现在想做的题（也可以全选）：我们按课本的顺序一道一道来。
+es_tutti	全选
+es_nessuno	取消选择
+es_num	第 {n} 题
+es_guidami_n	带我做选中的题（{n}）
+es_scegli_almeno	请至少勾选一道题。
+es_prog	第 {i} 题，共 {n} 题
+es_prossimo	下一题：第 {n} 题
+fb_giusto	回答正确！
+fb_quasi	就差一点了。
+fb_rivedi	还不正确。
+ts_occupato	服务繁忙：正在尝试另一个模型…
+ts_foto	请至少添加一张照片。
+ts_foto_es	请添加题目的照片。
+ts_idea	请先写下你的想法，哪怕只有一半。
+ts_mat_nome	请填写科目名称。
+ts_mat_gia	这个科目已经存在。
+ts_stampa	无法打印。
+ts_nodo_vuoto	节点的文字不能为空。
+ts_nodo_nuovo	请填写新节点的文字。
+ts_nodi_max	导图已有 60 个节点：已达上限。
+ts_nodi_gia	这两个节点已经相连。
+ts_mappa_piccola	AI 生成的导图太小：我已根据提纲生成导图。
+ts_demo_no	演示模式下无法完成。
+ts_foto_err	有一张照片无法打开：
+ts_non_riuscito	没有成功：

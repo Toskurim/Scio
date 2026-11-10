@@ -1,0 +1,363 @@
+tema_solo_elem	Në shkollën fillore përdoret tema Lojë.
+tema_dalle_medie	Nga shkolla 9-vjeçare e lart mund të zgjedhësh mes Qetë dhe Natë.
+aspetto_auto_nota	Pamja përshtatet vetë me vështirësitë e të nxënit që janë zgjedhur. Pa to mbeten shkronjat dhe hapësirat standarde. Mund ta ndryshosh me dorë kur të duash.
+aspetto_ripristina	Rikthe cilësimet e këshilluara
+mappa_trascina	Tërhiq kutitë dhe etiketat e lidhjeve me gisht ose me maus. Ose zgjidh një nyjë dhe përdor shigjetat më poshtë.
+mappa_muovi	Lëviz nyjën e zgjedhur
+mappa_riordina	Rendit automatikisht
+mappa_stampa	Printo hartën
+pratica	Stërvitje
+pr_vuota	Këtu gjen ushtrime për t’u stërvitur me të njëjtat tema të kapitullit, të frymëzuara nga ato të librit, por me të dhëna të ndryshme.
+pr_crea	Krijo ushtrimet
+pr_altri	Ushtrime të tjera
+pr_aiuto	Shkruaj përgjigjen tënde dhe shtyp Kontrollo. Nëse ngec, kërko një ndihmë: zgjidhja nuk jepet kurrë.
+pr_n	Ushtrimi {n}
+pr_tua	Përgjigjja jote
+pr_controlla	Kontrollo
+pr_indizio	Ndihmë
+pr_dammi_indizio	Më jep një ndihmë
+pr_scrivi	Shkruaj më parë përgjigjen tënde.
+livello_test	Niveli {n} · {nome}
+liv_1	Bazë
+liv_2	Mesatar
+liv_3	I avancuar
+liv_4	Ekspert
+liv_5	Mjeshtër
+test_altre	Pyetje të tjera të këtij niveli
+test_piu_difficile	Pyetje më të vështira
+test_piu_facile	Pyetje më të lehta
+test_sali	Ngjitu në nivelin {n}: {nome}
+preparo_domande	Po përgatis pyetje të reja…
+serve_chiave_ai	Për këtë funksion duhet çelësi i AI-së: e vendos prindi te Zona e prindërve › Cilësimet.
+traguardi	Arritjet e tua
+n_punti	{n} pikë
+verso_rango	Edhe {n} pikë për t’u bërë {r}
+rango_max	Ke arritur gradën më të lartë: urime!
+rango_0	Kureshtar
+rango_1	Studiues
+rango_2	Shkencëtar
+rango_3	Gjeni
+punti_guadagnati	+{n} pikë
+nuovo_rango	Gradë e re: {r}!
+nuovo_badge	Arritje e re: {b}
+badge_primo	Testi i parë
+badge_primo_d	Ke përfunduar testin tënd të parë.
+badge_dieci	Dhjetë teste
+badge_dieci_d	Ke përfunduar 10 teste.
+badge_perfetto	Gjithçka saktë
+badge_perfetto_d	Një test pa gabime.
+badge_liv3	Niveli i avancuar
+badge_liv3_d	Të paktën 80 % në nivelin 3.
+badge_liv5	Mjeshtër
+badge_liv5_d	Të paktën 80 % në nivelin 5.
+badge_allenato	I stërvitur mirë
+badge_allenato_d	5 ushtrime stërvitjeje të zgjidhura.
+acronimo	Ndihmë inteligjente për mësimin, pavarësinë dhe përfshirjen
+costruisci	Përmbledhja ime
+co_intro	Ndërtoje përmbledhjen vetë, një paragraf në çdo herë. Lexo paragrafin në libër dhe shkruaj me fjalët e tua: do të të them çfarë ke kapur tashmë dhe çfarë ia vlen të rishikosh, pa e shkruar në vendin tënd.
+co_metodo_t	Metoda në 4 hapa
+co_m1	Lexo të gjithë paragrafin.
+co_m2	Nënvizo 3–5 fjalë kyçe: emra, data, koncepte.
+co_m3	Mbyll librin dhe shkruaj 1–3 fjali me fjalët e tua.
+co_m4	Kontrollo dhe korrigjo.
+co_avanz	Paragrafë të përfunduar: {a} nga {n}
+co_chiave	Fjalët e mia kyçe
+co_tuo	Përmbledhja ime e paragrafit
+co_controlla	Kontrollo
+co_aiuto	Nuk di nga t’ia filloj
+co_aiuto_t	Provo të përgjigjesh me zë, pastaj shkruaje:
+co_aiuto_txt	Për çfarë flet «{t}»? Cila është gjëja më e rëndësishme për t’u mbajtur mend? Si do t’ia shpjegoje një shoku me dy fjali?
+co_scrivi	Shkruaj më parë të paktën një fjali me fjalët e tua.
+co_va_bene	Mirë është kështu
+co_esito_completo	Shumë mirë: i ke kapur idetë kryesore!
+co_esito_quasi	Je shumë afër.
+co_esito_da_rivedere	Rilexo paragrafin dhe provo sërish.
+co_pensa	Mendo për këto pyetje:
+co_finale	Përmbledhja ime
+co_stampa	Printo ose ruaj si PDF
+co_nota_sez	Nëse e fsheh përmbledhjen, nxënësi mund ta ndërtojë gjithsesi vetë te «Përmbledhja ime», me ndihmën e AI-së, por pa parë atë të gatshmen.
+badge_autore	Autor i përmbledhjes
+badge_autore_d	Ke ndërtuar vetë përmbledhjen e një kapitulli.
+orale	Pyetje me gojë
+or_intro	Trego me zë atë që ke mësuar, si në shkollë: të dëgjoj, të them çfarë the mirë, çfarë duhet korrigjuar dhe çfarë harrove, dhe të bëj disa pyetje. Vlerësoj vetëm përmbajtjen, jo mënyrën si flet.
+or_parte	Për çfarë do të pyetesh?
+or_tutto	I gjithë kapitulli
+or_inizia	Fillo pyetjet me gojë
+or_nota_it	Njohja e zërit dëgjon në italisht.
+or_privacy	Kujdes: për ta kthyer zërin në tekst, shfletuesi mund t’ia dërgojë audion prodhuesit të tij (për shembull Google ose Microsoft); teksti shkon te shërbimi i AI-së që ka zgjedhur prindi. Mund edhe ta shkruash përgjigjen.
+or_nomic	Njohja e zërit nuk është e disponueshme në këtë pajisje ose shfletues: mund ta shkruash përgjigjen.
+or_mic_negato	Mikrofoni nuk lejohet: aktivizoje te cilësimet e shfletuesit ose shkruaje përgjigjen.
+or_prima	Më trego: {t}. Kur të jesh gati, shtyp «Fol».
+or_parla	Fol
+or_ho_finito	Mbarova
+or_annulla	Anulo
+or_scrivi	Shkruaj në vend që të flasësh
+or_riascolta	Dëgjo sërish
+or_ascolto_t	Po të dëgjoj… kur të mbarosh, shtyp «Mbarova».
+or_rivedi_t	Ja çfarë kuptova. Mund ta korrigjosh tekstin para se ta dërgosh.
+or_invia	Dërgo përgjigjen
+or_aggiungi	Shto diçka tjetër me zë
+or_cancella	Fshi dhe provo sërish
+or_attesa	Po vlerësoj përgjigjen tënde…
+or_poco	Thuaj ose shkruaj diçka më shumë.
+or_turno	Përgjigjja {n} nga {m}
+or_giusto	E thënë mirë:
+or_correggi	Për t’u korrigjuar:
+or_manca	Mendo edhe për:
+or_esito_ottimo	Shumë mirë!
+or_esito_bene	Mirë, por mund të plotësohet.
+or_esito_da_rivedere	Për t’u rishikuar: rilexo dhe provo sërish.
+or_concludi	Mbyll pyetjet me gojë
+or_voce_ai	Zëri i AI-së
+or_fine_t	Pyetjet me gojë përfunduan
+or_risultato	Rezultati: {p} %
+or_da_ripassare	Për t’u përsëritur:
+or_ancora	Pyetje të reja me gojë
+badge_oratore	Orator
+badge_oratore_d	Pyetje me gojë me të paktën 80 %.
+gi_scegli	Zgjidh një lojë!
+gi_nota_adulto	Lojërat flasin: ngrije zërin. Nuk përdorin AI dhe nuk kushtojnë asgjë.
+gi_n_conta	Numëro
+gi_n_numeri	Numrat
+gi_n_dipiu	Më shumë, më pak
+gi_n_colori	Ngjyrat
+gi_n_forme	Format
+gi_n_lettere	Shkronjat
+gi_n_iniziali	Si fillon?
+gi_n_sequenze	Çfarë vjen më pas?
+gi_n_intruso	Gjej të huajin
+gi_d_conta	Sa janë?
+gi_d_numeri	Prek numrin {n}
+gi_d_piu	Ku ka më shumë?
+gi_d_meno	Ku ka më pak?
+gi_d_colore	Prek ngjyrën {c}
+gi_d_forma	Prek {f}
+gi_d_lettera	Prek shkronjën {l}
+gi_d_iniziale	Me cilën shkronjë fillon {p}?
+gi_d_sequenza	Çfarë vjen më pas?
+gi_d_intruso	Cili nuk përshtatet?
+gi_c_rosso	e kuqe
+gi_c_blu	blu
+gi_c_giallo	e verdhë
+gi_c_verde	jeshile
+gi_c_arancione	portokalli
+gi_c_viola	vjollcë
+gi_c_rosa	rozë
+gi_c_marrone	kafe
+gi_c_nero	e zezë
+gi_f_cerchio	rrethin
+gi_f_quadrato	katrorin
+gi_f_triangolo	trekëndëshin
+gi_f_rettangolo	drejtkëndëshin
+gi_f_stella	yllin
+gi_f_cuore	zemrën
+gi_bravo1	Saktë!
+gi_bravo2	Pikërisht, sa bukur!
+gi_bravo3	Po! Punë shumë e mirë!
+gi_riprova	Provo sërish!
+gi_fine	Mbarove! Yje: {n}
+gi_fine_voce	Mbarove! Fitove {n} yje.
+gi_ancora	Edhe një herë
+gi_altri	Lojëra të tjera
+gi_riascolta	Dëgjo sërish pyetjen
+gi_stelle_n	Yje: {n}
+gi_stat	Lojëra (kopsht)
+gi_stat_gioco	Loja
+gi_stat_partite	Raunde
+gi_stat_primo	Të sakta që në herën e parë
+gi_stat_liv	Vështirësia
+gi_stat_nota	Vështirësia rritet vetë kur fëmija gabon pak dhe ulet kur e ka të vështirë.
+tour_titolo	Udhëzues përdorimi
+tour_btn	Si përdoret
+tour_avanti	Para
+tour_indietro	Prapa
+tour_salta	Kapërce
+tour_fine	E kuptova
+tour_altrove	Udhëzuesi hapet nga faqja kryesore, nga një lëndë, nga një kapitull dhe nga zona e prindërve.
+tour_brand	Ky është AI.st.ain: preke për t’u kthyer gjithmonë te faqja kryesore.
+tour_testo	Me A− dhe A+ e zvogëlon ose e zmadhon tekstin. (Këshillë: vlen për të gjithë aplikacionin.)
+tour_aspetto	Këshillë: këtu ndryshon temën, shkronjat, hapësirat, shpejtësinë dhe zërin e leximit. Mund të shkarkosh edhe një zë italian më të natyrshëm, që punon pa internet.
+tour_addmat	Për të filluar, shto lëndët e tua: prek një emër më poshtë ose shkruaj një.
+tour_mat	Çdo kuti është një lëndë: hape për të shtuar kapituj dhe ushtrime.
+tour_gen	Zona e prindërve (me PIN) shërben për të lidhur AI-në, për të zgjedhur cilat funksione t’i fshihen çdo fëmije, për të parë statistikat dhe për të bërë kopje rezervë.
+tour_ancora	Nëse do ta shohësh sërish këtë udhëzues, prek pikëpyetjen.
+tour_nuovocap	Fillo këtu: fotografo faqet e kapitullit (edhe shumë). AI.st.ain përgatit përmbledhjen, skemën, hartën, shpjegimet dhe testin. Duhen disa minuta: lëre faqen hapur.
+tour_nuovoes	Fotografo një ushtrim: të udhëheq hap pas hapi, pa ta dhënë zgjidhjen.
+tour_controllo	E ke zgjidhur tashmë një ushtrim? Fotografoje dhe kërko të të kontrollohet arsyetimi.
+tour_tabs	Skedat e kapitullit: secila është një mënyrë e ndryshme për të mësuar të njëjtën temë. Fillo nga e para majtas dhe vazhdo djathtas.
+tour_ascolta	Me këtë buton kapitulli të lexohet me zë.
+tour_figlio	Këtu shton profilin e një fëmije: nivelin, ndihmat për mësimin dhe PIN-in.
+tour_fam	Te cilësimet e familjes lidh shërbimin e AI-së dhe zgjedh gjuhën.
+tour_priv	Këshillë: këtu sheh çfarë mbetet në pajisje dhe çfarë u dërgohet shërbimeve të jashtme.
+tour_backup	Këshillë: ruaj herë pas here një kopje rezervë. Nëse ndërron pajisje, e rikthen nga këtu.
+dsaq_promo_t	Kupto si mëson më mirë
+dsaq_promo	Një pyetësor prej rreth 3 minutash për shenjat që mund të të bëjnë të mendosh për një vështirësi specifike të të nxënit. Nuk është diagnozë: shërben vetëm për të kuptuar nëse ia vlen të thellohesh dhe cilat ndihma të provosh.
+dsaq_promo_btn	Plotëso pyetësorin
+dsaq_titolo	Pyetësor për shenjat e vështirësive të të nxënit
+dsaq_non_diag	Nuk është test diagnostikues dhe nuk e zëvendëson vlerësimin e një specialisti.
+dsaq_intro	Fjalitë flasin për personin që mëson: përgjigju ti ose një prind bashkë me ty. Mendo për 6 muajt e fundit dhe si shkon pavarësisht përpjekjes. Janë 24 pyetje, të ndara në 4 pjesë.
+dsaq_priv	Përgjigjet mbeten në këtë pajisje: nuk ruhen dhe nuk i dërgohen askujt.
+dsaq_inizia	Fillo
+dsaq_chiudi	Mbyll
+dsaq_avanti	Para
+dsaq_indietro	Prapa
+dsaq_fine	Shiko rezultatin
+dsaq_pag	Pjesa {i} nga {n}
+dsaq_scala	Sa shpesh ndodh?
+dsaq_mai	Kurrë ose pothuajse kurrë
+dsaq_volte	Ndonjëherë
+dsaq_spesso	Shpesh
+dsaq_tutte	Përgjigju të gjitha pyetjeve për të vazhduar.
+dsaq_risultato	Rezultati
+dsaq_res_0	Pak shenja
+dsaq_res_1	Disa shenja
+dsaq_res_2	Shumë shenja
+dsaq_esito_ok	Nga përgjigjet nuk dalin shenja të veçanta. Nëse sheh vështirësi që zgjasin në kohë, mund ta bësh sërish pyetësorin më vonë ose të flasësh me një mësues.
+dsaq_esito_si	Për fushat me më shumë shenja mund t’ia vlejë një thellim: fol me pediatrin ose me shkollën. Një vështirësi specifike të të nxënit mund ta diagnostikojë vetëm një ekip i specializuar (neuropsikiatër për fëmijë, psikolog). Ndërkohë mund t’i aktivizosh për provë ndihmat e aplikacionit: i heq kur të duash.
+dsaq_piccoli	Para fundit të klasës së 2-të ose të 3-të, zakonisht një diagnozë nuk është ende e mundur: shenjat duhen vëzhguar me kalimin e kohës.
+dsaq_altre_cause	Edhe shikimi ose dëgjimi, lodhja, ankthi ose të mësuarit në një gjuhë që nuk është e jotja mund të japin shenja të ngjashme.
+dsaq_attiva	Aktivizo për provë ndihmat e sugjeruara
+dsaq_attivati	Ndihmat u zgjodhën: kontrollo dhe ruaj profilin.
+dq_dislessia_1	Lexon shumë më ngadalë ose me më shumë mundim se të tjerët.
+dq_dislessia_2	Gjatë leximit kapërcen fjalë ose rreshta, ose humbet.
+dq_dislessia_3	Ngatërron shkronja të ngjashme (b/d, p/q, m/n) ose i kthen mbrapsht rrokjet.
+dq_dislessia_4	Pasi ka lexuar një tekst e ka të vështirë të kujtojë çfarë thoshte.
+dq_dislessia_5	E shmang leximin me zë ose shqetësohet kur duhet ta bëjë.
+dq_dislessia_6	Të mësuarit nga tekste të gjata e lodh shumë më tepër se të tjerët.
+dq_disortografia_1	Bën shumë gabime drejtshkrimore edhe në fjalë të thjeshta e të njohura.
+dq_disortografia_2	E shkruan të njëjtën fjalë në mënyra të ndryshme brenda të njëjtit tekst.
+dq_disortografia_3	Harron ose gabon theksat, apostrofat, shkronjat dyshe dhe h-në.
+dq_disortografia_4	Kur shkruan lë jashtë, shton ose ndërron shkronja apo rrokje.
+dq_disortografia_5	Kur e rilexon nuk i vë re gabimet e veta.
+dq_disortografia_6	Në diktim shkon shumë më keq sesa kur shkruan lirshëm.
+dq_disgrafia_1	Shkrimi i dorës është pak i lexueshëm ose shumë i çrregullt.
+dq_disgrafia_2	Shkruan ngadalë dhe lodhet shpejt.
+dq_disgrafia_3	E shtrëngon fort stilolapsin dhe pas pak i dhemb dora.
+dq_disgrafia_4	Rreshta të shtrembër, hapësira të çrregullta, shkronja me madhësi të ndryshme.
+dq_disgrafia_5	Kopjimi nga dërrasa ose nga libri është i ngadaltë dhe plot gabime.
+dq_disgrafia_6	E shmang shkrimin me dorë dhe parapëlqen shumë kompjuterin.
+dq_discalculia_1	E ka të vështirë të mbajë mend tabelën e shumëzimit dhe veprimet bazë (për shembull 7+8).
+dq_discalculia_2	Numëron ende me gishta ose me mend edhe për veprime të thjeshta.
+dq_discalculia_3	Ngatërron shenjat (+ − × ÷), i vendos keq numrat në kolonë ose i kthen mbrapsht.
+dq_discalculia_4	Ka vështirësi me orën, kalendarin, matjet ose paratë.
+dq_discalculia_5	Në problemat me disa hapa e humb fillin.
+dq_discalculia_6	Gabon në llogaritje edhe pasi e ka kuptuar arsyetimin.
+mappa_full	Ekran i plotë
+mappa_chiudi	Mbyll
+met_titolo	Metoda ime e të mësuarit
+met_pochi	Kam shënuar si ke mësuar në {n} teste. Pas disa testeve të tjera do të të tregoj cilat mënyra funksionojnë më mirë për ty.
+met_riga	Me {m}: {a} % mesatarisht ({na} teste), pa: {b} % ({nb} teste)
+met_nessuno	Tani për tani asnjë mënyrë të mësuari nuk dallohet nga të tjerat: vazhdo kështu dhe provo gjëra të ndryshme.
+met_cautela	Janë pak të dhëna dhe ka rëndësi edhe sa e vështirë është tema: merri si një tregues, jo si rregull.
+esp_t	Eksperiment i vogël:
+esp_prop	para testit tjetër provo të përdorësh {m}, pastaj krahasojmë rezultatin.
+esp_accetta	E pranoj sfidën
+esp_corso	Eksperiment në vazhdim: para testit tjetër përdor {m}.
+esp_annulla	Lëre
+esp_esito	Eksperiment: duke mësuar me {m} more {p} % (më parë, mesatarisht, {b} %).
+esp_v_su	Duket se të ndihmon!
+esp_v_giu	Këtë herë nuk ndihmoi: mund të provosh diçka tjetër.
+esp_v_pari	Pothuajse njësoj: duhen prova të tjera.
+come_t	Si ke mësuar?
+come_nota	Shëno çfarë ke përdorur për t’u përgatitur për këtë test (nëse aplikacioni e ka parë, është shënuar tashmë). Shërben për të kuptuar cilat mënyra funksionojnë më mirë për ty.
+come_ok	Fillo testin
+come_salta	Kapërce
+met_riassunto	përmbledhjen
+met_schema	skemën
+met_mappa	hartën
+met_spiegazioni	shpjegimet
+met_glossario	fjalorthin
+met_costruisci	shkrimin e përmbledhjes sime
+met_pratica	stërvitjen
+met_orale	pyetjet me gojë
+met_ascolto	dëgjimin e kapitullit
+met_libro	librin ose shënimet e mia
+met_insieme	të mësuarit me dikë
+met_set_t	Ndihmë për të gjetur metodën e vet të të mësuarit (jo e detyrueshme)
+met_set_nota	Mund të heqësh atë që të duket tepër ndërhyrëse. Informacionet mbeten në pajisje.
+met_set_chiedi	Para një testi pyet «Si ke mësuar?»
+met_set_confronto	Trego cilat mënyra të mësuari funksionojnë më mirë (krahasim me rezultatet e testeve)
+met_set_esp	Propozo eksperimente të vogla (të provosh një mënyrë të re të mësuari)
+vn_titolo	Zë i natyrshëm (italisht)
+vn_desc	Një zë italian shumë më i natyrshëm, falas. Shkarkohet vetëm një herë (rreth 95 MB: më mirë me Wi-Fi) dhe pastaj punon edhe pa internet. Gjithçka mbetet në pajisje: nuk i dërgohet asgjë askujt.
+vn_scarica	Shkarko zërin e natyrshëm
+vn_scarico	Po shkarkoj zërin… {p} %
+vn_usa	Përdor zërin e natyrshëm
+vn_ok	Zëri u shkarkua. Nëse pajisja është e ngadaltë ose e dobët, mund ta çaktivizosh: do të kthehet zëri i sistemit.
+vn_elimina	Fshi zërin e shkarkuar
+vn_errore	Nuk arrita ta shkarkoj zërin. Kontrollo lidhjen dhe provo sërish.
+vn_errore_uso	Zëri i natyrshëm nuk niset në këtë pajisje: po përdor zërin e sistemit.
+vn_prep	Po përgatis zërin… në leximin e parë duhen disa sekonda.
+cent	cent të $
+costi_t	Shpenzimi i vlerësuar për AI-në
+costi_mese	Këtë muaj: {c} ({n} kërkesa)
+costi_tot	Nga fillimi: {c}
+costi_ultimo	kërkesa e fundit: {c}
+costi_nota	Është një vlerësim: numëron vetëm atë që AI.st.ain i ka kërkuar Claude-it nga kjo pajisje, me çmimet e datës {d} (përditësohen një herë në ditë). Gjendja e vërtetë është në konsolën e Anthropic.
+costi_saldo	Shiko gjendjen e vërtetë
+costi_azzera	Zero numëruesin
+costi_conf	Ta zerosh numëruesin e shpenzimit të vlerësuar?
+tour_benvenuto	Mirë se erdhe në AI.st.ain! Për të filluar mjaftojnë tre hapa: 1) shto një lëndë, 2) hape dhe fotografo faqet e një kapitulli, 3) mëso nga skeda e parë e kapitullit dhe pastaj bëj testin. Të shoqëroj unë: prek «Para».
+tour_costruisci	«Përmbledhja ime»: shkruaj me fjalët e tua çfarë ke kuptuar dhe AI.st.ain të thotë çfarë mungon. Është mënyra më e mirë për të filluar mësimin.
+tour_ripasso	Këshillë: përsëritja e sotme. Pak pyetje të zgjedhura nga AI.st.ain për të rishikuar atë që rrezikon ta harrosh: mjaftojnë pak minuta në ditë.
+tour_traguardi	Këshillë: këtu janë pikët dhe arritjet e tua. Fitohen duke bërë teste, duke përsëritur dhe duke mësuar rregullisht.
+tour_metodo_home	Këshillë: AI.st.ain vëzhgon me cilat skeda ia del më mirë (përmbledhje, hartë, skemë…) dhe të sugjeron si të mësosh. Prindërit mund ta fikin.
+tour_testtab	Këshillë: testi përfundimtar. Pyetje me nivele, me përgjigje gjithmonë të përziera: nëse shkon mirë, vështirësia rritet.
+tour_mappatab	Këshillë: harta konceptuale. Mund ta lëvizësh, ta zmadhosh, ta ndryshosh dhe ta printosh.
+tour_oraletab	Këshillë: pjesa me gojë. Të përgatit ta tregosh temën me zë, si kur të pyet mësuesi, dhe të jep një koment.
+tour_pratica	Këshillë: praktika. Ushtrime për të përdorur atë që ke mësuar.
+tour_modfiglio	Me «Ndrysho» ndryshon gjithçka në një profil: nivelin, ndihmat për vështirësitë e të nxënit, cilat pjesë të fshihen (për shembull përmbledhja ose pjesa me gojë), metodën e të mësuarit dhe PIN-in.
+tour_stat	Statistikat e fëmijës: rezultatet e testeve, temat për t’u përforcuar, përsëritjet dhe provimet që vijnë. Mund edhe të printohen.
+tour_costi	Këshillë: shpenzimi i vlerësuar për AI-në. Tregon sa kushtojnë kërkesat e bëra nga ky aplikacion; gjendja e vërtetë është në konsolën e Anthropic.
+tour_s_nome	Emri dhe niveli i shkollës: niveli përshtat gjuhën, testet dhe pamjen. Emri mbetet në pajisje dhe nuk i dërgohet kurrë AI-së.
+tour_s_dsa	Ndihmat për vështirësitë e të nxënit (disleksi, disortografi, disgrafi, diskalkuli): kur i aktivizon, shpjegimet dhe tekstet përshtaten. Nëse ke dyshime, ka një pyetësor orientues (nuk është diagnozë).
+tour_s_sez	Këtu zgjedh çfarë sheh fëmija në çdo kapitull: përmbledhje, skemë, hartë, shpjegime, fjalorth, «Përmbledhja ime», praktikë, pjesa me gojë. Hiq shenjën për t’i fshehur; testi është gjithmonë. Nëse e fsheh përmbledhjen, fillohet nga «Përmbledhja ime».
+tour_s_met	Këshillë: metoda e të mësuarit. AI.st.ain mund të pyesë si është mësuar, të krahasojë rezultatet dhe të propozojë eksperimente të vogla. Këtu i ndez ose i fik.
+tour_s_col	Këshillë: ngjyrat në përmbledhje ndihmojnë të dallohen konceptet, datat dhe numrat, emrat.
+tour_s_pin	Këshillë: PIN-i i fëmijës (jo i detyrueshëm) shërben nëse vëllezërit e motrat nuk duhet ta shohin punën e njëri-tjetrit. Ti mund ta hapësh gjithmonë çdo profil.
+tour_s_voce	Këshillë: zëri i leximit. Me «Zë i natyrshëm» shkarkon një zë italian më të natyrshëm, që punon edhe pa internet.
+tour_stat_corpo	Më poshtë gjen rezultatet e testeve, mesataren, temat më të dobëta dhe përsëritjet e bëra.
+tour_stat_stampa	Me «Printo» merr faqen për ta çuar në një takim me mësuesit ose për ta ruajtur.
+guida_chiave	Si të marrësh çelësin API (udhëzues me figura)
+err_chiave	Çelësi API nuk është i vlefshëm: kopjoje sërish nga konsola pa hapësira para ose pas, ose krijo një të ri (shiko udhëzuesin te cilësimet e familjes).
+err_credito	Kredia në konsolë ka mbaruar (ose nuk është shtuar ende): rimbushe dhe provo sërish.
+err_permesso	Çelësi nuk ka leje ta përdorë këtë model. Kontrollo çelësin dhe emrin e modelit.
+err_modello	Modeli i treguar nuk ekziston. Lëre bosh fushën «Modeli» për të përdorur atë të këshilluarin.
+err_limite	Shumë kërkesa në pak kohë: prit një minutë dhe provo sërish.
+err_occupato	Shërbimi i Claude-it është i zënë për momentin: provo sërish pas disa minutash.
+err_rete	Nuk arrij të lidhem me shërbimin: kontrollo lidhjen me internetin dhe provo sërish.
+err_formato	Çelësat e Claude-it fillojnë me «sk-ant-»: kontrollo nëse ke kopjuar të duhurin.
+upd_txt	Ka një version të ri të AI.st.ain.
+upd_ora	Përditëso tani
+upd_dopo	Më vonë
+bk_t	Ruaj një kopje të të dhënave të tua
+bk_txt	Kapitujt dhe rezultatet janë vetëm në këtë pajisje: nëse ndërron telefon ose fshin të dhënat e shfletuesit, humbasin. Ruaj një kopje (kërko ndihmën e një prindi, nëse duhet) dhe mbaje në vend të sigurt.
+bk_dopo	Më vonë
+ai_sbaglia	Përmbledhjet dhe shpjegimet i përgatit AI-ja, që mund të gabojë: nëse ke dyshim, kontrollo në libër.
+es_trovati	Gjeta {n} ushtrime
+es_scegli_da	Shëno ato që do t’i bësh tani (edhe të gjitha): i bëjmë një nga një, sipas radhës së librit.
+es_tutti	Zgjidh të gjitha
+es_nessuno	Hiq zgjedhjen
+es_num	Ushtrimi {n}
+es_guidami_n	Më udhëhiq në ushtrimet e zgjedhura ({n})
+es_scegli_almeno	Shëno të paktën një ushtrim.
+es_prog	ushtrimi {i} nga {n}
+es_prossimo	Tjetri: ushtrimi {n}
+fb_giusto	Përgjigje e saktë!
+fb_quasi	Je shumë afër.
+fb_rivedi	Ende nuk është e saktë.
+ts_occupato	Shërbimi është i zënë: po provoj me një model tjetër…
+ts_foto	Shto të paktën një foto.
+ts_foto_es	Shto foton e ushtrimit.
+ts_idea	Shkruaj më parë idenë tënde, edhe përgjysmë.
+ts_mat_nome	Shkruaj emrin e lëndës.
+ts_mat_gia	Kjo lëndë ekziston tashmë.
+ts_stampa	Printimi nuk është i disponueshëm.
+ts_nodo_vuoto	Teksti i nyjës nuk mund të jetë bosh.
+ts_nodo_nuovo	Shkruaj tekstin e nyjës së re.
+ts_nodi_max	Harta ka tashmë 60 nyja: është maksimumi.
+ts_nodi_gia	Këto dy nyja janë tashmë të lidhura.
+ts_mappa_piccola	Harta e AI-së ishte shumë e vogël: e ndërtova nga skema.
+ts_demo_no	Në modalitetin demo nuk mund të përfundohet.
+ts_foto_err	Një foto nuk hapet:
+ts_non_riuscito	Nuk ia dola:

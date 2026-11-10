@@ -1,0 +1,363 @@
+tema_solo_elem	En primaria se usa el tema Juego.
+tema_dalle_medie	A partir de secundaria puedes elegir entre Calma y Noche.
+aspetto_auto_nota	El aspecto se adapta solo a las dificultades de aprendizaje elegidas. Sin ellas, la letra y el espaciado son los normales. Puedes cambiarlo a mano cuando quieras.
+aspetto_ripristina	Restablecer los ajustes recomendados
+mappa_trascina	Arrastra los recuadros y las etiquetas de las conexiones con el dedo o el ratón. También puedes elegir un nodo y usar las flechas de abajo.
+mappa_muovi	Mover el nodo elegido
+mappa_riordina	Ordenar automáticamente
+mappa_stampa	Imprimir el mapa
+pratica	Entrenamiento
+pr_vuota	Aquí tienes ejercicios para practicar los mismos temas del capítulo, inspirados en los del libro pero con datos distintos.
+pr_crea	Crear los ejercicios
+pr_altri	Más ejercicios
+pr_aiuto	Escribe tu respuesta y pulsa Comprobar. Si te atascas, pide una pista: la solución nunca se da.
+pr_n	Ejercicio {n}
+pr_tua	Tu respuesta
+pr_controlla	Comprobar
+pr_indizio	Pista
+pr_dammi_indizio	Dame una pista
+pr_scrivi	Escribe primero tu respuesta.
+livello_test	Nivel {n} · {nome}
+liv_1	Básico
+liv_2	Medio
+liv_3	Avanzado
+liv_4	Experto
+liv_5	Maestro
+test_altre	Más preguntas de este nivel
+test_piu_difficile	Preguntas más difíciles
+test_piu_facile	Preguntas más fáciles
+test_sali	Sube al nivel {n}: {nome}
+preparo_domande	Estoy preparando nuevas preguntas…
+serve_chiave_ai	Para esta función hace falta la clave de IA: la introduce el padre o la madre en Área de padres › Ajustes.
+traguardi	Tus logros
+n_punti	{n} puntos
+verso_rango	Te faltan {n} puntos para ser {r}
+rango_max	Has alcanzado el rango más alto: ¡enhorabuena!
+rango_0	Curioso
+rango_1	Estudioso
+rango_2	Científico
+rango_3	Genio
+punti_guadagnati	+{n} puntos
+nuovo_rango	Nuevo rango: ¡{r}!
+nuovo_badge	Nuevo logro: {b}
+badge_primo	Primer test
+badge_primo_d	Has completado tu primer test.
+badge_dieci	Diez tests
+badge_dieci_d	Has completado 10 tests.
+badge_perfetto	Todo bien
+badge_perfetto_d	Un test sin errores.
+badge_liv3	Nivel Avanzado
+badge_liv3_d	Al menos el 80 % en el nivel 3.
+badge_liv5	Maestro
+badge_liv5_d	Al menos el 80 % en el nivel 5.
+badge_allenato	Bien entrenado
+badge_allenato_d	5 ejercicios de entrenamiento resueltos.
+acronimo	Ayuda inteligente para el estudio, la autonomía y la inclusión
+costruisci	Mi resumen
+co_intro	Construye el resumen tú solo, un párrafo cada vez. Lee el párrafo en el libro y escribe con tus palabras: te diré qué has captado ya y qué te conviene repasar, sin escribirlo por ti.
+co_metodo_t	El método en 4 pasos
+co_m1	Lee el párrafo entero.
+co_m2	Subraya de 3 a 5 palabras clave: nombres, fechas, conceptos.
+co_m3	Cierra el libro y escribe de 1 a 3 frases con tus palabras.
+co_m4	Comprueba y corrige.
+co_avanz	Párrafos completados: {a} de {n}
+co_chiave	Mis palabras clave
+co_tuo	Mi resumen del párrafo
+co_controlla	Comprobar
+co_aiuto	No sé por dónde empezar
+co_aiuto_t	Intenta responder en voz alta y luego escríbelo:
+co_aiuto_txt	¿De qué trata «{t}»? ¿Qué es lo más importante que hay que recordar? ¿Cómo se lo explicarías a un amigo en dos frases?
+co_scrivi	Escribe primero al menos una frase con tus palabras.
+co_va_bene	Así está bien
+co_esito_completo	Muy bien: ¡has captado las ideas principales!
+co_esito_quasi	Ya casi lo tienes.
+co_esito_da_rivedere	Vuelve a leer el párrafo e inténtalo de nuevo.
+co_pensa	Piensa en estas preguntas:
+co_finale	Mi resumen
+co_stampa	Imprimir o guardar en PDF
+co_nota_sez	Si ocultas el resumen, el alumno puede construirlo igualmente por su cuenta en «Mi resumen», con ayuda de la IA pero sin ver el que ya está hecho.
+badge_autore	Autor del resumen
+badge_autore_d	Has construido tú solo el resumen de un capítulo.
+orale	Examen oral
+or_intro	Repite en voz alta lo que has estudiado, como en clase: te escucho, te digo qué has dicho bien, qué hay que corregir y qué se te ha olvidado, y te hago algunas preguntas. Solo valoro el contenido, no cómo hablas.
+or_parte	¿Sobre qué quieres que te pregunte?
+or_tutto	Todo el capítulo
+or_inizia	Empezar el examen oral
+or_nota_it	El reconocimiento de voz escucha en italiano.
+or_privacy	Atención: para transcribir la voz, el navegador puede enviar el audio a su fabricante (por ejemplo Google o Microsoft); el texto transcrito va al servicio de IA elegido por los padres. También puedes escribir la respuesta.
+or_nomic	El reconocimiento de voz no está disponible en este dispositivo o navegador: puedes escribir la respuesta.
+or_mic_negato	El micrófono no está permitido: actívalo en los ajustes del navegador o escribe la respuesta.
+or_prima	Cuéntame: {t}. Cuando estés listo, pulsa «Hablar».
+or_parla	Hablar
+or_ho_finito	He terminado
+or_annulla	Cancelar
+or_scrivi	Escribir en vez de hablar
+or_riascolta	Volver a escuchar
+or_ascolto_t	Te estoy escuchando… cuando termines, pulsa «He terminado».
+or_rivedi_t	Esto es lo que he entendido. Puedes corregir el texto antes de enviarlo.
+or_invia	Enviar la respuesta
+or_aggiungi	Añadir algo más con la voz
+or_cancella	Borrar y volver a intentar
+or_attesa	Estoy valorando tu respuesta…
+or_poco	Di o escribe algo más.
+or_turno	Respuesta {n} de {m}
+or_giusto	Bien dicho:
+or_correggi	Para corregir:
+or_manca	Piensa también en:
+or_esito_ottimo	¡Muy bien!
+or_esito_bene	Bien, pero se puede completar.
+or_esito_da_rivedere	Para repasar: vuelve a leer e inténtalo de nuevo.
+or_concludi	Terminar el examen oral
+or_voce_ai	Voz de la IA
+or_fine_t	Examen oral terminado
+or_risultato	Resultado: {p} %
+or_da_ripassare	Para repasar:
+or_ancora	Nuevo examen oral
+badge_oratore	Orador
+badge_oratore_d	Examen oral con al menos el 80 %.
+gi_scegli	¡Elige un juego!
+gi_nota_adulto	Los juegos hablan: sube el volumen. No usan la IA y no cuestan nada.
+gi_n_conta	Contar
+gi_n_numeri	Los números
+gi_n_dipiu	Más o menos
+gi_n_colori	Los colores
+gi_n_forme	Las formas
+gi_n_lettere	Las letras
+gi_n_iniziali	¿Cómo empieza?
+gi_n_sequenze	¿Qué viene después?
+gi_n_intruso	Busca el intruso
+gi_d_conta	¿Cuántos hay?
+gi_d_numeri	Toca el número {n}
+gi_d_piu	¿Dónde hay más?
+gi_d_meno	¿Dónde hay menos?
+gi_d_colore	Toca el color {c}
+gi_d_forma	Toca {f}
+gi_d_lettera	Toca la letra {l}
+gi_d_iniziale	¿Con qué letra empieza {p}?
+gi_d_sequenza	¿Qué viene después?
+gi_d_intruso	¿Cuál es el intruso?
+gi_c_rosso	rojo
+gi_c_blu	azul
+gi_c_giallo	amarillo
+gi_c_verde	verde
+gi_c_arancione	naranja
+gi_c_viola	morado
+gi_c_rosa	rosa
+gi_c_marrone	marrón
+gi_c_nero	negro
+gi_f_cerchio	el círculo
+gi_f_quadrato	el cuadrado
+gi_f_triangolo	el triángulo
+gi_f_rettangolo	el rectángulo
+gi_f_stella	la estrella
+gi_f_cuore	el corazón
+gi_bravo1	¡Correcto!
+gi_bravo2	¡Exacto, qué bien!
+gi_bravo3	¡Sí! ¡Muy buen trabajo!
+gi_riprova	¡Inténtalo otra vez!
+gi_fine	¡Has terminado! Estrellas: {n}
+gi_fine_voce	¡Has terminado! Has conseguido {n} estrellas.
+gi_ancora	Otra vez
+gi_altri	Otros juegos
+gi_riascolta	Volver a escuchar la pregunta
+gi_stelle_n	Estrellas: {n}
+gi_stat	Juegos (educación infantil)
+gi_stat_gioco	Juego
+gi_stat_partite	Partidas
+gi_stat_primo	Bien a la primera
+gi_stat_liv	Dificultad
+gi_stat_nota	La dificultad sube sola cuando el niño falla poco y baja si le cuesta.
+tour_titolo	Guía de uso
+tour_btn	Cómo se usa
+tour_avanti	Siguiente
+tour_indietro	Atrás
+tour_salta	Saltar
+tour_fine	Entendido
+tour_altrove	La guía se abre desde la página de inicio, una asignatura, un capítulo y el área de padres.
+tour_brand	Esto es AI.st.ain: tócalo para volver siempre a la página de inicio.
+tour_testo	Con A− y A+ reduces o amplías el texto. (Consejo: vale para toda la app.)
+tour_aspetto	Consejo: aquí cambias el tema, la letra, el espaciado, la velocidad y la voz de lectura. También puedes descargar una voz italiana más natural, que funciona sin conexión.
+tour_addmat	Para empezar, añade tus asignaturas: toca un nombre de abajo o escribe uno.
+tour_mat	Cada recuadro es una asignatura: ábrela para añadir capítulos y ejercicios.
+tour_gen	El área de padres (con PIN) sirve para conectar la IA, elegir qué funciones ocultar a cada hijo, ver las estadísticas y hacer copias de seguridad.
+tour_ancora	Si quieres volver a ver esta guía, toca el signo de interrogación.
+tour_nuovocap	Empieza aquí: fotografía las páginas del capítulo (aunque sean muchas). AI.st.ain prepara resumen, esquema, mapa, explicaciones y test. Tarda unos minutos: deja la página abierta.
+tour_nuovoes	Fotografía un ejercicio: te guía paso a paso, sin darte la solución.
+tour_controllo	¿Ya has hecho un ejercicio? Fotografíalo y haz que revisen tu razonamiento.
+tour_tabs	Las pestañas del capítulo: cada una es una forma distinta de estudiar el mismo tema. Empieza por la primera de la izquierda y avanza hacia la derecha.
+tour_ascolta	Con este botón se te lee el capítulo en voz alta.
+tour_figlio	Aquí añades el perfil de un hijo: nivel, ayudas para el estudio y PIN.
+tour_fam	En los ajustes de la familia conectas el servicio de IA y eliges el idioma.
+tour_priv	Consejo: aquí ves qué se queda en el dispositivo y qué se envía a servicios externos.
+tour_backup	Consejo: guarda de vez en cuando una copia de seguridad. Si cambias de dispositivo, la restauras desde aquí.
+dsaq_promo_t	Entender cómo estudias mejor
+dsaq_promo	Un cuestionario de unos 3 minutos sobre las señales que pueden hacer pensar en una dificultad específica de aprendizaje. No es un diagnóstico: solo sirve para saber si merece la pena profundizar y qué ayudas probar.
+dsaq_promo_btn	Hacer el cuestionario
+dsaq_titolo	Cuestionario sobre señales de dificultades de aprendizaje
+dsaq_non_diag	No es una prueba diagnóstica y no sustituye la valoración de un especialista.
+dsaq_intro	Las frases hablan de la persona que estudia: responde tú o uno de tus padres contigo. Piensa en los últimos 6 meses y en cómo va a pesar del esfuerzo. Son 24 preguntas, divididas en 4 partes.
+dsaq_priv	Las respuestas se quedan en este dispositivo: no se guardan ni se envían a nadie.
+dsaq_inizia	Empezar
+dsaq_chiudi	Cerrar
+dsaq_avanti	Siguiente
+dsaq_indietro	Atrás
+dsaq_fine	Ver el resultado
+dsaq_pag	Parte {i} de {n}
+dsaq_scala	¿Con qué frecuencia ocurre?
+dsaq_mai	Nunca o casi nunca
+dsaq_volte	A veces
+dsaq_spesso	A menudo
+dsaq_tutte	Responde a todas las preguntas para continuar.
+dsaq_risultato	Resultado
+dsaq_res_0	Pocas señales
+dsaq_res_1	Algunas señales
+dsaq_res_2	Muchas señales
+dsaq_esito_ok	De las respuestas no se desprenden señales especiales. Si ves dificultades que duran en el tiempo, puedes repetir el cuestionario más adelante o hablar con un profesor.
+dsaq_esito_si	En las áreas con más señales puede merecer la pena profundizar: háblalo con el pediatra o con el colegio. Una dificultad específica de aprendizaje solo puede diagnosticarla un equipo especializado (neuropediatra, psicólogo). Mientras tanto puedes activar a modo de prueba las ayudas de la app: las quitas cuando quieras.
+dsaq_piccoli	Antes del final de 2.º o 3.º de primaria normalmente todavía no es posible un diagnóstico: las señales deben observarse a lo largo del tiempo.
+dsaq_altre_cause	También la vista o el oído, el cansancio, la ansiedad o estudiar en un idioma que no es el propio pueden dar señales parecidas.
+dsaq_attiva	Activar a modo de prueba las ayudas sugeridas
+dsaq_attivati	Ayudas seleccionadas: revisa y guarda el perfil.
+dq_dislessia_1	Lee mucho más despacio o con más esfuerzo que los demás.
+dq_dislessia_2	Al leer se salta palabras o líneas, o se pierde.
+dq_dislessia_3	Confunde letras parecidas (b/d, p/q, m/n) o invierte las sílabas.
+dq_dislessia_4	Después de leer un texto le cuesta recordar lo que decía.
+dq_dislessia_5	Evita leer en voz alta o se pone nervioso cuando tiene que hacerlo.
+dq_dislessia_6	Estudiar con textos largos le cansa mucho más que a los demás.
+dq_disortografia_1	Comete muchas faltas de ortografía incluso en palabras sencillas y conocidas.
+dq_disortografia_2	Escribe la misma palabra de formas distintas en el mismo texto.
+dq_disortografia_3	Olvida o confunde tildes, apóstrofos, letras dobles y la h.
+dq_disortografia_4	Al escribir omite, añade o cambia letras o sílabas.
+dq_disortografia_5	Al releer no se da cuenta de sus propios errores.
+dq_disortografia_6	En los dictados le va mucho peor que cuando escribe libremente.
+dq_disgrafia_1	La letra a mano es poco legible o muy irregular.
+dq_disgrafia_2	Escribe despacio y se cansa pronto.
+dq_disgrafia_3	Aprieta mucho el bolígrafo y al poco tiempo le duele la mano.
+dq_disgrafia_4	Líneas torcidas, espacios irregulares, letras de tamaños distintos.
+dq_disgrafia_5	Copiar de la pizarra o del libro es lento y lleno de errores.
+dq_disgrafia_6	Evita escribir a mano y prefiere mucho el ordenador.
+dq_discalculia_1	Le cuesta recordar las tablas de multiplicar y los cálculos básicos (por ejemplo 7+8).
+dq_discalculia_2	Sigue contando con los dedos o mentalmente incluso en cálculos sencillos.
+dq_discalculia_3	Confunde los signos (+ − × ÷), coloca mal los números en columna o los invierte.
+dq_discalculia_4	Tiene dificultades con el reloj, el calendario, las medidas o el dinero.
+dq_discalculia_5	En los problemas con varios pasos pierde el hilo.
+dq_discalculia_6	Se equivoca en los cálculos incluso después de entender el razonamiento.
+mappa_full	Pantalla completa
+mappa_chiudi	Cerrar
+met_titolo	Mi método de estudio
+met_pochi	He anotado cómo has estudiado en {n} tests. Después de algunos tests más te mostraré qué formas de estudiar te funcionan mejor.
+met_riga	Con {m}: {a} % de media ({na} tests), sin: {b} % ({nb} tests)
+met_nessuno	Por ahora ninguna forma de estudiar destaca sobre las demás: sigue así y prueba cosas distintas.
+met_cautela	Son pocos datos y también cuenta lo difícil que es el tema: tómalos como una pista, no como una regla.
+esp_t	Pequeño experimento:
+esp_prop	antes del próximo test prueba a usar {m} y luego comparamos el resultado.
+esp_accetta	Acepto el reto
+esp_corso	Experimento en marcha: antes del próximo test usa {m}.
+esp_annulla	Dejarlo
+esp_esito	Experimento: estudiando con {m} has sacado un {p} % (antes, de media, un {b} %).
+esp_v_su	¡Parece que te ayuda!
+esp_v_giu	Esta vez no ha ayudado: puedes probar otra cosa.
+esp_v_pari	Casi igual: hacen falta más pruebas.
+come_t	¿Cómo has estudiado?
+come_nota	Marca lo que has usado para preparar este test (si la app ya lo ha visto, ya está marcado). Sirve para saber qué formas de estudiar te funcionan mejor.
+come_ok	Empezar el test
+come_salta	Saltar
+met_riassunto	el resumen
+met_schema	el esquema
+met_mappa	el mapa
+met_spiegazioni	las explicaciones
+met_glossario	el glosario
+met_costruisci	escribir mi resumen
+met_pratica	el entrenamiento
+met_orale	el examen oral
+met_ascolto	escuchar el capítulo
+met_libro	el libro o mis apuntes
+met_insieme	estudiar con alguien
+met_set_t	Ayuda para encontrar el propio método de estudio (opcional)
+met_set_nota	Puedes quitar lo que te parezca demasiado invasivo. La información se queda en el dispositivo.
+met_set_chiedi	Antes de un test preguntar «¿Cómo has estudiado?»
+met_set_confronto	Mostrar qué formas de estudiar funcionan mejor (comparación con los resultados de los tests)
+met_set_esp	Proponer pequeños experimentos (probar una forma nueva de estudiar)
+vn_titolo	Voz natural (italiano)
+vn_desc	Una voz italiana mucho más natural, gratuita. Se descarga una sola vez (unos 95 MB: mejor con wifi) y después funciona también sin conexión. Todo se queda en el dispositivo: no se envía nada a nadie.
+vn_scarica	Descargar la voz natural
+vn_scarico	Descargando la voz… {p} %
+vn_usa	Usar la voz natural
+vn_ok	Voz descargada. Si el dispositivo es lento o poco potente puedes desactivarla: volverá la voz del sistema.
+vn_elimina	Eliminar la voz descargada
+vn_errore	No he podido descargar la voz. Comprueba la conexión e inténtalo de nuevo.
+vn_errore_uso	La voz natural no arranca en este dispositivo: uso la voz del sistema.
+vn_prep	Preparando la voz… la primera lectura tarda unos segundos.
+cent	centavos de $
+costi_t	Gasto estimado en IA
+costi_mese	Este mes: {c} ({n} peticiones)
+costi_tot	Desde el principio: {c}
+costi_ultimo	última petición: {c}
+costi_nota	Es una estimación: solo cuenta lo que AI.st.ain ha pedido a Claude desde este dispositivo, con los precios del {d} (actualizados una vez al día). El saldo real está en la consola de Anthropic.
+costi_saldo	Ver el saldo real
+costi_azzera	Poner el contador a cero
+costi_conf	¿Poner a cero el contador del gasto estimado?
+tour_benvenuto	¡Bienvenido a AI.st.ain! Para empezar bastan tres pasos: 1) añade una asignatura, 2) ábrela y fotografía las páginas de un capítulo, 3) estudia con la primera pestaña del capítulo y luego haz el test. Yo te acompaño: toca «Siguiente».
+tour_costruisci	«Mi resumen»: escribe con tus palabras lo que has entendido y AI.st.ain te dice qué falta. Es la mejor forma de empezar a estudiar.
+tour_ripasso	Consejo: el repaso de hoy. Pocas preguntas elegidas por AI.st.ain para repasar lo que corres el riesgo de olvidar: bastan unos minutos al día.
+tour_traguardi	Consejo: aquí están tus puntos y tus logros. Se ganan haciendo los tests, repasando y estudiando con constancia.
+tour_metodo_home	Consejo: AI.st.ain observa con qué pestañas te va mejor (resumen, mapa, esquema…) y te sugiere cómo estudiar. Los padres pueden desactivarlo.
+tour_testtab	Consejo: el test final. Preguntas por niveles con respuestas siempre mezcladas: si te va bien, sube la dificultad.
+tour_mappatab	Consejo: el mapa conceptual. Puedes moverlo, ampliarlo, modificarlo y también imprimirlo.
+tour_oraletab	Consejo: el oral. Te prepara para contar el tema en voz alta, como en un examen oral, y te da un comentario.
+tour_pratica	Consejo: la práctica. Ejercicios para usar lo que has estudiado.
+tour_modfiglio	Con «Editar» cambias todo en un perfil: nivel, ayudas para las dificultades de aprendizaje, qué secciones ocultar (por ejemplo resumen u oral), método de estudio y PIN.
+tour_stat	Las estadísticas del hijo: resultados de los tests, temas que reforzar, repasos y exámenes próximos. También se pueden imprimir.
+tour_costi	Consejo: el gasto estimado en IA. Muestra cuánto cuestan las peticiones hechas por esta app; el saldo real está en la consola de Anthropic.
+tour_s_nome	Nombre y nivel escolar: el nivel adapta el lenguaje, los tests y el aspecto. El nombre se queda en el dispositivo y nunca se envía a la IA.
+tour_s_dsa	Las ayudas para las dificultades de aprendizaje (dislexia, disortografía, disgrafía, discalculia): al activarlas, las explicaciones y los textos se adaptan. Si tienes dudas hay un cuestionario de orientación (no es un diagnóstico).
+tour_s_sez	Aquí eliges qué ve el alumno en cada capítulo: resumen, esquema, mapa, explicaciones, glosario, «Mi resumen», práctica, oral. Quita la marca para ocultarlas; el test está siempre. Si ocultas el resumen, se empieza por «Mi resumen».
+tour_s_met	Consejo: el método de estudio. AI.st.ain puede preguntar cómo se ha estudiado, comparar los resultados y proponer pequeños experimentos. Aquí los activas o desactivas.
+tour_s_col	Consejo: los colores del resumen ayudan a distinguir conceptos, fechas y números, nombres.
+tour_s_pin	Consejo: el PIN del hijo (opcional) sirve si los hermanos no deben ver el trabajo de los demás. Tú siempre puedes abrir cualquier perfil.
+tour_s_voce	Consejo: la voz de lectura. Con «Voz natural» descargas una voz italiana más natural, que funciona también sin conexión.
+tour_stat_corpo	Aquí abajo tienes los resultados de los tests, la media, los temas más flojos y los repasos hechos.
+tour_stat_stampa	Con «Imprimir» obtienes la página para llevar a una reunión o para guardar.
+guida_chiave	Cómo conseguir la clave API (guía con imágenes)
+err_chiave	La clave API no es válida: vuelve a copiarla de la consola sin espacios delante ni detrás, o crea una nueva (mira la guía en los ajustes de la familia).
+err_credito	El crédito de la consola se ha agotado (o aún no se ha añadido): haz una recarga e inténtalo de nuevo.
+err_permesso	La clave no tiene permiso para usar este modelo. Comprueba la clave y el nombre del modelo.
+err_modello	El modelo indicado no existe. Deja vacío el campo «Modelo» para usar el recomendado.
+err_limite	Demasiadas peticiones en poco tiempo: espera un minuto e inténtalo de nuevo.
+err_occupato	El servicio de Claude está ocupado en este momento: inténtalo de nuevo dentro de unos minutos.
+err_rete	No consigo conectar con el servicio: comprueba la conexión a internet e inténtalo de nuevo.
+err_formato	Las claves de Claude empiezan por «sk-ant-»: comprueba que has copiado la correcta.
+upd_txt	Hay una versión nueva de AI.st.ain.
+upd_ora	Actualizar ahora
+upd_dopo	Más tarde
+bk_t	Guarda una copia de tus datos
+bk_txt	Los capítulos y los resultados están solo en este dispositivo: si cambias de teléfono o borras los datos del navegador, se pierden. Guarda una copia (pide ayuda a tus padres si hace falta) y consérvala en un lugar seguro.
+bk_dopo	Más tarde
+ai_sbaglia	Los resúmenes y las explicaciones los prepara la IA, que puede equivocarse: en caso de duda, compruébalo en el libro.
+es_trovati	He encontrado {n} ejercicios
+es_scegli_da	Marca los que quieres hacer ahora (también todos): los hacemos de uno en uno, en el orden del libro.
+es_tutti	Seleccionar todos
+es_nessuno	Quitar la selección
+es_num	Ejercicio {n}
+es_guidami_n	Guíame en los ejercicios elegidos ({n})
+es_scegli_almeno	Marca al menos un ejercicio.
+es_prog	ejercicio {i} de {n}
+es_prossimo	Siguiente: ejercicio {n}
+fb_giusto	¡Respuesta correcta!
+fb_quasi	Ya casi lo tienes.
+fb_rivedi	Todavía no es correcto.
+ts_occupato	El servicio está ocupado: pruebo con otro modelo…
+ts_foto	Añade al menos una foto.
+ts_foto_es	Añade la foto del ejercicio.
+ts_idea	Escribe primero tu idea, aunque esté a medias.
+ts_mat_nome	Escribe el nombre de la asignatura.
+ts_mat_gia	Esta asignatura ya existe.
+ts_stampa	La impresión no está disponible.
+ts_nodo_vuoto	El texto del nodo no puede estar vacío.
+ts_nodo_nuovo	Escribe el texto del nuevo nodo.
+ts_nodi_max	El mapa ya tiene 60 nodos: es el máximo.
+ts_nodi_gia	Estos dos nodos ya están conectados.
+ts_mappa_piccola	El mapa de la IA era demasiado pequeño: he construido el del esquema.
+ts_demo_no	En modo demo no se puede completar.
+ts_foto_err	Una foto no se abre:
+ts_non_riuscito	No lo he conseguido:

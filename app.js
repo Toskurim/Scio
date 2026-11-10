@@ -2,7 +2,7 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.43';
+const VERSIONE = '0.44';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
 const LIVELLI = ['infanzia', 'elementari', 'media', 'superiori', 'universita'];
 const GI = ['conta', 'numeri', 'dipiu', 'colori', 'forme', 'lettere', 'iniziali', 'sequenze', 'intruso'];
@@ -2730,7 +2730,7 @@ function giScelta(k) {
 function vGiochi() {
   const p = S.profilo;
   return barra() + cardBackup() + '<div class="hero"><img src="icons/icon-192.png" alt="" width="64" height="64"><div><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('gi_scegli') + '</p></div></div>' +
-    '<div class="gi-grid">' + GI.map(g => { const st = (S.giochi || {})[g]; return '<button class="mat gi-tile" data-act="gi-apri" data-g="' + g + '"><span class="gi-ico" aria-hidden="true">' + GI_ICO[g] + '</span><b>' + t('gi_n_' + g) + '</b><span class="muted">' + (st && st.fatte ? '⭐ ' + st.giuste : '&nbsp;') + '</span></button>'; }).join('') + '</div>' +
+    '<div class="gi-grid">' + GI.filter(g => g !== 'iniziali' || ['it', 'en'].includes((S.profilo && S.profilo.lingua) || 'it')).map(g => { const st = (S.giochi || {})[g]; return '<button class="mat gi-tile" data-act="gi-apri" data-g="' + g + '"><span class="gi-ico" aria-hidden="true">' + GI_ICO[g] + '</span><b>' + t('gi_n_' + g) + '</b><span class="muted">' + (st && st.fatte ? '⭐ ' + st.giuste : '&nbsp;') + '</span></button>'; }).join('') + '</div>' +
     '<p class="muted" style="text-align:center">' + t('gi_nota_adulto') + '</p>';
 }
 function vGioco() {

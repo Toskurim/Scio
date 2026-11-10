@@ -1,0 +1,363 @@
+tema_solo_elem	In der Grundschule gibt es das Design „Spiel“.
+tema_dalle_medie	Ab der Mittelstufe kannst du zwischen „Ruhig“ und „Nacht“ wählen.
+aspetto_auto_nota	Das Aussehen passt sich von selbst an die gewählten Lernstörungen an. Ohne Lernstörung bleiben Schrift und Abstände normal. Du kannst es jederzeit von Hand ändern.
+aspetto_ripristina	Empfohlene Einstellungen wiederherstellen
+mappa_trascina	Ziehe die Kästchen und die Beschriftungen der Verbindungen mit dem Finger oder der Maus. Oder wähle einen Knoten und benutze die Pfeile unten.
+mappa_muovi	Gewählten Knoten verschieben
+mappa_riordina	Automatisch anordnen
+mappa_stampa	Karte drucken
+pratica	Training
+pr_vuota	Hier findest du Übungen zu den Themen des Kapitels, angelehnt an die im Buch, aber mit anderen Zahlen und Angaben.
+pr_crea	Übungen erstellen
+pr_altri	Weitere Übungen
+pr_aiuto	Schreib deine Antwort und drücke „Prüfen“. Wenn du nicht weiterkommst, bitte um einen Hinweis: Die Lösung wird nie verraten.
+pr_n	Übung {n}
+pr_tua	Deine Antwort
+pr_controlla	Prüfen
+pr_indizio	Hinweis
+pr_dammi_indizio	Gib mir einen Hinweis
+pr_scrivi	Schreib zuerst deine Antwort.
+livello_test	Stufe {n} · {nome}
+liv_1	Einfach
+liv_2	Mittel
+liv_3	Fortgeschritten
+liv_4	Experte
+liv_5	Meister
+test_altre	Weitere Fragen dieser Stufe
+test_piu_difficile	Schwierigere Fragen
+test_piu_facile	Leichtere Fragen
+test_sali	Steige auf Stufe {n}: {nome}
+preparo_domande	Ich bereite neue Fragen vor…
+serve_chiave_ai	Für diese Funktion braucht man den KI-Schlüssel: Die Eltern tragen ihn unter Elternbereich › Einstellungen ein.
+traguardi	Deine Erfolge
+n_punti	{n} Punkte
+verso_rango	Noch {n} Punkte bis {r}
+rango_max	Du hast den höchsten Rang erreicht: Glückwunsch!
+rango_0	Neugierig
+rango_1	Fleißig
+rango_2	Wissenschaftler
+rango_3	Genie
+punti_guadagnati	+{n} Punkte
+nuovo_rango	Neuer Rang: {r}!
+nuovo_badge	Neuer Erfolg: {b}
+badge_primo	Erster Test
+badge_primo_d	Du hast deinen ersten Test abgeschlossen.
+badge_dieci	Zehn Tests
+badge_dieci_d	Du hast 10 Tests abgeschlossen.
+badge_perfetto	Alles richtig
+badge_perfetto_d	Ein Test ohne Fehler.
+badge_liv3	Stufe Fortgeschritten
+badge_liv3_d	Mindestens 80 % auf Stufe 3.
+badge_liv5	Meister
+badge_liv5_d	Mindestens 80 % auf Stufe 5.
+badge_allenato	Gut trainiert
+badge_allenato_d	5 Trainingsübungen gelöst.
+acronimo	Intelligente Hilfe für Lernen, Selbstständigkeit und Inklusion
+costruisci	Meine Zusammenfassung
+co_intro	Schreib die Zusammenfassung selbst, Absatz für Absatz. Lies den Absatz im Buch und schreib ihn mit eigenen Worten auf: Ich sage dir, was du schon erfasst hast und was du noch einmal ansehen solltest, ohne es für dich zu schreiben.
+co_metodo_t	Die Methode in 4 Schritten
+co_m1	Lies den ganzen Absatz.
+co_m2	Unterstreiche 3–5 Schlüsselwörter: Namen, Daten, Begriffe.
+co_m3	Schließ das Buch und schreib 1–3 Sätze mit eigenen Worten.
+co_m4	Prüfe und verbessere.
+co_avanz	Fertige Absätze: {a} von {n}
+co_chiave	Meine Schlüsselwörter
+co_tuo	Meine Zusammenfassung des Absatzes
+co_controlla	Prüfen
+co_aiuto	Ich weiß nicht, wo ich anfangen soll
+co_aiuto_t	Versuch erst laut zu antworten, dann schreib es auf:
+co_aiuto_txt	Worum geht es in „{t}“? Was ist das Wichtigste, das man sich merken sollte? Wie würdest du es einem Freund in zwei Sätzen erklären?
+co_scrivi	Schreib zuerst mindestens einen Satz mit eigenen Worten.
+co_va_bene	Passt so
+co_esito_completo	Sehr gut: Du hast die Hauptgedanken erfasst!
+co_esito_quasi	Fast geschafft.
+co_esito_da_rivedere	Lies den Absatz noch einmal und versuch es erneut.
+co_pensa	Denk über diese Fragen nach:
+co_finale	Meine Zusammenfassung
+co_stampa	Drucken oder als PDF speichern
+co_nota_sez	Wenn du die Zusammenfassung ausblendest, kann das Kind sie trotzdem selbst unter „Meine Zusammenfassung“ schreiben, mit Hilfe der KI, aber ohne die fertige zu sehen.
+badge_autore	Autor der Zusammenfassung
+badge_autore_d	Du hast die Zusammenfassung eines Kapitels selbst geschrieben.
+orale	Mündliche Abfrage
+or_intro	Erzähl laut, was du gelernt hast, wie in der Schule: Ich höre zu, sage dir, was gut war, was zu verbessern ist und was du vergessen hast, und stelle dir ein paar Fragen. Ich bewerte nur den Inhalt, nicht wie du sprichst.
+or_parte	Wozu möchtest du abgefragt werden?
+or_tutto	Das ganze Kapitel
+or_inizia	Abfrage starten
+or_nota_it	Die Spracherkennung hört auf Italienisch zu.
+or_privacy	Achtung: Um die Stimme in Text umzuwandeln, kann der Browser die Aufnahme an seinen Hersteller senden (zum Beispiel Google oder Microsoft); der Text geht an den KI-Dienst, den die Eltern gewählt haben. Du kannst die Antwort auch schreiben.
+or_nomic	Die Spracherkennung ist auf diesem Gerät oder in diesem Browser nicht verfügbar: Du kannst die Antwort schreiben.
+or_mic_negato	Das Mikrofon ist nicht erlaubt: Schalte es in den Browser-Einstellungen ein oder schreib die Antwort.
+or_prima	Erzähl mir: {t}. Wenn du bereit bist, drücke „Sprechen“.
+or_parla	Sprechen
+or_ho_finito	Ich bin fertig
+or_annulla	Abbrechen
+or_scrivi	Schreiben statt sprechen
+or_riascolta	Noch einmal anhören
+or_ascolto_t	Ich höre dir zu… Wenn du fertig bist, drücke „Ich bin fertig“.
+or_rivedi_t	Das habe ich verstanden. Du kannst den Text vor dem Absenden verbessern.
+or_invia	Antwort senden
+or_aggiungi	Noch etwas dazusagen
+or_cancella	Löschen und neu versuchen
+or_attesa	Ich bewerte deine Antwort…
+or_poco	Sag oder schreib noch etwas mehr.
+or_turno	Antwort {n} von {m}
+or_giusto	Gut gesagt:
+or_correggi	Zu verbessern:
+or_manca	Denk auch an:
+or_esito_ottimo	Sehr gut!
+or_esito_bene	Gut, aber es fehlt noch etwas.
+or_esito_da_rivedere	Noch einmal ansehen: Lies nach und versuch es erneut.
+or_concludi	Abfrage beenden
+or_voce_ai	Stimme der KI
+or_fine_t	Abfrage beendet
+or_risultato	Ergebnis: {p} %
+or_da_ripassare	Zum Wiederholen:
+or_ancora	Neue Abfrage
+badge_oratore	Redner
+badge_oratore_d	Mündliche Abfrage mit mindestens 80 %.
+gi_scegli	Wähle ein Spiel!
+gi_nota_adulto	Die Spiele sprechen: Mach den Ton lauter. Sie nutzen keine KI und kosten nichts.
+gi_n_conta	Zählen
+gi_n_numeri	Die Zahlen
+gi_n_dipiu	Mehr oder weniger
+gi_n_colori	Die Farben
+gi_n_forme	Die Formen
+gi_n_lettere	Die Buchstaben
+gi_n_iniziali	Womit fängt es an?
+gi_n_sequenze	Was kommt danach?
+gi_n_intruso	Was passt nicht?
+gi_d_conta	Wie viele sind es?
+gi_d_numeri	Tippe auf die Zahl {n}
+gi_d_piu	Wo sind mehr?
+gi_d_meno	Wo sind weniger?
+gi_d_colore	Tippe auf die Farbe {c}
+gi_d_forma	Tippe auf {f}
+gi_d_lettera	Tippe auf den Buchstaben {l}
+gi_d_iniziale	Mit welchem Buchstaben fängt {p} an?
+gi_d_sequenza	Was kommt danach?
+gi_d_intruso	Was passt nicht dazu?
+gi_c_rosso	Rot
+gi_c_blu	Blau
+gi_c_giallo	Gelb
+gi_c_verde	Grün
+gi_c_arancione	Orange
+gi_c_viola	Lila
+gi_c_rosa	Rosa
+gi_c_marrone	Braun
+gi_c_nero	Schwarz
+gi_f_cerchio	den Kreis
+gi_f_quadrato	das Quadrat
+gi_f_triangolo	das Dreieck
+gi_f_rettangolo	das Rechteck
+gi_f_stella	den Stern
+gi_f_cuore	das Herz
+gi_bravo1	Richtig!
+gi_bravo2	Genau, wie schön!
+gi_bravo3	Ja! Sehr gut gemacht!
+gi_riprova	Versuch es noch einmal!
+gi_fine	Geschafft! Sterne: {n}
+gi_fine_voce	Geschafft! Du hast {n} Sterne bekommen.
+gi_ancora	Noch einmal
+gi_altri	Andere Spiele
+gi_riascolta	Frage noch einmal anhören
+gi_stelle_n	Sterne: {n}
+gi_stat	Spiele (Kindergarten)
+gi_stat_gioco	Spiel
+gi_stat_partite	Runden
+gi_stat_primo	Beim ersten Versuch richtig
+gi_stat_liv	Schwierigkeit
+gi_stat_nota	Die Schwierigkeit steigt von selbst, wenn das Kind wenige Fehler macht, und sinkt, wenn es sich schwertut.
+tour_titolo	Anleitung
+tour_btn	So funktioniert es
+tour_avanti	Weiter
+tour_indietro	Zurück
+tour_salta	Überspringen
+tour_fine	Verstanden
+tour_altrove	Die Anleitung öffnet sich auf der Startseite, in einem Fach, in einem Kapitel und im Elternbereich.
+tour_brand	Das ist AI.st.ain: Tippe darauf, um immer zur Startseite zurückzukehren.
+tour_testo	Mit A− und A+ machst du den Text kleiner oder größer. (Tipp: Das gilt für die ganze App.)
+tour_aspetto	Tipp: Hier änderst du Design, Schrift, Abstände, Geschwindigkeit und Vorlesestimme. Du kannst auch eine natürlichere italienische Stimme herunterladen, die ohne Internet funktioniert.
+tour_addmat	Füge zuerst deine Fächer hinzu: Tippe unten auf einen Namen oder schreib einen eigenen.
+tour_mat	Jedes Kästchen ist ein Fach: Öffne es, um Kapitel und Übungen hinzuzufügen.
+tour_gen	Der Elternbereich (mit PIN) dient dazu, die KI zu verbinden, für jedes Kind Funktionen auszublenden, die Statistiken anzusehen und Sicherungskopien zu machen.
+tour_ancora	Wenn du diese Anleitung noch einmal sehen willst, tippe auf das Fragezeichen.
+tour_nuovocap	Fang hier an: Fotografiere die Seiten des Kapitels (auch viele). AI.st.ain erstellt Zusammenfassung, Gliederung, Karte, Erklärungen und Test. Das dauert ein paar Minuten: Lass die Seite offen.
+tour_nuovoes	Fotografiere eine Aufgabe: Du wirst Schritt für Schritt geführt, ohne die Lösung zu bekommen.
+tour_controllo	Hast du eine Aufgabe schon gelöst? Fotografiere sie und lass deinen Lösungsweg prüfen.
+tour_tabs	Die Reiter des Kapitels: Jeder ist eine andere Art, dasselbe Thema zu lernen. Fang mit dem ersten links an und geh nach rechts weiter.
+tour_ascolta	Mit dieser Taste wird dir das Kapitel vorgelesen.
+tour_figlio	Hier legst du das Profil eines Kindes an: Stufe, Lernhilfen und PIN.
+tour_fam	In den Familieneinstellungen verbindest du den KI-Dienst und wählst die Sprache.
+tour_priv	Tipp: Hier siehst du, was auf dem Gerät bleibt und was an externe Dienste gesendet wird.
+tour_backup	Tipp: Speichere ab und zu eine Sicherungskopie. Wenn du das Gerät wechselst, stellst du sie hier wieder her.
+dsaq_promo_t	Verstehen, wie du am besten lernst
+dsaq_promo	Ein Fragebogen von etwa 3 Minuten zu Anzeichen, die auf eine Lernstörung hindeuten können. Er ist keine Diagnose: Er hilft nur zu verstehen, ob eine Abklärung sinnvoll ist und welche Hilfen man ausprobieren kann.
+dsaq_promo_btn	Fragebogen ausfüllen
+dsaq_titolo	Fragebogen zu Anzeichen einer Lernstörung
+dsaq_non_diag	Das ist kein Diagnosetest und ersetzt nicht die Untersuchung durch eine Fachperson.
+dsaq_intro	Die Sätze handeln von der Person, die lernt: Antworte selbst oder gemeinsam mit einem Elternteil. Denk an die letzten 6 Monate und daran, wie es trotz Anstrengung läuft. Es sind 24 Fragen in 4 Teilen.
+dsaq_priv	Die Antworten bleiben auf diesem Gerät: Sie werden weder gespeichert noch an jemanden gesendet.
+dsaq_inizia	Starten
+dsaq_chiudi	Schließen
+dsaq_avanti	Weiter
+dsaq_indietro	Zurück
+dsaq_fine	Ergebnis ansehen
+dsaq_pag	Teil {i} von {n}
+dsaq_scala	Wie oft kommt das vor?
+dsaq_mai	Nie oder fast nie
+dsaq_volte	Manchmal
+dsaq_spesso	Oft
+dsaq_tutte	Beantworte alle Fragen, um weiterzumachen.
+dsaq_risultato	Ergebnis
+dsaq_res_0	Wenige Anzeichen
+dsaq_res_1	Einige Anzeichen
+dsaq_res_2	Viele Anzeichen
+dsaq_esito_ok	Aus den Antworten ergeben sich keine besonderen Anzeichen. Wenn du Schwierigkeiten siehst, die lange anhalten, kannst du den Fragebogen später wiederholen oder mit einer Lehrkraft sprechen.
+dsaq_esito_si	Bei den Bereichen mit mehr Anzeichen kann eine Abklärung sinnvoll sein: Sprich mit dem Kinderarzt oder mit der Schule. Eine Lernstörung kann nur ein Fachteam feststellen (Kinder- und Jugendpsychiatrie, Psychologie). In der Zwischenzeit kannst du die Hilfen der App probeweise einschalten: Du kannst sie jederzeit wieder ausschalten.
+dsaq_piccoli	Vor dem Ende der 2.–3. Klasse ist eine Diagnose meist noch nicht möglich: Die Anzeichen müssen über längere Zeit beobachtet werden.
+dsaq_altre_cause	Auch Sehen oder Hören, Müdigkeit, Angst oder das Lernen in einer fremden Sprache können ähnliche Anzeichen hervorrufen.
+dsaq_attiva	Vorgeschlagene Hilfen probeweise einschalten
+dsaq_attivati	Hilfen ausgewählt: Prüfe und speichere das Profil.
+dq_dislessia_1	Liest viel langsamer oder mühsamer als andere.
+dq_dislessia_2	Überspringt beim Lesen Wörter oder Zeilen oder verliert die Stelle.
+dq_dislessia_3	Verwechselt ähnliche Buchstaben (b/d, p/q, m/n) oder vertauscht Silben.
+dq_dislessia_4	Kann sich nach dem Lesen eines Textes schwer erinnern, was darin stand.
+dq_dislessia_5	Vermeidet lautes Vorlesen oder wird dabei unruhig.
+dq_dislessia_6	Das Lernen mit langen Texten ermüdet viel stärker als bei anderen.
+dq_disortografia_1	Macht viele Rechtschreibfehler, auch bei einfachen, bekannten Wörtern.
+dq_disortografia_2	Schreibt dasselbe Wort im selben Text auf verschiedene Weise.
+dq_disortografia_3	Vergisst oder verwechselt Akzente, Apostrophe, Doppelbuchstaben und h.
+dq_disortografia_4	Lässt beim Schreiben Buchstaben oder Silben aus, fügt welche hinzu oder vertauscht sie.
+dq_disortografia_5	Bemerkt beim Durchlesen die eigenen Fehler nicht.
+dq_disortografia_6	Beim Diktat läuft es viel schlechter als beim freien Schreiben.
+dq_disgrafia_1	Die Handschrift ist schwer lesbar oder sehr unregelmäßig.
+dq_disgrafia_2	Schreibt langsam und ermüdet schnell.
+dq_disgrafia_3	Hält den Stift sehr fest, und nach kurzer Zeit tut die Hand weh.
+dq_disgrafia_4	Schiefe Zeilen, unregelmäßige Abstände, unterschiedlich große Buchstaben.
+dq_disgrafia_5	Abschreiben von der Tafel oder aus dem Buch ist langsam und voller Fehler.
+dq_disgrafia_6	Vermeidet das Schreiben mit der Hand und bevorzugt deutlich den Computer.
+dq_discalculia_1	Kann sich das Einmaleins und einfache Rechnungen (zum Beispiel 7+8) schwer merken.
+dq_discalculia_2	Zählt auch bei einfachen Rechnungen noch mit den Fingern oder im Kopf ab.
+dq_discalculia_3	Verwechselt die Zeichen (+ − × ÷), schreibt Zahlen falsch untereinander oder vertauscht sie.
+dq_discalculia_4	Hat Schwierigkeiten mit Uhr, Kalender, Maßen oder Geld.
+dq_discalculia_5	Verliert bei Aufgaben mit mehreren Schritten den Faden.
+dq_discalculia_6	Verrechnet sich, obwohl der Lösungsweg verstanden wurde.
+mappa_full	Vollbild
+mappa_chiudi	Schließen
+met_titolo	Meine Lernmethode
+met_pochi	Ich habe bei {n} Tests notiert, wie du gelernt hast. Nach ein paar weiteren Tests zeige ich dir, welche Lernwege für dich am besten funktionieren.
+met_riga	Mit {m}: im Schnitt {a} % ({na} Tests), ohne: {b} % ({nb} Tests)
+met_nessuno	Bisher sticht kein Lernweg hervor: Mach weiter so und probiere Verschiedenes aus.
+met_cautela	Es sind wenige Daten, und auch die Schwierigkeit des Themas zählt: Sieh es als Hinweis, nicht als Regel.
+esp_t	Kleines Experiment:
+esp_prop	Probiere vor dem nächsten Test {m} aus, dann vergleichen wir das Ergebnis.
+esp_accetta	Ich nehme die Herausforderung an
+esp_corso	Experiment läuft: Nutze vor dem nächsten Test {m}.
+esp_annulla	Lieber nicht
+esp_esito	Experiment: Mit {m} hast du {p} % erreicht (vorher im Schnitt {b} %).
+esp_v_su	Das scheint dir zu helfen!
+esp_v_giu	Diesmal hat es nicht geholfen: Du kannst etwas anderes probieren.
+esp_v_pari	Fast gleich: Es braucht weitere Versuche.
+come_t	Wie hast du gelernt?
+come_nota	Kreuze an, was du zur Vorbereitung auf diesen Test benutzt hast (was die App schon gesehen hat, ist bereits markiert). So erkennen wir, welche Lernwege für dich am besten funktionieren.
+come_ok	Test starten
+come_salta	Überspringen
+met_riassunto	die Zusammenfassung
+met_schema	die Gliederung
+met_mappa	die Karte
+met_spiegazioni	die Erklärungen
+met_glossario	das Glossar
+met_costruisci	das Schreiben meiner Zusammenfassung
+met_pratica	das Training
+met_orale	die mündliche Abfrage
+met_ascolto	das Anhören des Kapitels
+met_libro	das Buch oder meine Notizen
+met_insieme	das Lernen mit jemandem
+met_set_t	Hilfe, die eigene Lernmethode zu finden (freiwillig)
+met_set_nota	Du kannst abschalten, was dir zu aufdringlich erscheint. Die Informationen bleiben auf dem Gerät.
+met_set_chiedi	Vor einem Test fragen: „Wie hast du gelernt?“
+met_set_confronto	Zeigen, welche Lernwege am besten funktionieren (Vergleich mit den Testergebnissen)
+met_set_esp	Kleine Experimente vorschlagen (einen neuen Lernweg ausprobieren)
+vn_titolo	Natürliche Stimme (Italienisch)
+vn_desc	Eine viel natürlichere italienische Stimme, kostenlos. Sie wird nur einmal heruntergeladen (etwa 95 MB: am besten über WLAN) und funktioniert dann auch ohne Internet. Alles bleibt auf dem Gerät: Es wird nichts an irgendjemanden gesendet.
+vn_scarica	Natürliche Stimme herunterladen
+vn_scarico	Stimme wird geladen… {p} %
+vn_usa	Natürliche Stimme verwenden
+vn_ok	Stimme heruntergeladen. Wenn das Gerät langsam oder schwach ist, kannst du sie ausschalten: Dann wird wieder die Systemstimme verwendet.
+vn_elimina	Heruntergeladene Stimme löschen
+vn_errore	Die Stimme konnte nicht heruntergeladen werden. Prüfe die Verbindung und versuch es erneut.
+vn_errore_uso	Die natürliche Stimme startet auf diesem Gerät nicht: Ich verwende die Systemstimme.
+vn_prep	Ich bereite die Stimme vor… Beim ersten Vorlesen dauert es ein paar Sekunden.
+cent	US-Cent
+costi_t	Geschätzte Kosten für die KI
+costi_mese	Diesen Monat: {c} ({n} Anfragen)
+costi_tot	Seit Beginn: {c}
+costi_ultimo	letzte Anfrage: {c}
+costi_nota	Das ist eine Schätzung: Sie zählt nur, was AI.st.ain von diesem Gerät aus bei Claude angefragt hat, mit den Preisen vom {d} (einmal täglich aktualisiert). Das echte Guthaben steht in der Anthropic-Konsole.
+costi_saldo	Echtes Guthaben ansehen
+costi_azzera	Zähler zurücksetzen
+costi_conf	Den Zähler der geschätzten Kosten zurücksetzen?
+tour_benvenuto	Willkommen bei AI.st.ain! Für den Anfang reichen drei Schritte: 1) Füge ein Fach hinzu, 2) öffne es und fotografiere die Seiten eines Kapitels, 3) lerne mit dem ersten Reiter des Kapitels und mach dann den Test. Ich begleite dich: Tippe auf „Weiter“.
+tour_costruisci	„Meine Zusammenfassung“: Schreib mit eigenen Worten, was du verstanden hast, und AI.st.ain sagt dir, was fehlt. Das ist der beste Einstieg ins Lernen.
+tour_ripasso	Tipp: die Wiederholung von heute. Wenige Fragen, die AI.st.ain auswählt, um zu wiederholen, was du sonst vergessen könntest: Ein paar Minuten am Tag genügen.
+tour_traguardi	Tipp: Hier sind deine Punkte und Erfolge. Man bekommt sie durch Tests, Wiederholen und regelmäßiges Lernen.
+tour_metodo_home	Tipp: AI.st.ain beobachtet, mit welchen Reitern du am besten zurechtkommst (Zusammenfassung, Karte, Gliederung…), und schlägt dir vor, wie du lernen kannst. Die Eltern können das ausschalten.
+tour_testtab	Tipp: der Abschlusstest. Fragen in Stufen mit immer neu gemischten Antworten: Wenn es gut läuft, steigt die Schwierigkeit.
+tour_mappatab	Tipp: die Begriffskarte. Du kannst sie verschieben, vergrößern, bearbeiten und auch drucken.
+tour_oraletab	Tipp: die mündliche Abfrage. Sie bereitet dich darauf vor, das Thema laut zu erzählen, wie in der Schule, und gibt dir eine Rückmeldung.
+tour_pratica	Tipp: das Training. Übungen, um das Gelernte anzuwenden.
+tour_modfiglio	Mit „Bearbeiten“ änderst du alles an einem Profil: Stufe, Hilfen bei Lernstörungen, welche Bereiche ausgeblendet werden (zum Beispiel Zusammenfassung oder mündliche Abfrage), Lernmethode und PIN.
+tour_stat	Die Statistiken des Kindes: Testergebnisse, Themen zum Festigen, Wiederholungen und bevorstehende Prüfungen. Man kann sie auch drucken.
+tour_costi	Tipp: die geschätzten Kosten für die KI. Sie zeigen, was die Anfragen dieser App kosten; das echte Guthaben steht in der Anthropic-Konsole.
+tour_s_nome	Name und Schulstufe: Die Stufe passt Sprache, Tests und Aussehen an. Der Name bleibt auf dem Gerät und wird nie an die KI gesendet.
+tour_s_dsa	Die Hilfen bei Lernstörungen (Legasthenie, Rechtschreibstörung, Dysgrafie, Dyskalkulie): Wenn du sie einschaltest, werden Erklärungen und Texte angepasst. Bei Zweifeln gibt es einen Fragebogen zur Orientierung (keine Diagnose).
+tour_s_sez	Hier wählst du, was das Kind in jedem Kapitel sieht: Zusammenfassung, Gliederung, Karte, Erklärungen, Glossar, „Meine Zusammenfassung“, Training, mündliche Abfrage. Entferne das Häkchen, um etwas auszublenden; den Test gibt es immer. Wenn du die Zusammenfassung ausblendest, beginnt man mit „Meine Zusammenfassung“.
+tour_s_met	Tipp: die Lernmethode. AI.st.ain kann fragen, wie gelernt wurde, die Ergebnisse vergleichen und kleine Experimente vorschlagen. Hier schaltest du das ein oder aus.
+tour_s_col	Tipp: Die Farben in der Zusammenfassung helfen, Begriffe, Daten und Zahlen sowie Namen zu unterscheiden.
+tour_s_pin	Tipp: Die PIN des Kindes (freiwillig) ist nützlich, wenn Geschwister die Arbeit der anderen nicht sehen sollen. Du kannst immer jedes Profil öffnen.
+tour_s_voce	Tipp: die Vorlesestimme. Mit „Natürliche Stimme“ lädst du eine natürlichere italienische Stimme herunter, die auch ohne Internet funktioniert.
+tour_stat_corpo	Hier unten findest du die Testergebnisse, den Durchschnitt, die schwächsten Themen und die gemachten Wiederholungen.
+tour_stat_stampa	Mit „Drucken“ bekommst du die Seite zum Mitnehmen in ein Gespräch oder zum Aufbewahren.
+guida_chiave	So bekommst du den API-Schlüssel (Anleitung mit Bildern)
+err_chiave	Der API-Schlüssel ist ungültig: Kopiere ihn noch einmal aus der Konsole, ohne Leerzeichen davor oder danach, oder erstelle einen neuen (siehe Anleitung in den Familieneinstellungen).
+err_credito	Das Guthaben in der Konsole ist aufgebraucht (oder wurde noch nicht hinzugefügt): Lade es auf und versuch es erneut.
+err_permesso	Der Schlüssel darf dieses Modell nicht verwenden. Prüfe den Schlüssel und den Namen des Modells.
+err_modello	Das angegebene Modell gibt es nicht. Lass das Feld „Modell“ leer, um das empfohlene zu verwenden.
+err_limite	Zu viele Anfragen in kurzer Zeit: Warte eine Minute und versuch es erneut.
+err_occupato	Der Dienst von Claude ist gerade ausgelastet: Versuch es in ein paar Minuten erneut.
+err_rete	Ich kann den Dienst nicht erreichen: Prüfe die Internetverbindung und versuch es erneut.
+err_formato	Die Schlüssel von Claude beginnen mit „sk-ant-“: Prüfe, ob du den richtigen kopiert hast.
+upd_txt	Es gibt eine neue Version von AI.st.ain.
+upd_ora	Jetzt aktualisieren
+upd_dopo	Später
+bk_t	Speichere eine Kopie deiner Daten
+bk_txt	Die Kapitel und Ergebnisse liegen nur auf diesem Gerät: Wenn du das Handy wechselst oder die Browserdaten löschst, gehen sie verloren. Speichere eine Kopie (bitte bei Bedarf einen Elternteil) und bewahre sie sicher auf.
+bk_dopo	Später
+ai_sbaglia	Zusammenfassungen und Erklärungen erstellt die KI, die sich irren kann: Sieh im Zweifel im Buch nach.
+es_trovati	Ich habe {n} Aufgaben gefunden
+es_scegli_da	Kreuze an, welche du jetzt machen willst (auch alle): Wir machen sie nacheinander, in der Reihenfolge des Buches.
+es_tutti	Alle auswählen
+es_nessuno	Auswahl aufheben
+es_num	Aufgabe {n}
+es_guidami_n	Führe mich durch die gewählten Aufgaben ({n})
+es_scegli_almeno	Kreuze mindestens eine Aufgabe an.
+es_prog	Aufgabe {i} von {n}
+es_prossimo	Weiter: Aufgabe {n}
+fb_giusto	Richtige Antwort!
+fb_quasi	Fast geschafft.
+fb_rivedi	Noch nicht richtig.
+ts_occupato	Der Dienst ist ausgelastet: Ich versuche es mit einem anderen Modell…
+ts_foto	Füge mindestens ein Foto hinzu.
+ts_foto_es	Füge das Foto der Aufgabe hinzu.
+ts_idea	Schreib zuerst deine Idee, auch wenn sie noch nicht fertig ist.
+ts_mat_nome	Schreib den Namen des Fachs.
+ts_mat_gia	Dieses Fach gibt es schon.
+ts_stampa	Drucken ist nicht verfügbar.
+ts_nodo_vuoto	Der Text des Knotens darf nicht leer sein.
+ts_nodo_nuovo	Schreib den Text des neuen Knotens.
+ts_nodi_max	Die Karte hat schon 60 Knoten: Das ist das Maximum.
+ts_nodi_gia	Diese beiden Knoten sind schon verbunden.
+ts_mappa_piccola	Die Karte der KI war zu klein: Ich habe sie aus der Gliederung erstellt.
+ts_demo_no	Im Demo-Modus lässt sich das nicht abschließen.
+ts_foto_err	Ein Foto lässt sich nicht öffnen:
+ts_non_riuscito	Das hat nicht geklappt:

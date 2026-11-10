@@ -1,0 +1,363 @@
+tema_solo_elem	À l’école primaire, il y a le thème Jeu.
+tema_dalle_medie	À partir du collège, tu peux choisir entre Calme et Nuit.
+aspetto_auto_nota	L’apparence s’adapte toute seule aux troubles « dys » choisis. Sans trouble, la police et les espacements restent standard. Tu peux la changer à la main quand tu veux.
+aspetto_ripristina	Rétablir les réglages conseillés
+mappa_trascina	Fais glisser les cases et les étiquettes des liens avec le doigt ou la souris. Sinon, choisis un nœud et utilise les flèches ci-dessous.
+mappa_muovi	Déplacer le nœud choisi
+mappa_riordina	Réorganiser automatiquement
+mappa_stampa	Imprimer la carte
+pratica	Entraînement
+pr_vuota	Ici tu trouves des exercices pour t’entraîner sur les sujets du chapitre, inspirés de ceux du livre mais avec des données différentes.
+pr_crea	Créer les exercices
+pr_altri	Autres exercices
+pr_aiuto	Écris ta réponse et appuie sur Vérifier. Si tu es bloqué, demande un indice : la solution n’est jamais donnée.
+pr_n	Exercice {n}
+pr_tua	Ta réponse
+pr_controlla	Vérifier
+pr_indizio	Indice
+pr_dammi_indizio	Donne-moi un indice
+pr_scrivi	Écris d’abord ta réponse.
+livello_test	Niveau {n} · {nome}
+liv_1	Débutant
+liv_2	Moyen
+liv_3	Avancé
+liv_4	Expert
+liv_5	Maître
+test_altre	Autres questions de ce niveau
+test_piu_difficile	Questions plus difficiles
+test_piu_facile	Questions plus faciles
+test_sali	Passe au niveau {n} : {nome}
+preparo_domande	Je prépare de nouvelles questions…
+serve_chiave_ai	Cette fonction a besoin de la clé IA : le parent la saisit dans Espace parents › Réglages.
+traguardi	Tes réussites
+n_punti	{n} points
+verso_rango	Encore {n} points pour devenir {r}
+rango_max	Tu as atteint le grade le plus élevé : bravo !
+rango_0	Curieux
+rango_1	Studieux
+rango_2	Scientifique
+rango_3	Génie
+punti_guadagnati	+{n} points
+nuovo_rango	Nouveau grade : {r} !
+nuovo_badge	Nouvelle réussite : {b}
+badge_primo	Premier test
+badge_primo_d	Tu as terminé ton premier test.
+badge_dieci	Dix tests
+badge_dieci_d	Tu as terminé 10 tests.
+badge_perfetto	Tout juste
+badge_perfetto_d	Un test sans erreur.
+badge_liv3	Niveau Avancé
+badge_liv3_d	Au moins 80 % au niveau 3.
+badge_liv5	Maître
+badge_liv5_d	Au moins 80 % au niveau 5.
+badge_allenato	Bien entraîné
+badge_allenato_d	5 exercices d’entraînement résolus.
+acronimo	Aide intelligente pour l’étude, l’autonomie et l’inclusion
+costruisci	Mon résumé
+co_intro	Construis le résumé toi-même, un paragraphe à la fois. Lis le paragraphe dans le livre et écris avec tes mots : je te dirai ce que tu as déjà saisi et ce qu’il vaut mieux revoir, sans l’écrire à ta place.
+co_metodo_t	La méthode en 4 étapes
+co_m1	Lis le paragraphe en entier.
+co_m2	Souligne 3 à 5 mots-clés : noms, dates, notions.
+co_m3	Ferme le livre et écris 1 à 3 phrases avec tes mots.
+co_m4	Vérifie et corrige.
+co_avanz	Paragraphes terminés : {a} sur {n}
+co_chiave	Mes mots-clés
+co_tuo	Mon résumé du paragraphe
+co_controlla	Vérifier
+co_aiuto	Je ne sais pas par où commencer
+co_aiuto_t	Essaie de répondre à voix haute, puis écris-le :
+co_aiuto_txt	De quoi parle « {t} » ? Quelle est la chose la plus importante à retenir ? Comment l’expliquerais-tu à un ami en deux phrases ?
+co_scrivi	Écris d’abord au moins une phrase avec tes mots.
+co_va_bene	C’est bien comme ça
+co_esito_completo	Très bien : tu as saisi les idées principales !
+co_esito_quasi	Tu y es presque.
+co_esito_da_rivedere	Relis le paragraphe et réessaie.
+co_pensa	Réfléchis à ces questions :
+co_finale	Mon résumé
+co_stampa	Imprimer ou enregistrer en PDF
+co_nota_sez	Si tu masques le résumé, l’élève peut quand même le construire lui-même dans « Mon résumé », avec l’aide de l’IA mais sans voir celui qui est déjà prêt.
+badge_autore	Auteur du résumé
+badge_autore_d	Tu as construit toi-même le résumé d’un chapitre.
+orale	Interrogation orale
+or_intro	Redis à voix haute ce que tu as étudié, comme à l’école : je t’écoute, je te dis ce que tu as bien dit, ce qu’il faut corriger et ce que tu as oublié, et je te pose quelques questions. J’évalue seulement le contenu, pas ta façon de parler.
+or_parte	Sur quoi veux-tu être interrogé ?
+or_tutto	Tout le chapitre
+or_inizia	Commencer l’interrogation
+or_nota_it	La reconnaissance vocale écoute en italien.
+or_privacy	Attention : pour transcrire la voix, le navigateur peut envoyer l’audio à son éditeur (par exemple Google ou Microsoft) ; le texte transcrit est envoyé au service d’IA choisi par le parent. Tu peux aussi écrire la réponse.
+or_nomic	La reconnaissance vocale n’est pas disponible sur cet appareil ou ce navigateur : tu peux écrire la réponse.
+or_mic_negato	Le micro n’est pas autorisé : active-le dans les réglages du navigateur ou écris la réponse.
+or_prima	Raconte-moi : {t}. Quand tu es prêt, appuie sur « Parler ».
+or_parla	Parler
+or_ho_finito	J’ai fini
+or_annulla	Annuler
+or_scrivi	Écrire au lieu de parler
+or_riascolta	Réécouter
+or_ascolto_t	Je t’écoute… quand tu as fini, appuie sur « J’ai fini ».
+or_rivedi_t	Voici ce que j’ai compris. Tu peux corriger le texte avant de l’envoyer.
+or_invia	Envoyer la réponse
+or_aggiungi	Ajouter quelque chose à voix haute
+or_cancella	Effacer et réessayer
+or_attesa	J’évalue ta réponse…
+or_poco	Dis ou écris un peu plus.
+or_turno	Réponse {n} sur {m}
+or_giusto	Bien dit :
+or_correggi	À corriger :
+or_manca	Pense aussi à :
+or_esito_ottimo	Très bien !
+or_esito_bene	Bien, mais on peut compléter.
+or_esito_da_rivedere	À revoir : relis et réessaie.
+or_concludi	Terminer l’interrogation
+or_voce_ai	Voix de l’IA
+or_fine_t	Interrogation terminée
+or_risultato	Résultat : {p} %
+or_da_ripassare	À réviser :
+or_ancora	Nouvelle interrogation
+badge_oratore	Orateur
+badge_oratore_d	Interrogation orale avec au moins 80 %.
+gi_scegli	Choisis un jeu !
+gi_nota_adulto	Les jeux parlent : monte le son. Ils n’utilisent pas l’IA et ne coûtent rien.
+gi_n_conta	Compter
+gi_n_numeri	Les nombres
+gi_n_dipiu	Plus ou moins
+gi_n_colori	Les couleurs
+gi_n_forme	Les formes
+gi_n_lettere	Les lettres
+gi_n_iniziali	Ça commence par… ?
+gi_n_sequenze	Qu’est-ce qui vient après ?
+gi_n_intruso	Trouve l’intrus
+gi_d_conta	Combien y en a-t-il ?
+gi_d_numeri	Touche le nombre {n}
+gi_d_piu	Où y en a-t-il le plus ?
+gi_d_meno	Où y en a-t-il le moins ?
+gi_d_colore	Touche la couleur {c}
+gi_d_forma	Touche {f}
+gi_d_lettera	Touche la lettre {l}
+gi_d_iniziale	Par quelle lettre commence {p} ?
+gi_d_sequenza	Qu’est-ce qui vient après ?
+gi_d_intruso	Quel est l’intrus ?
+gi_c_rosso	rouge
+gi_c_blu	bleu
+gi_c_giallo	jaune
+gi_c_verde	vert
+gi_c_arancione	orange
+gi_c_viola	violet
+gi_c_rosa	rose
+gi_c_marrone	marron
+gi_c_nero	noir
+gi_f_cerchio	le cercle
+gi_f_quadrato	le carré
+gi_f_triangolo	le triangle
+gi_f_rettangolo	le rectangle
+gi_f_stella	l’étoile
+gi_f_cuore	le cœur
+gi_bravo1	C’est juste !
+gi_bravo2	Exact, c’est super !
+gi_bravo3	Oui ! Très beau travail !
+gi_riprova	Essaie encore !
+gi_fine	C’est fini ! Étoiles : {n}
+gi_fine_voce	C’est fini ! Tu as gagné {n} étoiles.
+gi_ancora	Encore
+gi_altri	Autres jeux
+gi_riascolta	Réécouter la question
+gi_stelle_n	Étoiles : {n}
+gi_stat	Jeux (école maternelle)
+gi_stat_gioco	Jeu
+gi_stat_partite	Parties
+gi_stat_primo	Juste du premier coup
+gi_stat_liv	Difficulté
+gi_stat_nota	La difficulté augmente toute seule quand l’enfant fait peu d’erreurs et baisse s’il a du mal.
+tour_titolo	Guide d’utilisation
+tour_btn	Comment ça marche
+tour_avanti	Suivant
+tour_indietro	Retour
+tour_salta	Passer
+tour_fine	J’ai compris
+tour_altrove	Le guide s’ouvre depuis la page d’accueil, une matière, un chapitre et l’espace parents.
+tour_brand	Voici AI.st.ain : touche-le pour revenir à tout moment à la page d’accueil.
+tour_testo	Avec A− et A+, tu réduis ou agrandis le texte. (Conseil : cela vaut pour toute l’appli.)
+tour_aspetto	Conseil : ici tu changes le thème, la police, les espacements, la vitesse et la voix de lecture. Tu peux aussi télécharger une voix italienne plus naturelle, qui fonctionne sans connexion.
+tour_addmat	Pour commencer, ajoute tes matières : touche un nom ci-dessous ou écris-en un.
+tour_mat	Chaque case est une matière : ouvre-la pour ajouter des chapitres et des exercices.
+tour_gen	L’espace parents (avec code PIN) sert à connecter l’IA, à choisir les fonctions à masquer pour chaque enfant, à voir les statistiques et à faire les copies de sauvegarde.
+tour_ancora	Si tu veux revoir ce guide, touche le point d’interrogation.
+tour_nuovocap	Commence ici : photographie les pages du chapitre (même beaucoup). AI.st.ain prépare résumé, plan, carte, explications et test. Cela prend quelques minutes : laisse la page ouverte.
+tour_nuovoes	Photographie un exercice : tu es guidé pas à pas, sans que la solution soit donnée.
+tour_controllo	Tu as déjà fait un exercice ? Photographie-le et fais vérifier ton raisonnement.
+tour_tabs	Les onglets du chapitre : chacun est une façon différente d’étudier le même sujet. Commence par le premier à gauche et avance vers la droite.
+tour_ascolta	Avec ce bouton, le chapitre t’est lu à voix haute.
+tour_figlio	Ici tu ajoutes le profil d’un enfant : niveau, aides pour l’étude et code PIN.
+tour_fam	Dans les réglages de la famille, tu connectes le service d’IA et tu choisis la langue.
+tour_priv	Conseil : ici tu vois ce qui reste sur l’appareil et ce qui est envoyé aux services externes.
+tour_backup	Conseil : enregistre de temps en temps une copie de sauvegarde. Si tu changes d’appareil, tu la restaures ici.
+dsaq_promo_t	Comprendre comment tu étudies le mieux
+dsaq_promo	Un questionnaire d’environ 3 minutes sur les signes qui peuvent faire penser à un trouble « dys ». Ce n’est pas un diagnostic : il sert seulement à savoir s’il vaut la peine d’approfondir et quelles aides essayer.
+dsaq_promo_btn	Faire le questionnaire
+dsaq_titolo	Questionnaire sur les signes de troubles « dys »
+dsaq_non_diag	Ce n’est pas un test de diagnostic et il ne remplace pas l’évaluation d’un spécialiste.
+dsaq_intro	Les phrases parlent de la personne qui étudie : réponds toi-même ou avec un parent. Pense aux 6 derniers mois et à ce qui se passe malgré les efforts. Il y a 24 questions, réparties en 4 parties.
+dsaq_priv	Les réponses restent sur cet appareil : elles ne sont ni enregistrées ni envoyées à qui que ce soit.
+dsaq_inizia	Commencer
+dsaq_chiudi	Fermer
+dsaq_avanti	Suivant
+dsaq_indietro	Retour
+dsaq_fine	Voir le résultat
+dsaq_pag	Partie {i} sur {n}
+dsaq_scala	À quelle fréquence ?
+dsaq_mai	Jamais ou presque jamais
+dsaq_volte	Parfois
+dsaq_spesso	Souvent
+dsaq_tutte	Réponds à toutes les questions pour continuer.
+dsaq_risultato	Résultat
+dsaq_res_0	Peu de signes
+dsaq_res_1	Quelques signes
+dsaq_res_2	Beaucoup de signes
+dsaq_esito_ok	Les réponses ne montrent pas de signes particuliers. Si tu vois des difficultés qui durent, tu peux refaire le questionnaire plus tard ou en parler à un enseignant.
+dsaq_esito_si	Pour les domaines avec le plus de signes, un approfondissement peut valoir la peine : parles-en au pédiatre ou à l’école. Seule une équipe spécialisée (pédopsychiatre, psychologue, orthophoniste) peut diagnostiquer un trouble « dys ». En attendant, tu peux activer à l’essai les aides de l’appli : tu les retires quand tu veux.
+dsaq_piccoli	Avant la fin de la 2ᵉ ou 3ᵉ année d’école primaire, un diagnostic n’est en général pas encore possible : les signes doivent être observés dans la durée.
+dsaq_altre_cause	La vue ou l’audition, la fatigue, l’anxiété ou le fait d’étudier dans une langue qui n’est pas la sienne peuvent aussi donner des signes semblables.
+dsaq_attiva	Activer à l’essai les aides suggérées
+dsaq_attivati	Aides sélectionnées : vérifie et enregistre le profil.
+dq_dislessia_1	Lit beaucoup plus lentement ou avec plus d’effort que les autres.
+dq_dislessia_2	En lisant, saute des mots ou des lignes, ou se perd.
+dq_dislessia_3	Confond des lettres proches (b/d, p/q, m/n) ou inverse les syllabes.
+dq_dislessia_4	Après avoir lu un texte, a du mal à se rappeler ce qu’il disait.
+dq_dislessia_5	Évite de lire à voix haute ou s’agite quand il faut le faire.
+dq_dislessia_6	Étudier sur de longs textes fatigue beaucoup plus que les autres.
+dq_disortografia_1	Fait beaucoup de fautes d’orthographe, même dans des mots simples et connus.
+dq_disortografia_2	Écrit le même mot de façons différentes dans le même texte.
+dq_disortografia_3	Oublie ou se trompe dans les accents, les apostrophes, les doubles consonnes et le h.
+dq_disortografia_4	En écrivant, oublie, ajoute ou échange des lettres ou des syllabes.
+dq_disortografia_5	En se relisant, ne remarque pas ses propres erreurs.
+dq_disortografia_6	En dictée, c’est bien pire qu’en écriture libre.
+dq_disgrafia_1	L’écriture à la main est peu lisible ou très irrégulière.
+dq_disgrafia_2	Écrit lentement et se fatigue vite.
+dq_disgrafia_3	Serre fort le stylo et a vite mal à la main.
+dq_disgrafia_4	Lignes de travers, espaces irréguliers, lettres de tailles différentes.
+dq_disgrafia_5	Copier depuis le tableau ou le livre est lent et plein d’erreurs.
+dq_disgrafia_6	Évite d’écrire à la main et préfère nettement l’ordinateur.
+dq_discalculia_1	A du mal à retenir les tables de multiplication et les calculs simples (par exemple 7+8).
+dq_discalculia_2	Compte encore sur les doigts ou de tête même pour des calculs simples.
+dq_discalculia_3	Confond les signes (+ − × ÷), aligne mal les nombres ou les inverse.
+dq_discalculia_4	A des difficultés avec l’heure, le calendrier, les mesures ou l’argent.
+dq_discalculia_5	Dans les problèmes à plusieurs étapes, perd le fil.
+dq_discalculia_6	Se trompe dans les calculs même après avoir compris le raisonnement.
+mappa_full	Plein écran
+mappa_chiudi	Fermer
+met_titolo	Ma méthode de travail
+met_pochi	J’ai noté comment tu as étudié pour {n} tests. Après quelques tests de plus, je te montrerai quelles façons d’étudier marchent le mieux pour toi.
+met_riga	Avec {m} : {a} % en moyenne ({na} tests), sans : {b} % ({nb} tests)
+met_nessuno	Pour l’instant, aucune façon d’étudier ne se distingue des autres : continue comme ça et essaie des choses différentes.
+met_cautela	Il y a peu de données et la difficulté du sujet compte aussi : prends-les comme un indice, pas comme une règle.
+esp_t	Petite expérience :
+esp_prop	avant le prochain test, essaie d’utiliser {m}, puis nous comparerons le résultat.
+esp_accetta	Je relève le défi
+esp_corso	Expérience en cours : avant le prochain test, utilise {m}.
+esp_annulla	Laisser tomber
+esp_esito	Expérience : en étudiant avec {m}, tu as obtenu {p} % (avant, en moyenne, {b} %).
+esp_v_su	On dirait que ça t’aide !
+esp_v_giu	Cette fois, ça n’a pas aidé : tu peux essayer autre chose.
+esp_v_pari	Presque pareil : il faut d’autres essais.
+come_t	Comment as-tu étudié ?
+come_nota	Coche ce que tu as utilisé pour préparer ce test (ce que l’appli a déjà vu est déjà coché). Cela sert à comprendre quelles façons d’étudier marchent le mieux pour toi.
+come_ok	Commencer le test
+come_salta	Passer
+met_riassunto	le résumé
+met_schema	le plan
+met_mappa	la carte
+met_spiegazioni	les explications
+met_glossario	le glossaire
+met_costruisci	l’écriture de mon résumé
+met_pratica	l’entraînement
+met_orale	l’interrogation orale
+met_ascolto	l’écoute du chapitre
+met_libro	le livre ou mes notes
+met_insieme	le travail avec quelqu’un
+met_set_t	Aide pour trouver sa propre méthode de travail (facultatif)
+met_set_nota	Tu peux retirer ce que tu trouves trop envahissant. Les informations restent sur l’appareil.
+met_set_chiedi	Avant un test, demander « Comment as-tu étudié ? »
+met_set_confronto	Montrer quelles façons d’étudier marchent le mieux (comparaison avec les résultats des tests)
+met_set_esp	Proposer de petites expériences (essayer une nouvelle façon d’étudier)
+vn_titolo	Voix naturelle (italien)
+vn_desc	Une voix italienne beaucoup plus naturelle, gratuite. Elle se télécharge une seule fois (environ 95 Mo : de préférence en Wi-Fi) et fonctionne ensuite même sans connexion. Tout reste sur l’appareil : rien n’est envoyé à personne.
+vn_scarica	Télécharger la voix naturelle
+vn_scarico	Téléchargement de la voix… {p} %
+vn_usa	Utiliser la voix naturelle
+vn_ok	Voix téléchargée. Si l’appareil est lent ou peu puissant, tu peux la désactiver : la voix du système reviendra.
+vn_elimina	Supprimer la voix téléchargée
+vn_errore	Je n’ai pas réussi à télécharger la voix. Vérifie la connexion et réessaie.
+vn_errore_uso	La voix naturelle ne démarre pas sur cet appareil : j’utilise la voix du système.
+vn_prep	Je prépare la voix… la première lecture prend quelques secondes.
+cent	centimes de $
+costi_t	Dépense estimée pour l’IA
+costi_mese	Ce mois-ci : {c} ({n} requêtes)
+costi_tot	Depuis le début : {c}
+costi_ultimo	dernière requête : {c}
+costi_nota	C’est une estimation : elle compte seulement ce qu’AI.st.ain a demandé à Claude depuis cet appareil, avec les prix du {d} (mis à jour une fois par jour). Le vrai solde est dans la console Anthropic.
+costi_saldo	Voir le vrai solde
+costi_azzera	Remettre le compteur à zéro
+costi_conf	Remettre à zéro le compteur de la dépense estimée ?
+tour_benvenuto	Bienvenue dans AI.st.ain ! Pour commencer, trois étapes suffisent : 1) ajoute une matière, 2) ouvre-la et photographie les pages d’un chapitre, 3) étudie avec le premier onglet du chapitre puis fais le test. Je t’accompagne : touche « Suivant ».
+tour_costruisci	« Mon résumé » : écris avec tes mots ce que tu as compris et AI.st.ain te dit ce qui manque. C’est la meilleure façon de commencer à étudier.
+tour_ripasso	Conseil : la révision du jour. Quelques questions choisies par AI.st.ain pour revoir ce que tu risques d’oublier : quelques minutes par jour suffisent.
+tour_traguardi	Conseil : ici se trouvent tes points et tes réussites. On les gagne en faisant les tests, en révisant et en étudiant régulièrement.
+tour_metodo_home	Conseil : AI.st.ain observe avec quels onglets tu es le plus à l’aise (résumé, carte, plan…) et te suggère comment étudier. Les parents peuvent le désactiver.
+tour_testtab	Conseil : le test final. Des questions par niveaux, avec des réponses toujours mélangées : si tu réussis, la difficulté augmente.
+tour_mappatab	Conseil : la carte mentale. Tu peux la déplacer, l’agrandir, la modifier et aussi l’imprimer.
+tour_oraletab	Conseil : l’oral. Il te prépare à raconter le sujet à voix haute, comme à l’interrogation, et te donne un commentaire.
+tour_pratica	Conseil : l’entraînement. Des exercices pour utiliser ce que tu as étudié.
+tour_modfiglio	Avec « Modifier », tu changes tout dans un profil : niveau, aides pour les troubles « dys », sections à masquer (par exemple résumé ou oral), méthode de travail et code PIN.
+tour_stat	Les statistiques de l’enfant : résultats des tests, sujets à renforcer, révisions et contrôles à venir. On peut aussi les imprimer.
+tour_costi	Conseil : la dépense estimée pour l’IA. Elle montre combien coûtent les requêtes faites par cette appli ; le vrai solde est dans la console Anthropic.
+tour_s_nome	Nom et niveau scolaire : le niveau adapte le langage, les tests et l’apparence. Le nom reste sur l’appareil et n’est jamais envoyé à l’IA.
+tour_s_dsa	Les aides pour les troubles « dys » (dyslexie, dysorthographie, dysgraphie, dyscalculie) : en les activant, les explications et les textes sont adaptés. En cas de doute, il y a un questionnaire d’orientation (ce n’est pas un diagnostic).
+tour_s_sez	Ici tu choisis ce que l’enfant voit dans chaque chapitre : résumé, plan, carte, explications, glossaire, « Mon résumé », entraînement, oral. Décoche pour masquer ; le test est toujours là. Si tu masques le résumé, on commence par « Mon résumé ».
+tour_s_met	Conseil : la méthode de travail. AI.st.ain peut demander comment on a étudié, comparer les résultats et proposer de petites expériences. Ici tu les actives ou les désactives.
+tour_s_col	Conseil : les couleurs dans le résumé aident à distinguer les notions, les dates et les nombres, les noms.
+tour_s_pin	Conseil : le code PIN de l’enfant (facultatif) sert si les frères et sœurs ne doivent pas voir le travail des autres. Toi, tu peux toujours ouvrir chaque profil.
+tour_s_voce	Conseil : la voix de lecture. Avec « Voix naturelle », tu télécharges une voix italienne plus naturelle, qui fonctionne même sans connexion.
+tour_stat_corpo	Ci-dessous tu trouves les résultats des tests, la moyenne, les sujets les plus fragiles et les révisions faites.
+tour_stat_stampa	Avec « Imprimer », tu obtiens la page à apporter à un entretien ou à conserver.
+guida_chiave	Comment obtenir la clé API (guide avec images)
+err_chiave	La clé API n’est pas valide : recopie-la depuis la console sans espace avant ni après, ou crées-en une nouvelle (voir le guide dans les réglages de la famille).
+err_credito	Le crédit sur la console est épuisé (ou n’a pas encore été ajouté) : recharge-le et réessaie.
+err_permesso	La clé n’a pas l’autorisation d’utiliser ce modèle. Vérifie la clé et le nom du modèle.
+err_modello	Le modèle indiqué n’existe pas. Laisse le champ « Modèle » vide pour utiliser celui qui est conseillé.
+err_limite	Trop de requêtes en peu de temps : attends une minute et réessaie.
+err_occupato	Le service de Claude est momentanément occupé : réessaie dans quelques minutes.
+err_rete	Je n’arrive pas à me connecter au service : vérifie la connexion internet et réessaie.
+err_formato	Les clés de Claude commencent par « sk-ant- » : vérifie que tu as copié la bonne.
+upd_txt	Il y a une nouvelle version d’AI.st.ain.
+upd_ora	Mettre à jour maintenant
+upd_dopo	Plus tard
+bk_t	Enregistre une copie de tes données
+bk_txt	Les chapitres et les résultats sont seulement sur cet appareil : si tu changes de téléphone ou effaces les données du navigateur, ils sont perdus. Enregistre une copie (demande à un parent, si besoin) et garde-la en lieu sûr.
+bk_dopo	Plus tard
+ai_sbaglia	Les résumés et les explications sont préparés par l’IA, qui peut se tromper : en cas de doute, vérifie dans le livre.
+es_trovati	J’ai trouvé {n} exercices
+es_scegli_da	Coche ceux que tu veux faire maintenant (même tous) : on les fait un par un, dans l’ordre du livre.
+es_tutti	Tout sélectionner
+es_nessuno	Tout désélectionner
+es_num	Exercice {n}
+es_guidami_n	Guide-moi dans les exercices choisis ({n})
+es_scegli_almeno	Coche au moins un exercice.
+es_prog	exercice {i} sur {n}
+es_prossimo	Suivant : exercice {n}
+fb_giusto	Bonne réponse !
+fb_quasi	Tu y es presque.
+fb_rivedi	Ce n’est pas encore juste.
+ts_occupato	Le service est occupé : j’essaie avec un autre modèle…
+ts_foto	Ajoute au moins une photo.
+ts_foto_es	Ajoute la photo de l’exercice.
+ts_idea	Écris d’abord ton idée, même à moitié.
+ts_mat_nome	Écris le nom de la matière.
+ts_mat_gia	Cette matière existe déjà.
+ts_stampa	L’impression n’est pas disponible.
+ts_nodo_vuoto	Le texte du nœud ne peut pas être vide.
+ts_nodo_nuovo	Écris le texte du nouveau nœud.
+ts_nodi_max	La carte a déjà 60 nœuds : c’est le maximum.
+ts_nodi_gia	Ces deux nœuds sont déjà reliés.
+ts_mappa_piccola	La carte de l’IA était trop petite : j’ai construit celle du plan.
+ts_demo_no	En mode démo, on ne peut pas terminer.
+ts_foto_err	Une photo ne s’ouvre pas :
+ts_non_riuscito	Je n’ai pas réussi :
