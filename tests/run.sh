@@ -5,5 +5,5 @@ cd "$(dirname "$0")/.."
 python3 -m http.server 8766 >/dev/null 2>&1 & SRV=$!
 sleep 1
 export NODE_PATH="$(npm root -g)"
-for t in t14 t26 t33 t36 t37 t39 t40 t41; do echo "== $t"; node tests/$t.js 2>&1 | grep -a "FALLITO\|TUTTO OK\|ERRORI\|Error" ; done
+for t in t14 t26 t33 t36 t37 t39 t40 t41 t43; do echo "== $t"; node tests/$t.js 2>&1 | grep -a "FALLITO\|TUTTO OK\|ERRORI\|Error" ; done
 kill $SRV

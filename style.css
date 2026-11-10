@@ -293,3 +293,24 @@ body[data-liv=universita] *{animation:none!important}
 main#app{display:block}
 .h-es{font-size:1.25rem;line-height:1.4;margin:0 0 8px}
 .st-scroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* v0.43: giochi per la scuola dell'infanzia */
+.gi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.gi-tile{align-items:center;text-align:center;min-height:140px}
+.gi-ico{font-size:2.6rem;line-height:1}
+.gi-card{text-align:center}
+.gi-dire{font-size:1.5rem;margin:0}
+.gi-voce{font-size:1.5rem;min-width:56px;min-height:56px;flex:none}
+.gi-stim{margin:14px 0;font-size:2.6rem;line-height:1.25}
+.gi-gr{display:inline-flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:320px;font-size:2rem;line-height:1.2}
+.gi-big{font-size:3.2rem;line-height:1.1}
+.gi-num{font-size:3rem;line-height:1}
+.gi-opz{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:16px 0 8px}
+.gi-opt{min-width:112px;min-height:112px;padding:10px;border:var(--bw) solid var(--border);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s ease}
+.gi-opt:active{transform:scale(.96)}
+.gi-opt:focus-visible{outline:4px solid var(--accent);outline-offset:3px}
+.gi-opt.giusta{background:var(--ok);outline:4px solid var(--ok-ink,#1B7A46)}
+.gi-opt.no{opacity:.35}
+.gi-fb{font-size:1.3rem;font-weight:700;min-height:1.6em;margin:6px 0}
+.gi-stelle{font-size:1.4rem;letter-spacing:2px}.gi-vuote{opacity:.45}
+@media (prefers-reduced-motion:reduce){.gi-opt{transition:none}}

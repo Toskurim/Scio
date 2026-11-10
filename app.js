@@ -2,9 +2,10 @@
 /* ===== AI.st.ain v0.8.1 — app web installabile (PWA) ===== */
 /* Anti-clickjacking: AI.st.ain non si lascia incorniciare in altre pagine. */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('AI.st.ain non può essere aperto dentro un\'altra pagina.'); }
-const VERSIONE = '0.42';
+const VERSIONE = '0.43';
 const SEZ = ['riassunto', 'schema', 'mappa', 'spiegazioni', 'glossario', 'costruisci', 'pratica', 'orale'];
-const LIVELLI = ['elementari', 'media', 'superiori', 'universita'];
+const LIVELLI = ['infanzia', 'elementari', 'media', 'superiori', 'universita'];
+const GI = ['conta', 'numeri', 'dipiu', 'colori', 'forme', 'lettere', 'iniziali', 'sequenze', 'intruso'];
 const LS = 'scio.v0.3';
 const LS_V2 = 'scio.v0.2';
 const LS_VECCHIO = 'scio.v0.1';
@@ -78,7 +79,7 @@ function urlConsentito(u) {
 }
 /* ===== Dati: una famiglia, più figli ===== */
 function aiVuoto() { return { provider: 'demo', key: '', kc: '', model: '', preset: 'ollama', url: '' }; }
-function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti(), esp: null }; }
+function statoVuoto() { return { id: uid(), profilo: null, capitoli: [], esercizi: [], materie: [], rip: {}, verifiche: [], controlli: 0, premi: premiVuoti(), esp: null, giochi: {} }; }
 function famVuota() { const l = String(navigator.language || 'it').slice(0, 2).toLowerCase(); return { pin: '', ai: aiVuoto(), lingua: LINGUE[l] ? l : 'it', ultimoBackup: '', dsaAI: true }; }
 function caricaDB() {
   try {
@@ -169,7 +170,8 @@ function pulisciDati(o) {
     const ripetizioni = {};
     if (c.rip && typeof c.rip === 'object') Object.keys(c.rip).slice(0, 3000).forEach(k => { const r = c.rip[k]; if (/^[A-Za-z0-9_-]{1,40}\|\d{1,4}$/.test(k) && r && typeof r === 'object' && DATA(r.next)) ripetizioni[k] = { b: Math.max(0, Math.min(6, Math.floor(N(r.b)))), next: DATA(r.next) }; });
     const verifiche = A(c.verifiche).filter(v => v && typeof v === 'object' && DATA(v.data)).slice(0, 200).map(v => ({ id: ID(v.id), materia: Tx(v.materia, 60), data: DATA(v.data), argomento: Tx(v.argomento, 120) }));
-    return { id: ID(c.id), profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))), premi: pulisciPremi(c.premi), esp: (c.esp && METODI.includes(c.esp.m)) ? { m: c.esp.m, dal: Tx(c.esp.dal, 40), base: Math.max(0, Math.min(100, N(c.esp.base))) } : null };
+    const giochi = {}; GI.forEach(k => { const x = c.giochi && c.giochi[k]; if (x && typeof x === 'object') giochi[k] = { fatte: Math.max(0, Math.floor(N(x.fatte))), dom: Math.max(0, Math.floor(N(x.dom))), giuste: Math.max(0, Math.floor(N(x.giuste))), liv: Math.max(1, Math.min(3, Math.floor(N(x.liv)) || 1)), ult: Tx(x.ult, 40) }; });
+    return { id: ID(c.id), giochi, profilo, capitoli, esercizi, materie: L(c.materie, 60).filter(m => m.trim()), rip: ripetizioni, verifiche, controlli: Math.max(0, Math.floor(N(c.controlli))), premi: pulisciPremi(c.premi), esp: (c.esp && METODI.includes(c.esp.m)) ? { m: c.esp.m, dal: Tx(c.esp.dal, 40), base: Math.max(0, Math.min(100, N(c.esp.base))) } : null };
   });
   const fam = famVuota();
   if (p.fam && typeof p.fam === 'object' && LINGUE[p.fam.lingua]) fam.lingua = p.fam.lingua;
@@ -207,6 +209,7 @@ function applicaTema() {
 
 /* ===== Collegamento all'AI ===== */
 const TESTO_LIVELLO = {
+  infanzia: 'scuola dell\'infanzia (3-5 anni). Il bambino non sa leggere: frasi cortissime (al massimo 8 parole), parole concrete di tutti i giorni, tono affettuoso',
   elementari: 'scuola elementare (6-10 anni). ADATTA TUTTO A UN BAMBINO: frasi corte (al massimo 12 parole), parole semplici e concrete, niente gergo; ogni spiegazione al massimo 3 frasi con un esempio dalla vita di tutti i giorni; riassunto_breve di 3 frasi; nel glossario definizioni con parole da bambino; tono giocoso e incoraggiante; il test ha da 10 a 15 domande (invece di 20-30), con domande molto semplici e dirette',
   media: 'scuola media (11-13 anni)',
   superiori: 'scuola superiore (14-18 anni)',
@@ -1186,10 +1189,10 @@ function vOrale(c) {
 }
 function salvaBozzePratica(c) { V.prBozza = V.prBozza || {}; arr(c.pratica).forEach((_, i) => { const el = document.getElementById('pr' + i); if (el) V.prBozza[i] = el.value; }); }
 /* ===== v0.14: aspetto automatico per livello e DSA ===== */
-function temiPer(livello) { return livello === 'elementari' ? ['gioco'] : ['calmo', 'notte']; }
+function temiPer(livello) { return livello === 'elementari' || livello === 'infanzia' ? ['gioco'] : ['calmo', 'notte']; }
 function temaValido(p) { const ok = temiPer(p && p.livello); return p && ok.includes(p.tema) ? p.tema : ok[0]; }
 function aspettoConsigliato(livello, dsa) {
-  const d = dsa || {}, r = { tema: livello === 'elementari' ? 'gioco' : 'calmo', font: 'tema', fs: 1, lh: 1.6, ls: 0, ws: 0 };
+  const d = dsa || {}, r = { tema: livello === 'elementari' || livello === 'infanzia' ? 'gioco' : 'calmo', font: 'tema', fs: livello === 'infanzia' ? 1.15 : 1, lh: 1.6, ls: 0, ws: 0 };
   if (d.dislessia) Object.assign(r, { font: 'lexend', fs: 1.1, lh: 1.9, ls: 0.06, ws: 0.15 });
   else if (d.disortografia) Object.assign(r, { font: 'andika', fs: 1.05, lh: 1.7, ls: 0.03, ws: 0.08 });
   else if (d.discalculia) Object.assign(r, { font: 'atkinson', lh: 1.7 });
@@ -1608,6 +1611,7 @@ function cardBackup() {
 }
 function vHome() {
   const p = S.profilo; if (!p) return vScelta();
+  if (p.livello === 'infanzia') return vGiochi();
   const ultimi = S.capitoli.slice(0, 3);
   const mancanti = MATERIE.filter(m => m !== 'Altro' && !S.materie.some(x => sameM(x, m)));
   const due = ripDovute().length, ver = prossimeVerifiche(21);
@@ -1800,6 +1804,7 @@ function statisticheCorpo(f, st) {
     '<h3 style="margin-top:16px">' + t('stat_deboli') + '</h3>' + (st.deboli.length ? '<ul>' + st.deboli.map(d => '<li><b>' + esc(d.argomento) + '</b> — ' + t('stat_volte', { n: d.volte }) + (d.materie.length ? ' <span class="muted">(' + esc(d.materie.join(', ')) + ')</span>' : '') + '</li>').join('') + '</ul>' : vuoto) +
     '<h3 style="margin-top:16px">' + t('stat_ripasso') + '</h3><p>' + t('stat_rip_riga', { a: st.ripasso.totale, b: st.ripasso.dovute, c: st.ripasso.ritardo }) + '</p>' +
     '<h3 style="margin-top:16px">' + t('stat_verifiche') + '</h3>' + (st.verifiche.length ? '<ul>' + st.verifiche.map(v => '<li><b>' + esc(v.materia) + '</b>' + (v.argomento ? ' · ' + esc(v.argomento) : '') + ' — ' + esc(quando(v.giorni)) + ' <span class="muted">(' + (v.ultimoPct != null ? t('stat_ultimo_test', { p: v.ultimoPct }) : t('stat_nessun_test')) + ')</span></li>').join('') + '</ul>' : vuoto) +
+    statGiochi(f) +
     '<h3 style="margin-top:16px">' + t('stat_esercizi') + '</h3><p>' + (st.esercizi ? t('stat_es_riga', { f: st.esFiniti, n: st.esercizi, m: st.indiziMedi != null ? st.indiziMedi : '–' }) : t('stat_vuoto')) + '</p>';
 }
 function vStat() {
@@ -1834,11 +1839,11 @@ function render() {
   if (V.or && V.or.fase === 'ascolto' && !(V.vista === 'capitolo' && V.tab === 'orale' && V.cap === V.or.cap)) { V.or.fermo = true; V.or.fase = 'pronto'; try { if (V.rec) V.rec.abort(); } catch (e) { /* già fermo */ } V.rec = null; }
   if ((V.vista === 'fam' || V.vista === 'setup') && FAM.pin && !V.genitoriOk) V.vista = 'genitori';
   if (V.vista === 'genitori' && !FAM.pin) V.vista = 'fam';
-  if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'scegli-es', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
+  if (!S.profilo && ['home', 'materia', 'capitolo', 'esercizio', 'nuovo-cap', 'nuovo-es', 'scegli-es', 'gioco', 'controllo', 'aspetto', 'ripasso'].includes(V.vista)) V.vista = DB.figli.length ? 'scelta' : (FAM.pin ? 'genitori' : 'fam');
   if (!['genitori', 'fam', 'setup', 'stat', 'privacy'].includes(V.vista)) V.genitoriOk = false;
   applicaTema();
   const v = V.vista;
-  const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, 'scegli-es': vScegliEs, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
+  const M = { privacy: vPrivacy, fam: vFam, setup: vSetup, scelta: vScelta, home: vHome, 'nuovo-cap': () => vNuovo('cap'), 'nuovo-es': () => vNuovo('es'), controllo: vControllo, 'scegli-es': vScegliEs, gioco: vGioco, materia: vMateria, capitolo: vCapitolo, esercizio: vEsercizio, genitori: vGenitori, stat: vStat, aspetto: vAspetto, ripasso: vRipasso };
   document.getElementById('app').oninput = null;
   document.getElementById('app').innerHTML = (M[v] || vHome)();
   if (V.mzFit && document.querySelector('.mappa-wrap')) { V.mzFit = false; if (!V.mEdit || V.mFull) fitMappa(); }
@@ -2407,6 +2412,7 @@ function tourVistaCorrente() {
 function tourAuto() {
   if (navigator.webdriver || V.mFull || document.getElementById('tour') || document.getElementById('dsaq') || V.busy) return;
   const k = tourVistaCorrente(); if (!k) return;
+  if (k === 'home' && S.profilo && S.profilo.livello === 'infanzia') return;
   const letti = +tourLetti()[tourChiave(k)] || 0; if (letti >= FASE_TOUR) return;
   const vista = V.vista;
   setTimeout(() => { if (V.vista === vista && !V.busy && !document.getElementById('tour') && !document.getElementById('dsaq')) tourAvvia(k, { da: letti + 1, fino: FASE_TOUR }); }, 800);
@@ -2488,7 +2494,7 @@ function dsaq() {
     } else {
       const liste = DSA_Q.map(a => [a[0], livello(punti(a[0]))]), alcuni = liste.filter(x => x[1] > 0);
       h = '<h2>' + t('dsaq_risultato') + '</h2><div class="fb warn"><b>' + t('dsaq_non_diag') + '</b></div>' + liste.map(x => '<div class="card"><div class="row" style="justify-content:space-between"><b>' + t(x[0]) + '</b><span class="chip ' + (x[1] === 0 ? 'ok' : 'warn') + '">' + t('dsaq_res_' + x[1]) + '</span></div></div>').join('') +
-        '<p>' + (alcuni.length ? t('dsaq_esito_si') : t('dsaq_esito_ok')) + '</p>' + (liv === 'elementari' && alcuni.length ? '<p class="muted">' + t('dsaq_piccoli') + '</p>' : '') + '<p class="muted">' + t('dsaq_altre_cause') + '</p>' +
+        '<p>' + (alcuni.length ? t('dsaq_esito_si') : t('dsaq_esito_ok')) + '</p>' + ((liv === 'elementari' || liv === 'infanzia') && alcuni.length ? '<p class="muted">' + t('dsaq_piccoli') + '</p>' : '') + '<p class="muted">' + t('dsaq_altre_cause') + '</p>' +
         '<div class="row">' + (alcuni.length && document.querySelector('[data-dsa]') ? '<button class="btn" data-q="attiva">' + t('dsaq_attiva') + '</button>' : '') + '<button class="btn sec" data-q="chiudi">' + t('dsaq_chiudi') + '</button></div>';
       box._liste = alcuni.map(x => x[0]);
     }
@@ -2638,3 +2644,114 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' || location.h
   }).catch(() => {});
 }
 render();
+/* ===== v0.43: scuola dell'infanzia (3-5 anni) — giochi parlati, senza AI e senza costi ===== */
+const GI_ICO = { conta: '🍎', numeri: '🔢', dipiu: '⚖️', colori: '🎨', forme: '🔺', lettere: '🔤', iniziali: '🐱', sequenze: '🧩', intruso: '🔍' };
+const GI_TOT = 6;
+const GI_COLORI = [['rosso', '#E53935'], ['blu', '#1E63D6'], ['giallo', '#FFD21F'], ['verde', '#2E9E4F'], ['arancione', '#FB8C00'], ['viola', '#8E44C9'], ['rosa', '#F48FB1'], ['marrone', '#7B4B2A'], ['nero', '#1B1B1B']];
+const GI_FORME = {
+  cerchio: '<circle cx="50" cy="50" r="40"/>', quadrato: '<rect x="12" y="12" width="76" height="76" rx="4"/>', triangolo: '<path d="M50 10 92 88H8z"/>',
+  rettangolo: '<rect x="4" y="26" width="92" height="48" rx="4"/>', stella: '<path d="M50 6l13 28 31 4-23 21 6 31-27-15-27 15 6-31L6 38l31-4z"/>', cuore: '<path d="M50 88C20 64 8 48 8 32a21 21 0 0 1 42-6 21 21 0 0 1 42 6c0 16-12 32-42 56z"/>'
+};
+const GI_PAROLE = [['🐱', 'gatto', 'cat'], ['🐶', 'cane', 'dog'], ['🍎', 'mela', 'apple'], ['☀️', 'sole', 'sun'], ['🌙', 'luna', 'moon'], ['🐟', 'pesce', 'fish'], ['🏠', 'casa', 'house'], ['🌳', 'albero', 'tree'], ['🍌', 'banana', 'banana'], ['🦁', 'leone', 'lion'], ['🐸', 'rana', 'frog'], ['🍕', 'pizza', 'pizza'], ['🚂', 'treno', 'train'], ['⭐', 'stella', 'star'], ['🌸', 'fiore', 'flower'], ['🐝', 'ape', 'bee'], ['🥚', 'uovo', 'egg'], ['🐻', 'orso', 'bear'], ['🐘', 'elefante', 'elephant'], ['🍦', 'gelato', 'ice cream'], ['🐭', 'topo', 'mouse'], ['🦆', 'anatra', 'duck']];
+const GI_GRUPPI = [['🍎', '🍌', '🍇', '🍓', '🍐', '🍊'], ['🐶', '🐱', '🐭', '🐰', '🐻', '🐸'], ['🚗', '🚌', '🚲', '✈️', '🚂', '🚢'], ['👕', '👖', '🧦', '👟', '🧢', '🧤']];
+const GI_OGGETTI = ['🍎', '⭐', '🐟', '🚗', '🌸', '🐞', '🎈', '🍪'];
+function giR(n) { return Math.floor(Math.random() * n); }
+function giMesc(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = giR(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+function giAltri(tutti, giusto, n) { return giMesc(tutti.filter(x => x !== giusto)).slice(0, n); }
+function giIt() { return ((S.profilo && S.profilo.lingua) || 'it') === 'it'; }
+function giSvg(forma, colore) { return '<svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true" fill="' + colore + '" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round">' + GI_FORME[forma] + '</svg>'; }
+function giGruppo(e, n) { return '<span class="gi-gr">' + Array.from({ length: n }, () => '<span>' + e + '</span>').join('') + '</span>'; }
+function giStato(g) { S.giochi = S.giochi || {}; if (!S.giochi[g]) S.giochi[g] = { fatte: 0, dom: 0, giuste: 0, liv: 1, ult: '' }; return S.giochi[g]; }
+/* Una domanda: { dire: frase letta ad alta voce, stim: figura da guardare, opz: [{ h: contenuto, a: nome per chi non vede, ok }] } */
+function giDomanda(g, liv) {
+  const L = Math.max(1, Math.min(3, liv)) - 1; let dire = '', stim = '', opz = [];
+  const num = (n, ok) => ({ h: '<b class="gi-num">' + n + '</b>', a: String(n), ok: ok });
+  if (g === 'conta') {
+    const max = [3, 5, 10][L], n = 1 + giR(max), e = GI_OGGETTI[giR(GI_OGGETTI.length)];
+    dire = t('gi_d_conta'); stim = giGruppo(e, n);
+    opz = giMesc([n].concat(giAltri(Array.from({ length: Math.max(max, 4) }, (_, i) => i + 1), n, 2))).map(x => num(x, x === n));
+  } else if (g === 'numeri') {
+    const max = [5, 10, 20][L], n = 1 + giR(max);
+    dire = t('gi_d_numeri', { n: n }); opz = giMesc([n].concat(giAltri(Array.from({ length: max }, (_, i) => i + 1), n, L ? 3 : 2))).map(x => num(x, x === n));
+  } else if (g === 'dipiu') {
+    const max = [4, 6, 9][L], a = 1 + giR(max); let b = 1 + giR(max); while (b === a || (!L && Math.abs(a - b) < 2)) b = 1 + giR(max);
+    const piu = giR(2) === 0, e = GI_OGGETTI[giR(GI_OGGETTI.length)];
+    dire = t(piu ? 'gi_d_piu' : 'gi_d_meno'); opz = [a, b].map(x => ({ h: giGruppo(e, x), a: String(x), ok: piu ? x === Math.max(a, b) : x === Math.min(a, b) }));
+  } else if (g === 'colori') {
+    const lista = GI_COLORI.slice(0, [4, 6, 9][L]), c = lista[giR(lista.length)];
+    dire = t('gi_d_colore', { c: t('gi_c_' + c[0]) }); opz = giMesc([c].concat(giAltri(lista, c, L === 2 ? 3 : 2))).map(x => ({ h: giSvg('cerchio', x[1]), a: t('gi_c_' + x[0]), ok: x === c }));
+  } else if (g === 'forme') {
+    const lista = Object.keys(GI_FORME).slice(0, [3, 4, 6][L]), f = lista[giR(lista.length)], col = GI_COLORI[giR(6)][1];
+    dire = t('gi_d_forma', { f: t('gi_f_' + f) }); opz = giMesc([f].concat(giAltri(lista, f, L === 2 ? 3 : 2))).map(x => ({ h: giSvg(x, col), a: t('gi_f_' + x), ok: x === f }));
+  } else if (g === 'lettere') {
+    const lista = ['AEIOU', 'AEIOUMPSTLRNC', 'ABCDEFGHILMNOPQRSTUVZ'][L].split(''), l = lista[giR(lista.length)];
+    dire = t('gi_d_lettera', { l: l }); opz = giMesc([l].concat(giAltri(lista, l, L ? 3 : 2))).map(x => ({ h: '<b class="gi-num">' + x + '</b>', a: x, ok: x === l }));
+  } else if (g === 'iniziali') {
+    const p = GI_PAROLE[giR(GI_PAROLE.length)], parola = giIt() ? p[1] : p[2], l = parola[0].toUpperCase();
+    dire = t('gi_d_iniziale', { p: parola }); stim = '<span class="gi-big">' + p[0] + '</span>';
+    opz = giMesc([l].concat(giAltri('ABCDEFGHILMNOPRSTUV'.split(''), l, L ? 3 : 2))).map(x => ({ h: '<b class="gi-num">' + x + '</b>', a: x, ok: x === l }));
+  } else if (g === 'sequenze') {
+    const pal = giMesc(['🔴', '🔵', '🟡', '🟢']), mod = [[0, 1], [0, 0, 1], [0, 1, 2]][L], len = [4, 6, 6][L];
+    const seq = Array.from({ length: len + 1 }, (_, i) => pal[mod[i % mod.length]]), giusto = seq[len];
+    dire = t('gi_d_sequenza'); stim = '<span class="gi-gr">' + seq.slice(0, len).map(x => '<span>' + x + '</span>').join('') + '<span>❓</span></span>';
+    const usati = [...new Set(mod.map(m => pal[m]))]; opz = giMesc(L === 1 ? usati.concat(pal[3]) : usati).map(x => ({ h: '<span class="gi-big">' + x + '</span>', a: x, ok: x === giusto }));
+  } else {
+    const gr = giMesc(GI_GRUPPI), fuori = gr[1][giR(6)];
+    dire = t('gi_d_intruso'); opz = giMesc(giMesc(gr[0]).slice(0, [2, 3, 4][L]).map(x => ({ h: '<span class="gi-big">' + x + '</span>', a: x, ok: false })).concat([{ h: '<span class="gi-big">' + fuori + '</span>', a: fuori, ok: true }]));
+  }
+  return { dire: dire, stim: stim, opz: opz };
+}
+function giDi(testo) {
+  if (!(VN.ok && vnUsa()) && !('speechSynthesis' in window)) { if (!V.giAvv) { V.giAvv = true; toast(t('voce_non')); } return; }
+  try { parlaCb(testo, null, null, { vel: 0.85 }); } catch (e) { /* senza voce il gioco va avanti lo stesso */ }
+}
+function giNuova() { const G = V.gi; G.q = giDomanda(G.g, G.liv); G.primo = true; G.no = {}; G.fb = ''; }
+function giApri(g) {
+  if (!GI.includes(g)) return; fermaVoce();
+  V.gi = { g: g, i: 0, stelle: 0, liv: giStato(g).liv || 1, fine: false, tk: 0 }; giNuova(); V.vista = 'gioco';
+  giDi(V.gi.q.dire);
+}
+function giScelta(k) {
+  const G = V.gi; if (!G || G.fine || G.fb === 'ok') return; const o = G.q.opz[k]; if (!o || G.no[k]) return;
+  if (!o.ok) { G.no[k] = true; G.primo = false; G.fb = 'no'; giDi(t('gi_riprova')); return; }
+  G.fb = 'ok'; if (G.primo) G.stelle++; giDi(t('gi_bravo' + (1 + giR(3))));
+  const tk = ++G.tk;
+  setTimeout(() => {
+    if (V.gi !== G || tk !== G.tk || V.vista !== 'gioco') return;
+    G.i++;
+    if (G.i >= GI_TOT) {
+      G.fine = true; const st = giStato(G.g); st.fatte++; st.dom += GI_TOT; st.giuste += G.stelle; st.ult = new Date().toISOString();
+      if (G.stelle >= GI_TOT - 1) st.liv = Math.min(3, G.liv + 1); else if (G.stelle <= 2) st.liv = Math.max(1, G.liv - 1);
+      premi().xp += G.stelle; salva(); giDi(t('gi_fine_voce', { n: G.stelle }));
+    } else { giNuova(); giDi(G.q.dire); }
+    render();
+  }, 1500);
+}
+function vGiochi() {
+  const p = S.profilo;
+  return barra() + cardBackup() + '<div class="hero"><img src="icons/icon-192.png" alt="" width="64" height="64"><div><h1>' + t('ciao', { n: esc(p.nome) }) + '</h1><p class="muted">' + t('gi_scegli') + '</p></div></div>' +
+    '<div class="gi-grid">' + GI.map(g => { const st = (S.giochi || {})[g]; return '<button class="mat gi-tile" data-act="gi-apri" data-g="' + g + '"><span class="gi-ico" aria-hidden="true">' + GI_ICO[g] + '</span><b>' + t('gi_n_' + g) + '</b><span class="muted">' + (st && st.fatte ? '⭐ ' + st.giuste : '&nbsp;') + '</span></button>'; }).join('') + '</div>' +
+    '<p class="muted" style="text-align:center">' + t('gi_nota_adulto') + '</p>';
+}
+function vGioco() {
+  const G = V.gi; if (!G || !S.profilo) return vHome();
+  const testa = '<div class="row" style="justify-content:space-between;margin-bottom:10px"><button class="btn sec" data-act="gi-esci">‹ ' + t('gi_altri') + '</button><span class="gi-stelle" aria-label="' + esc(t('gi_stelle_n', { n: G.stelle })) + '">' + '⭐'.repeat(G.stelle) + '<span class="gi-vuote">' + '☆'.repeat(Math.max(0, GI_TOT - G.stelle)) + '</span></span></div>';
+  if (G.fine) return barra() + testa + '<div class="card gi-card"><div class="gi-big" aria-hidden="true">🎉</div><h1>' + t('gi_fine', { n: G.stelle }) + '</h1><div class="row" style="justify-content:center"><button class="btn" data-act="gi-apri" data-g="' + G.g + '">' + t('gi_ancora') + '</button><button class="btn sec" data-act="gi-esci">' + t('gi_altri') + '</button></div></div>';
+  const q = G.q;
+  return barra() + testa + '<div class="card gi-card"><div class="row" style="justify-content:center;flex-wrap:nowrap;align-items:center"><h1 class="gi-dire">' + esc(q.dire) + '</h1><button class="btn sec gi-voce" data-act="gi-ridi" aria-label="' + esc(t('gi_riascolta')) + '">🔊</button></div>' +
+    (q.stim ? '<div class="gi-stim" aria-hidden="' + (G.g === 'conta' ? 'false' : 'true') + '">' + q.stim + '</div>' : '') +
+    '<div class="gi-opz">' + q.opz.map((o, k) => '<button class="gi-opt' + (G.fb === 'ok' && o.ok ? ' giusta' : '') + (G.no[k] ? ' no' : '') + '" data-act="gi-scelta" data-i="' + k + '" aria-label="' + esc(o.a) + '"' + (G.no[k] || G.fb === 'ok' ? ' disabled' : '') + '>' + o.h + '</button>').join('') + '</div>' +
+    '<p class="gi-fb" role="status">' + (G.fb === 'ok' ? '✓ ' + t('gi_bravo1') : G.fb === 'no' ? t('gi_riprova') : '&nbsp;') + '</p><p class="muted" style="text-align:center">' + (G.i + 1) + ' / ' + GI_TOT + '</p></div>';
+}
+function statGiochi(f) {
+  const gs = f.giochi || {}, righe = GI.filter(g => gs[g] && gs[g].fatte);
+  if (!righe.length) return f.profilo && f.profilo.livello === 'infanzia' ? '<h3 style="margin-top:16px">' + t('gi_stat') + '</h3><p>' + t('stat_vuoto') + '</p>' : '';
+  return '<h3 style="margin-top:16px">' + t('gi_stat') + '</h3><div class="st-scroll" tabindex="0" role="region" aria-label="' + esc(t('gi_stat')) + '"><table class="st-tab"><thead><tr><th>' + t('gi_stat_gioco') + '</th><th>' + t('gi_stat_partite') + '</th><th>' + t('gi_stat_primo') + '</th><th>' + t('gi_stat_liv') + '</th></tr></thead><tbody>' +
+    righe.map(g => '<tr><td>' + GI_ICO[g] + ' ' + t('gi_n_' + g) + '</td><td>' + gs[g].fatte + '</td><td>' + Math.round(100 * gs[g].giuste / Math.max(1, gs[g].dom)) + '%</td><td>' + gs[g].liv + ' / 3</td></tr>').join('') + '</tbody></table></div><p class="muted">' + t('gi_stat_nota') + '</p>';
+}
+Object.assign(AZ, {
+  'gi-apri': el => { giApri(el.dataset.g); },
+  'gi-scelta': el => { giScelta(+el.dataset.i); },
+  'gi-ridi': () => { if (V.gi && V.gi.q) giDi(V.gi.q.dire); return 'async'; },
+  'gi-esci': () => { fermaVoce(); V.gi = null; V.vista = 'home'; }
+});

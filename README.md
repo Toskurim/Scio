@@ -1,4 +1,4 @@
-# AI.st.ain v0.42 — app di studio installabile (PWA)
+# AI.st.ain v0.43 — app di studio installabile (PWA)
 
 **AI.st.ain** = *Aiuto Intelligente per lo STudio, l'Autonomia e l'INclusione* (un omaggio, nel nome, ad Albert Einstein).
 Prima si chiamava Scio: il repository e l'indirizzo restano gli stessi e i dati già salvati si ritrovano.
@@ -10,6 +10,11 @@ Nessun server, nessun account, nessun tracciamento: **i dati restano sul disposi
 Indirizzo dell'app: https://toskurim.github.io/Scio/ (attenzione: la S di AI.st.ain è maiuscola).
 
 - Pagina di presentazione pubblica: `presentazione.html` (https://toskurim.github.io/Scio/presentazione.html), da mandare a chi vuole conoscere l'app.
+
+## Novità della v0.43
+- Nuovo livello «Scuola dell'infanzia (3-5)»: al posto di materie e capitoli il bambino trova 9 giochi parlati (contare, numeri, di più/di meno, colori, forme, lettere, lettera iniziale, sequenze, intruso). Non usano l'AI, non costano niente e funzionano senza rete.
+- Pulsanti grandi, domanda letta ad alta voce (🔊 per riascoltarla), nessuna punizione per l'errore: si riprova. La difficoltà (3 livelli) sale e scende da sola.
+- Nelle statistiche dei genitori compare la tabella dei giochi (partite, giuste al primo colpo, difficoltà).
 
 ## Novità della v0.42
 - Corretto: il numero dell'esercizio e il pulsante «Prossimo» sparivano dopo aver chiuso e riaperto l'app.

@@ -462,6 +462,38 @@ DE('badge_oratore', 'Oratore', 'Speaker'); DE('badge_oratore_d', 'Interrogazione
 
 /* ricerca testo: lingua corrente */
 let LINGUA_CORRENTE = 'it';
+/* v0.43: scuola dell'infanzia */
+D('infanzia', 'Scuola dell’infanzia (3–5)', 'Preschool (3–5)', 'Kindergarten (3–5)', 'École maternelle (3–5)', 'Educación infantil (3–5)', 'Grădiniță (3–5)', 'Kopshti (3–5)', 'رياض الأطفال (3–5)', '幼儿园(3–5 岁)');
+DE('gi_scegli', 'Scegli un gioco!', 'Pick a game!');
+DE('gi_nota_adulto', 'I giochi parlano: alza il volume. Non usano l’AI e non costano niente.', 'The games talk: turn the volume up. They do not use AI and cost nothing.');
+DE('gi_n_conta', 'Conta', 'Count'); DE('gi_n_numeri', 'I numeri', 'Numbers'); DE('gi_n_dipiu', 'Di più, di meno', 'More or fewer');
+DE('gi_n_colori', 'I colori', 'Colours'); DE('gi_n_forme', 'Le forme', 'Shapes'); DE('gi_n_lettere', 'Le lettere', 'Letters');
+DE('gi_n_iniziali', 'Come comincia?', 'First letter'); DE('gi_n_sequenze', 'Cosa viene dopo?', 'What comes next?'); DE('gi_n_intruso', 'Trova l’intruso', 'Odd one out');
+DE('gi_d_conta', 'Quanti sono?', 'How many are there?');
+DE('gi_d_numeri', 'Tocca il numero {n}', 'Tap the number {n}');
+DE('gi_d_piu', 'Dove ce ne sono di più?', 'Where are there more?');
+DE('gi_d_meno', 'Dove ce ne sono di meno?', 'Where are there fewer?');
+DE('gi_d_colore', 'Tocca il colore {c}', 'Tap the colour {c}');
+DE('gi_d_forma', 'Tocca {f}', 'Tap {f}');
+DE('gi_d_lettera', 'Tocca la lettera {l}', 'Tap the letter {l}');
+DE('gi_d_iniziale', 'Con quale lettera comincia {p}?', 'Which letter does {p} start with?');
+DE('gi_d_sequenza', 'Cosa viene dopo?', 'What comes next?');
+DE('gi_d_intruso', 'Qual è l’intruso?', 'Which one does not belong?');
+DE('gi_c_rosso', 'rosso', 'red'); DE('gi_c_blu', 'blu', 'blue'); DE('gi_c_giallo', 'giallo', 'yellow'); DE('gi_c_verde', 'verde', 'green'); DE('gi_c_arancione', 'arancione', 'orange');
+DE('gi_c_viola', 'viola', 'purple'); DE('gi_c_rosa', 'rosa', 'pink'); DE('gi_c_marrone', 'marrone', 'brown'); DE('gi_c_nero', 'nero', 'black');
+DE('gi_f_cerchio', 'il cerchio', 'the circle'); DE('gi_f_quadrato', 'il quadrato', 'the square'); DE('gi_f_triangolo', 'il triangolo', 'the triangle');
+DE('gi_f_rettangolo', 'il rettangolo', 'the rectangle'); DE('gi_f_stella', 'la stella', 'the star'); DE('gi_f_cuore', 'il cuore', 'the heart');
+DE('gi_bravo1', 'Giusto!', 'Correct!'); DE('gi_bravo2', 'Esatto, che bello!', 'Yes, well done!'); DE('gi_bravo3', 'Sì! Ottimo lavoro!', 'Yes! Great job!');
+DE('gi_riprova', 'Riprova!', 'Try again!');
+DE('gi_fine', 'Hai finito! Stelle: {n}', 'All done! Stars: {n}');
+DE('gi_fine_voce', 'Hai finito! Hai preso {n} stelle.', 'All done! You got {n} stars.');
+DE('gi_ancora', 'Ancora', 'Again'); DE('gi_altri', 'Altri giochi', 'Other games');
+DE('gi_riascolta', 'Riascolta la domanda', 'Hear the question again');
+DE('gi_stelle_n', 'Stelle: {n}', 'Stars: {n}');
+DE('gi_stat', 'Giochi (scuola dell’infanzia)', 'Games (preschool)');
+DE('gi_stat_gioco', 'Gioco', 'Game'); DE('gi_stat_partite', 'Partite', 'Rounds'); DE('gi_stat_primo', 'Giuste al primo colpo', 'Right first time'); DE('gi_stat_liv', 'Difficoltà', 'Difficulty');
+DE('gi_stat_nota', 'La difficoltà sale da sola quando il bambino sbaglia poco e scende se fa fatica.', 'Difficulty goes up by itself when the child makes few mistakes and down when it is hard.');
+
 function t(k, v) {
   let s = (I18N[LINGUA_CORRENTE] && I18N[LINGUA_CORRENTE][k]) || I18N.it[k] || k;
   if (v) Object.keys(v).forEach(x => { s = s.split('{' + x + '}').join(v[x]); });
